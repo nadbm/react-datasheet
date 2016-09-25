@@ -11,7 +11,7 @@ import React from 'react';
 import ReactDataSheet from 'react-datasheet';
 
 // include styles
-import 'react-datasheet/dist/rdatasheet.css';
+import 'react-datasheet/dist/react-datasheet.css';
 
 class App extends React.Component {
 
