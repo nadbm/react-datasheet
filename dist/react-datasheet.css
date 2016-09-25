@@ -1,0 +1,41 @@
+	table.data-grid {
+		table-layout: fixed;
+
+	}	
+	table.data-grid, table.data-grid th, table.data-grid td {
+	   border: 1px solid black;
+	}
+
+
+	table.data-grid td.cell input {
+		width:100%;
+		border: 0;
+		padding-right:2px;
+		text-align:right;
+	}
+
+	table.data-grid td.cell.updated {
+	    background-color: rgba(0, 145, 253, 0.16);
+	    transition : background-color 0ms ease ;
+	}
+	table.data-grid td.cell {
+		user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+
+      	cursor: cell;
+	    background-color: none;
+	    transition : background-color 500ms ease ;
+	    vertical-align: middle;
+	    text-align: right;
+	    border: 1px solid #DDD;
+	    
+
+	}
+	table.data-grid td.cell.selected {
+      border: 1px solid rgb(33, 133, 208);
+       border-style:double;
+      transition: none;
+      box-shadow: inset -200px 1px 0px rgba(33, 133, 208, 0.15)
+    }
