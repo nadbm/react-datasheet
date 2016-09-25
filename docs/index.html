@@ -4,14 +4,21 @@
     <meta charset="UTF-8">
     <title>React-datasheet by nadbm</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     
     <link rel="stylesheet" type="text/css" href="stylesheet.css" media="screen">
     <style type="text/css">
-      table {
-        display: 'table' !important;
+      table.data-grid {
         width:100%;
+        border-collapse: collapse;
+        box-shadow: 0px 0px 0px 10px rgba(204, 204, 204, 0.1);
+      }
+      table.data-grid input {
+        width: 100%;
+        font-size: 14px;
+      }
+      table.data-grid td {
+        padding: 2px 10px;
       }
     </style>
   </head>
