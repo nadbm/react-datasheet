@@ -250,7 +250,8 @@ export default class ReactDataSheet extends Component {
     (!cell.readOnly) ? this.setState({editing: {i:i, j:j}}) : null;
   }
   onMouseDown(i, j) {
-    let editing = isEmpty(this.state.editing) ? {} : this.state.editing;
+    let editing = (isEmpty(this.state.editing) || this.state.editing.i !== i || this.state.editing.j == j) ? {} : this.state.editing;
+   
     this.setState({selecting: true, start:{i, j}, end:{i, j}, editing:editing});
 
 

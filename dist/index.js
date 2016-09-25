@@ -405,7 +405,8 @@
     }, {
       key: 'onMouseDown',
       value: function onMouseDown(i, j) {
-        var editing = isEmpty(this.state.editing) ? {} : this.state.editing;
+        var editing = isEmpty(this.state.editing) || this.state.editing.i !== i || this.state.editing.j == j ? {} : this.state.editing;
+
         this.setState({ selecting: true, start: { i: i, j: j }, end: { i: i, j: j }, editing: editing });
 
         document.addEventListener('mouseup', this.onMouseUp);

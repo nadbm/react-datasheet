@@ -1,9 +1,22 @@
 # React DataSheet 
 
+A simple react component to create a spreadsheet.
+
+## Current features
+1. Select cells, copy-paste cells
+2. Navigation using keyboard keys
+3. Deletion using keyboard keys 
+4. Callbacks for onChange, valueRenderer(visible data), dataRenderer(underlying data in the input, takes the value by default)
+    * more examples to come soon! 
+
 ## Installation    
 React 15
 
     npm install react-datasheet --save
+
+## Demo
+    
+    [https://nadbm.github.io/react-datasheet/](https://nadbm.github.io/react-datasheet/)
 
 ## Usage
 ``` javascript
