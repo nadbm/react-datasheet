@@ -167,7 +167,7 @@ export default class ReactDataSheet extends Component {
     }
     else if (e.keyCode === TAB_KEY) {
       newLocation = { i : start.i, j: start.j + 1}
-      newLocation = data[newLocation.i][newLocation.j] ? newLocation : { i : start.i + 1, j: 0}
+      newLocation = typeof(data[newLocation.i][newLocation.j]) !== "undefined" ? newLocation : { i : start.i + 1, j: 0}
     }
     else if (e.keyCode === RIGHT_KEY) {
       newLocation = { i : start.i, j: start.j + 1}
@@ -182,7 +182,7 @@ export default class ReactDataSheet extends Component {
       newLocation = { i : start.i  + 1, j: start.j}
     }
     
-    if(newLocation && data[newLocation.i] && data[newLocation.i][newLocation.j]) {
+    if(newLocation && data[newLocation.i] && typeof(data[newLocation.i][newLocation.j]) !== "undefined") {
       this.setState({end:newLocation, start: newLocation, editing: {}});
     }
     if(newLocation) { 
@@ -241,7 +241,7 @@ export default class ReactDataSheet extends Component {
       let startCell = data[start.i][start.j];
       //empty out cell if user starts typing without pressing enter
       if(e.keyCode !== ENTER_KEY && !isEditing) this.onChange(start.i, start.j, "");
-      if(startCell && !startCell.readOnly) this.setState({editing: start});
+      if((typeof(startCell) !== "undefined") && !startCell.readOnly) this.setState({editing: start});
     }
   }
 
