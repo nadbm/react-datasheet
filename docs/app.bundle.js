@@ -16042,7 +16042,8 @@
 	  if (x === y) {
 	    // Steps 1-5, 7-10
 	    // Steps 6.b-6.e: +0 != -0
-	    return x !== 0 || 1 / x === 1 / y;
+	    // Added the nonzero y check to make Flow happy, but it is redundant
+	    return x !== 0 || y !== 0 || 1 / x === 1 / y;
 	  } else {
 	    // Step 6.a: NaN == NaN
 	    return x !== x && y !== y;
@@ -21482,8 +21483,8 @@
 	var range = function range(start, end) {
 	  var array = [];
 	  var inc = end - start > 0;
-	  for (var i = start; inc ? i < end : i > end; inc ? i++ : i--) {
-	    array.push(i);
+	  for (var i = start; inc ? i <= end : i >= end; inc ? i++ : i--) {
+	    inc ? array.push(i) : array.unshift(i);
 	  }
 	  return array;
 	};
@@ -21521,7 +21522,7 @@
 	      }
 	      if (prevProps.editing === false && this.props.editing === true) {
 	        this._input.focus();
-	        this._input.value = this.props.data;
+	        this._input.value = this.props.data == null ? this.props.value : this.props.data;
 	      }
 	    }
 	  }, {
@@ -21551,7 +21552,7 @@
 	      return _react2.default.createElement(
 	        'td',
 	        {
-	          className: className + ' cell ' + (selected ? 'selected' : '') + ' ' + (this.state.updated ? 'updated' : ''),
+	          className: className + " cell " + (selected ? 'selected' : '') + " " + (this.state.updated ? 'updated' : ''),
 	          onMouseDown: function onMouseDown() {
 	            return _onMouseDown(row, col);
 	          },
@@ -21653,23 +21654,41 @@
 	  }, {
 	    key: 'handleCopy',
 	    value: function handleCopy(e) {
-	      var _this5 = this;
+	      var _props2 = this.props;
+	      var dataRenderer = _props2.dataRenderer;
+	      var valueRenderer = _props2.valueRenderer;
+	      var data = _props2.data;
 
-	      var cellConverter = this.props.dataRenderer ? this.props.dataRenderer : this.props.valueRenderer;
-	      if (!isEmpty(this.state.start)) {
-	        var text = range(this.state.start.i, this.state.end.i + 1).map(function (j) {
-	          return _this5.props.data.slice(0)[j].slice(_this5.state.start.j, _this5.state.end.j + 1).map(function (cell) {
-	            return cellConverter(cell);
-	          }).join('\t');
-	        }).join('\n');
-	        e.preventDefault();
-	        e.clipboardData.setData('text/plain', text);
+
+	      if (dataRenderer) {
+	        valueRenderer = dataRenderer;
 	      }
+	      if (isEmpty(this.state.start)) {
+	        return false;
+	      }
+	      var _state = this.state;
+	      var start = _state.start;
+	      var end = _state.end;
+
+	      var text = range(start.i, end.i).map(function (i) {
+	        return range(start.j, end.j).map(function (j) {
+	          return data[i][j];
+	        }).map(function (cell) {
+	          var value = dataRenderer ? dataRenderer(cell) : null;
+	          if (value === "" || value === null || typeof value === "undefined") {
+	            return valueRenderer(cell);
+	          } else {
+	            return value;
+	          }
+	        }).join('\t');
+	      }).join('\n');
+	      e.preventDefault();
+	      e.clipboardData.setData('text/plain', text);
 	    }
 	  }, {
 	    key: 'handlePaste',
 	    value: function handlePaste(e) {
-	      var _this6 = this;
+	      var _this5 = this;
 
 	      var pasteData = e.clipboardData.getData('text/plain').split('\n').map(function (row) {
 	        return row.split('\t');
@@ -21677,11 +21696,11 @@
 	      var map = new Map();
 	      this.props.data.map(function (row, i) {
 	        return row.map(function (cell, j) {
-	          var start = _this6.state.start;
+	          var start = _this5.state.start;
 	          var cellData = pasteData[i - start.i] && pasteData[i - start.i][j - start.j];
 
 	          if (!cell.readOnly && typeof cellData !== "undefined") {
-	            _this6.props.onPaste ? map.set(cell, cellData) : _this6.onChange(i, j, cellData);
+	            _this5.props.onPaste ? map.set(cell, cellData) : _this5.onChange(i, j, cellData);
 	          }
 	        });
 	      });
@@ -21695,9 +21714,9 @@
 	    key: 'handleKeyboardCellMovement',
 	    value: function handleKeyboardCellMovement(e) {
 	      var newLocation = null;
-	      var _state = this.state;
-	      var start = _state.start;
-	      var editing = _state.editing;
+	      var _state2 = this.state;
+	      var start = _state2.start;
+	      var editing = _state2.editing;
 	      var data = this.props.data;
 
 
@@ -21729,8 +21748,8 @@
 	    key: 'getSelectedCells',
 	    value: function getSelectedCells(data, start, end) {
 	      var selected = [];
-	      range(start.i, end.i + 1).map(function (i) {
-	        range(start.j, end.j + 1).map(function (j) {
+	      range(start.i, end.i).map(function (i) {
+	        range(start.j, end.j).map(function (j) {
 	          selected.push({ cell: data[i][j], i: i, j: j });
 	        });
 	      });
@@ -21746,7 +21765,7 @@
 	  }, {
 	    key: 'handleKey',
 	    value: function handleKey(e) {
-	      var _this7 = this;
+	      var _this6 = this;
 
 	      if (isEmpty(this.state.start) || this.state.cmdDown) {
 	        return true;
@@ -21759,22 +21778,22 @@
 	        return true;
 	      };
 
-	      var _state2 = this.state;
-	      var start = _state2.start;
-	      var end = _state2.end;
+	      var _state3 = this.state;
+	      var start = _state3.start;
+	      var end = _state3.end;
 
 	      var data = this.props.data;
 	      var isEditing = !isEmpty(this.state.editing);
 
 	      if ((e.keyCode === DELETE_KEY || e.keyCode === BACKSPACE_KEY) && !isEditing) {
-	        //CASE when user presses delete
-	        console.log(this.getSelectedCells(data, start, end));
 	        this.getSelectedCells(data, start, end).map(function (_ref) {
 	          var cell = _ref.cell;
 	          var i = _ref.i;
 	          var j = _ref.j;
 
-	          _this7.onChange(i, j, "");
+	          if (!cell.readOnly) {
+	            _this6.onChange(i, j, "");
+	          }
 	        });
 	        e.preventDefault();
 	      } else if (e.keyCode === ENTER_KEY && isEditing) {
@@ -21823,24 +21842,26 @@
 	    key: 'onChange',
 	    value: function onChange(i, j, val) {
 	      var cell = this.props.data[i][j];
-	      this.props.onChange(cell, i, j, val);
-	      this.setState({ editing: {} });
+	      if (!cell.readOnly) {
+	        this.props.onChange(cell, i, j, val);
+	        this.setState({ editing: {} });
+	      }
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this8 = this;
+	      var _this7 = this;
 
-	      var _props2 = this.props;
-	      var keyFunction = _props2.keyFunction;
-	      var dataRenderer = _props2.dataRenderer;
-	      var valueRenderer = _props2.valueRenderer;
-	      var className = _props2.className;
+	      var _props3 = this.props;
+	      var keyFunction = _props3.keyFunction;
+	      var dataRenderer = _props3.dataRenderer;
+	      var valueRenderer = _props3.valueRenderer;
+	      var className = _props3.className;
 
 
 	      var isSelected = function isSelected(i, j) {
-	        var start = _this8.state.start;
-	        var end = _this8.state.end;
+	        var start = _this7.state.start;
+	        var end = _this7.state.end;
 	        var pos_x = j >= start.j && j <= end.j;
 	        var neg_x = j <= start.j && j >= end.j;
 	        var pos_y = i >= start.i && i <= end.i;
@@ -21850,13 +21871,13 @@
 	      };
 
 	      var isEditing = function isEditing(i, j) {
-	        return _this8.state.editing.i === i && _this8.state.editing.j == j;
+	        return _this7.state.editing.i === i && _this7.state.editing.j == j;
 	      };
 
 	      return _react2.default.createElement(
 	        'table',
 	        { ref: function ref(r) {
-	            return _this8.area = r;
+	            return _this7.area = r;
 	          }, className: 'data-grid ' + (className ? className : '') },
 	        _react2.default.createElement(
 	          'tbody',
@@ -21871,17 +21892,17 @@
 	                  className: cell.className ? cell.className : '',
 	                  row: i,
 	                  col: j,
-	                  onMouseDown: _this8.onMouseDown,
-	                  onDoubleClick: _this8.onDoubleClick,
-	                  onMouseOver: _this8.onMouseOver,
+	                  onMouseDown: _this7.onMouseDown,
+	                  onDoubleClick: _this7.onDoubleClick,
+	                  onMouseOver: _this7.onMouseOver,
 
 	                  value: valueRenderer(cell),
-	                  data: dataRenderer ? dataRenderer(cell) : valueRenderer(cell),
+	                  data: dataRenderer ? dataRenderer(cell) : null,
 	                  selected: isSelected(i, j),
 	                  editing: isEditing(i, j),
 	                  colSpan: cell.colSpan,
 	                  rowSpan: cell.rowSpan,
-	                  onChange: _this8.onChange
+	                  onChange: _this7.onChange
 	                });
 	              })
 	            );
@@ -21904,8 +21925,9 @@
 	exports.default = ReactDataSheet;
 	ReactDataSheet.propTypes = {
 	  data: _react.PropTypes.array.isRequired, // Array of objects, number
-	  onChange: _react.PropTypes.func, // Fn to handle any change
-	  valueRenderer: _react.PropTypes.func.isRequired, // Fn to render data from provided data celss
+	  className: _react.PropTypes.string, // (Optional) Extra class to be added
+	  onChange: _react.PropTypes.func, // (Optional) Fn to handle any change
+	  valueRenderer: _react.PropTypes.func.isRequired, // (Optional) Fn to render data from provided data celss
 	  dataRenderer: _react.PropTypes.func };
 
 /***/ },
@@ -25914,8 +25936,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../examples/node_modules/css-loader/index.js!./react-datasheet.css", function() {
-				var newContent = require("!!./../examples/node_modules/css-loader/index.js!./react-datasheet.css");
+			module.hot.accept("!!./../docs/node_modules/css-loader/index.js!./react-datasheet.css", function() {
+				var newContent = require("!!./../docs/node_modules/css-loader/index.js!./react-datasheet.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
