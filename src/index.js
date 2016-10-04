@@ -255,6 +255,12 @@ export default class ReactDataSheet extends Component {
              [186,187,189, 190, 107,109, 110, ENTER_KEY].indexOf(e.keyCode) > -1) {
       
       let startCell = data[start.i][start.j];
+
+      // return if cell is readOnly
+      if (startCell.readOnly) {
+        return true;
+      }
+
       //empty out cell if user starts typing without pressing enter
       if(e.keyCode !== ENTER_KEY && !isEditing) this.onChange(start.i, start.j, "");
       if((typeof(startCell) !== "undefined") && !startCell.readOnly) this.setState({editing: start});
