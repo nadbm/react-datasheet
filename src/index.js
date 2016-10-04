@@ -42,6 +42,7 @@ class DataCell extends Component {
     if(prevProps.editing === false && this.props.editing === true) {
       this._input.focus();
       this._input.value = this.props.data == null ? this.props.value : this.props.data;
+      this._input.select();
     }
   }
 
