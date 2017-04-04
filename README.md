@@ -25,9 +25,9 @@ $ npm install react-datasheet --save
 Import in your project
 
 ```javascript
-import Datasheet from 'react-datasheet';
+import ReactDataSheet from 'react-datasheet';
 // Be sure to include styles at some point, probably during your bootstrapping
-import 'react-datasheet/dist/react-datasheet.css';
+import 'react-datasheet/lib/react-datasheet.css';
 ```
 
 ## Usage
