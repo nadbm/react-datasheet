@@ -1,0 +1,140 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.equation.cell {
+  position: relative;
+}
+.error.cell {
+  background: rgba(255,0,0,0.14);
+  font-size: 0.8em;
+  color: red;
+}
+.error.cell > div.text {
+  text-align: center;
+}
+.equation.cell:before {
+  content: '';
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-style: solid;
+  border-width: 6px 6px 0 0;
+  border-color: #2185d0 transparent transparent transparent;
+  z-index: 2;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.container {
+  width: 600px;
+  margin: auto;
+}
+table.data-grid {
+  margin: auto;
+  width: 100%;
+}
+.Select-control, .Select-input, .Select-placeholder,.Select-clear, .Select-placeholder, .Select--single > .Select-control .Select-value {
+  height: 15px;
+  line-height: 12px;
+  font-size: 12px;
+  text-align: left;
+  border-radius: 0;
+  border: 0;
+}
+
+.Select-control input{
+  height: 16px;
+  font-size: 12px;
+  padding: 0;
+}
+.sheet-container {
+  display: block;
+  padding: 5px;
+  box-shadow: 0px 0px 2px #CCC;
+  margin: auto;
+  width: 500px;
+  margin-top: 20px;
+  transition: box-shadow 0.2s ease-in;
+}
+.sheet-container:hover {
+  transition: box-shadow 0.5s ease-in;
+  box-shadow: 2px 4px 6px #CCC; 
+}
+.sheet-container table.data-grid tr td.cell:not(.selected){
+  border: 1px solid #ececec;
+}
+.sheet-container table.data-grid tr td.cell{
+  font-size: 12px;
+}
+div.divider {
+  margin: 40px 0px;
+  height: 1px;
+  width: 100%;
+  background-color: #EEE;
+}
+pre {
+      display: inline-block;
+    background: #333;
+    padding: 10px 30px;
+    border-left: 2px solid white;
+}
+.header {
+  text-align: center;
+  padding: 50px 0px;
+  background: #e63946;
+  color: #EEE;
+  margin-bottom: 50px;
+}
+.footer-container a {
+  color: white;
+}
+.footer-container {
+  margin-top: 50px;
+  text-align: center;
+    padding: 50px 0px;
+    background: #e63946;
+    color: #EEE;
+}
+.add-grocery {
+  text-align: left;
+  padding: 5px 10px;
+  color: #888;
+}
+.add-button {
+  float: right;
+    border-radius: 0;
+    background: #CCC;
+    border-radius: 2px;
+    padding: 2px 20px;
+    background: #e63946;
+    color: white;
+    cursor: pointer;
+    font-size: 9px;
+}
+.add-button:hover {
+  background: #f17d86;
+}

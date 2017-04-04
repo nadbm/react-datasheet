@@ -1,25 +1,21 @@
 {
-  "name": "webpack-starter",
-  "version": "1.0.0",
-  "description": "React Data-sheet test",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "./node_modules/.bin/webpack-dev-server --content-base src --inline --hot"
-  },
+  "name": "react-datasheet",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "http://nadbm.github.io/react-datasheet",
   "devDependencies": {
-    "babel-core": "^6.10.4",
-    "babel-loader": "^6.2.4",
-    "babel-preset-es2015": "^6.14.0",
-    "webpack": "^1.13.1"
+    "react-scripts": "0.9.5"
   },
   "dependencies": {
-    "babel-polyfill": "^6.9.1",
-    "css-loader": "^0.25.0",
-    "react": "^15.3.2",
-    "react-dom": "^15.3.2",
-    "style-loader": "^0.13.1"
+    "mathjs": "^3.10.0",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-select": "^1.0.0-rc.3"
   },
-  "author": "",
-  "license": "ISC"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
 }
