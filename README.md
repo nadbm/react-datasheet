@@ -1,4 +1,4 @@
-# React-Select
+# React-Datasheet
 A simple react component to create a spreadsheet. 
 https://nadbm.github.io/react-datasheet/
 
