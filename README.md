@@ -1,6 +1,11 @@
-# React-Select
+
+[![Build Status](https://travis-ci.org/nadbm/react-datasheet.svg?branch=master)](https://travis-ci.org/nadbm/react-datasheet)
+[![Coverage Status](https://coveralls.io/repos/github/nadbm/react-datasheet/badge.svg)](https://coveralls.io/github/nadbm/react-datasheet) 
+# React-Datasheet
 A simple react component to create a spreadsheet. 
-https://nadbm.github.io/react-datasheet/
+Demo here: https://nadbm.github.io/react-datasheet/
+Examples are located in 
+
 
 Current features
 
@@ -20,7 +25,7 @@ $ npm install react-datasheet --save
 Import in your project
 
 ```javascript
-import Datasheet from 'react-select';
+import Datasheet from 'react-datasheet';
 // Be sure to include styles at some point, probably during your bootstrapping
 import 'react-datasheet/dist/react-datasheet.css';
 ```
