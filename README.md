@@ -37,7 +37,7 @@ React-Datasheet generates a table with the cells. Double-clicking or typing edit
 The data provided should be an array of rows, and each row should include the cells.
 
 ### Basic Usage
-```javascript
+```jsx
 class App extends React.Component {
   constructor (props) {
     super(props)
@@ -72,9 +72,7 @@ class App extends React.Component {
 
 There are two values that each cell shows. The first is via ```valueRenderer``` and the second is via ```dataRenderer```. When a cell is in *edit mode*, it will show the value returned from ```dataRenderer```. It needs to return a string as this value is set in an input field.
 
-```javascript 
-
-
+```jsx 
   const grid = [
      [{value:  5, expr: '1 + 4'}, {value:  6, expr: '6'}],
      [{value:  5, expr: '1 + 4'}, {value:  5, expr: '1 + 4'}]
@@ -93,8 +91,7 @@ There are two values that each cell shows. The first is via ```valueRenderer``` 
 
 ### Cells with underlying component
 
-```javascript 
-
+```jsx 
   const grid = [
      [{
       value:  5, 
