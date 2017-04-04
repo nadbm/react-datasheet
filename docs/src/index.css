@@ -138,3 +138,14 @@ pre {
 .add-button:hover {
   background: #f17d86;
 }
+.github-link {
+  display: block;
+  width: 200px;
+  font-size: 12px;
+  text-decoration: none;
+  margin: auto;
+  color: white;
+}
+.github-link:hover {
+  color: #DDD;
+}
