@@ -21,7 +21,7 @@ export default class ComponentCell extends PureComponent {
   }
 
   render() {
-    let {row, col, readOnly, forceComponent, rowSpan, colSpan, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick} = this.props;
+    let {row, col, readOnly, forceComponent, rowSpan, colSpan, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu} = this.props;
 
 
     return <td ref = {(ref) => this._container = ref}
@@ -33,6 +33,7 @@ export default class ComponentCell extends PureComponent {
               onMouseDown={()=> onMouseDown(row,col)}
               onDoubleClick={()=> onDoubleClick(row,col)}
               onMouseOver={()=> onMouseOver(row,col)}
+              onContextMenu={(e) => onContextMenu(e,row,col)}
               colSpan={colSpan || 1}
               rowSpan={rowSpan || 1}>
               { ((editing && !readOnly) || forceComponent) ? this.props.component : value }
@@ -51,6 +52,7 @@ ComponentCell.propTypes = {
   onMouseDown: PropTypes.func.isRequired,
   onDoubleClick: PropTypes.func.isRequired,
   onMouseOver: PropTypes.func.isRequired,
+  onContextMenu: PropTypes.func.isRequired,
   updated: PropTypes.bool,
   forceComponent: PropTypes.bool
 }
