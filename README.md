@@ -114,6 +114,7 @@ data | Array | Array of rows and each row should contain the cell objects to dis
 valueRenderer | func | Method to render the value of the cell `function(cell)`. This is visible by default
 dataRenderer | func | Method to render the underlying value of the cell `function(cell)`. This data is visible once in edit mode.
 onChange | func | onChange handler: `function(cell, i, j, newValue) {}`
+onPaste | func | onPaste handler: `function(array) {}` If set, the function will be called with an array of rows. Each row has an array of objects containing the cell and raw pasted value. If the pasted value cannot be matched with a cell, the cell value will be undefined
 
 ## Cell Options
 
