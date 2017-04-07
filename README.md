@@ -125,6 +125,6 @@ readOnly | Bool | false | Cell will never go in edit mode
 key | String | undefined | By default, each cell is given the key of col number and row number. This would override that key
 className | String | undefined | Additional class names for cells.
 component | ReactElement | undefined | Insert a react element or JSX to this field. This will render on edit mode
-forceComponent | bool | false | Renders whats in component at all times, even when not in edit mode
+forceComponent | bool | false | Renders what's in component at all times, even when not in edit mode
 colSpan | number | 1 | The colSpan of the cell's td element
 rowSpan | number | 1 | The rowSpan of the cell's td element
