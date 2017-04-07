@@ -3,12 +3,12 @@
 [![Coverage Status](https://coveralls.io/repos/github/nadbm/react-datasheet/badge.svg)](https://coveralls.io/github/nadbm/react-datasheet) 
 # React-Datasheet
 A simple react component to create a spreadsheet. 
+
 Demo here: https://nadbm.github.io/react-datasheet/
+
 Examples are located in https://github.com/nadbm/react-datasheet/tree/master/docs/src/examples
 
-
-Current features
-
+Current features:
 * Select cells, copy-paste cells
 * Navigation using keyboard keys
 * Deletion using keyboard keys
@@ -19,15 +19,15 @@ Current features
 ## Installation
 
 Install from npm: 
-```javascript
+```bash
 $ npm install react-datasheet --save
 ```
-Import in your project
+Import in your project:
 
 ```javascript
-import Datasheet from 'react-datasheet';
+import ReactDataSheet from 'react-datasheet';
 // Be sure to include styles at some point, probably during your bootstrapping
-import 'react-datasheet/dist/react-datasheet.css';
+import 'react-datasheet/lib/react-datasheet.css';
 ```
 
 ## Usage
@@ -37,7 +37,7 @@ React-Datasheet generates a table with the cells. Double-clicking or typing edit
 The data provided should be an array of rows, and each row should include the cells.
 
 ### Basic Usage
-```javascript
+```jsx
 class App extends React.Component {
   constructor (props) {
     super(props)
@@ -72,43 +72,37 @@ class App extends React.Component {
 
 There are two values that each cell shows. The first is via ```valueRenderer``` and the second is via ```dataRenderer```. When a cell is in *edit mode*, it will show the value returned from ```dataRenderer```. It needs to return a string as this value is set in an input field.
 
-```javascript 
-
-
-  const grid = [
-     [{value:  5, expr: '1 + 4'}, {value:  6, expr: '6'}],
-     [{value:  5, expr: '1 + 4'}, {value:  5, expr: '1 + 4'}]
-  ]
-  const onChange = (cell, i, j, newValue) => console.log("New expression :" + newValue)
-  <ReactDataSheet 
-    data={grid}
-    valueRenderer={(cell) => cell.value}
-    dataRenderer={(cell) => cell.expr}
-    onChange={} 
-  />
-    )
-  }
-}
+```jsx 
+const grid = [
+   [{value:  5, expr: '1 + 4'}, {value:  6, expr: '6'}],
+   [{value:  5, expr: '1 + 4'}, {value:  5, expr: '1 + 4'}]
+]
+const onChange = (cell, i, j, newValue) => console.log("New expression :" + newValue)
+<ReactDataSheet 
+  data={grid}
+  valueRenderer={(cell) => cell.value}
+  dataRenderer={(cell) => cell.expr}
+  onChange={} 
+/>
 ```
 
 ### Cells with underlying component
 
-```javascript 
-
-  const grid = [
-     [{
-      value:  5, 
-        component: ( 
-          <button onClick={() => console.log("clicked")}}>
-            Rendered
-          </button>
-        )
-      }]
-  ]
-  <ReactDataSheet 
-    data={grid}
-    valueRenderer={(cell) => cell.value}
-  />
+```jsx 
+const grid = [
+   [{
+    value:  5, 
+      component: ( 
+        <button onClick={() => console.log("clicked")}}>
+          Rendered
+        </button>
+      )
+    }]
+]
+<ReactDataSheet 
+  data={grid}
+  valueRenderer={(cell) => cell.value}
+/>
 ```
 This renders a single cell with the value 5. Once in edit mode, the button will appear.
 
@@ -129,8 +123,8 @@ Option | Type | Default |  Description
 :--- | :--- | :--- | :--
 readOnly | Bool | false | Cell will never go in edit mode
 key | String | undefined | By default, each cell is given the key of col number and row number. This would override that key
-className | String | undefined | Additional class names for cells. 
+className | String | undefined | Additional class names for cells.
 component | ReactElement | undefined | Insert a react element or JSX to this field. This will render on edit mode
-forceComponent | bool | false | Renders whats in component at all times, even when not in edit mode
+forceComponent | bool | false | Renders what's in component at all times, even when not in edit mode
 colSpan | number | 1 | The colSpan of the cell's td element
 rowSpan | number | 1 | The rowSpan of the cell's td element
