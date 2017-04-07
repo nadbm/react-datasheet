@@ -79,7 +79,7 @@ export default class MathSheet extends React.Component {
   }
 
   cellUpdate(state, changeCell, expr) {
-    const scope = _.mapValues(state, (val) => isNaN(val.value) ? 0 : parseInt(val.value))
+    const scope = _.mapValues(state, (val) => isNaN(val.value) ? 0 : parseFloat(val.value))
     const updatedCell = _.assign({}, changeCell, this.computeExpr(changeCell.key, expr, scope))
     state[changeCell.key] = updatedCell
 
