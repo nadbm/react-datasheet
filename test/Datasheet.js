@@ -105,7 +105,7 @@ describe('Component', () => {
         wrapper.setProps({ editing: true, selected: true })
 
         expect(wrapper.html()).toEqual(
-          shallow(<td className='cell selected' colSpan={1} rowSpan={1}>
+          shallow(<td className='cell selected editing' colSpan={1} rowSpan={1}>
             <span style={{display:'none'}}>5</span>
             <input style={{display:'block'}}/>
           </td>).html())

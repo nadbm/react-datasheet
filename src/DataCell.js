@@ -44,7 +44,8 @@ export default class DataCell extends PureComponent {
       <td 
         className={[ 
             className, "cell",
-            selected && 'selected', 
+            selected && 'selected',
+            editing && 'editing',
             readOnly && 'read-only',
             this.state.updated && 'updated'
           ].filter(a => a).join(' ') }
