@@ -75,16 +75,16 @@ table.data-grid {
   display: block;
   padding: 5px;
 
-  box-shadow: 2px 4px 6px #CCC; 
+  box-shadow: 0px 0px 6px #CCC; 
   margin: auto;
   width: 500px;
   margin-top: 20px;
   transition: box-shadow 0.5s ease-in;
 }
 .sheet-container:hover {
-  transition: box-shadow 0.2s ease-in;
+  transition: box-shadow 0.5s ease-in;
 
-  box-shadow: 0px 0px 2px #CCC;
+  box-shadow: 0px 0px 1px #CCC;
 }
 .sheet-container table.data-grid tr td.cell:not(.selected){
   border: 1px solid #ececec;

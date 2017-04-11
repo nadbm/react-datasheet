@@ -26,6 +26,7 @@ export default class BasicSheet extends React.Component {
       <Datasheet
         data={this.state.grid}
         valueRenderer={(cell) => cell.value}
+        onContextMenu={(e, cell, i, j) => cell.readOnly ? e.preventDefault() : null}
         onChange={(modifiedCell, colI, rowJ, value) =>
           this.setState({
             grid: this.state.grid.map((row) =>
