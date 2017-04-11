@@ -576,8 +576,6 @@ describe('Component', () => {
       })
     })
     
-
-
     describe("editing", () => {
       let cells = null;
       beforeEach(() => {
@@ -906,6 +904,37 @@ describe('Component', () => {
         expect(data[0][0].data).toEqual('')
         expect(data[0][1].data).toEqual(2)
       });
+    })
+
+    describe("contextmenu", () => {
+      let cells = null;
+      beforeEach(() => {
+        cells = wrapper.find('td');
+      })
+
+      it('starts calls contextmenu with right object', (done) => {
+          const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}]];
+          customWrapper = mount(
+            <DataSheet
+              data = {datacust}
+              valueRenderer = {(cell) => cell.data}
+              onChange = {(cell, i, j, value) => datacust[i][j].data = value}
+              onContextMenu = {(e, cell, i, j) => {
+                try {
+                  expect(cell).toEqual({data: 12, readOnly: true});
+                  done();
+                }
+                catch(err) {
+                  done(err);
+                }
+                
+              }}
+            />
+          );
+          customWrapper.find('td').at(0).simulate('contextmenu');
+      });
+
+
     });
   })
 })

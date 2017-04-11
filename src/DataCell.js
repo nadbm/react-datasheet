@@ -43,16 +43,16 @@ export default class DataCell extends PureComponent {
     return (
       <td 
         className={[ 
-            className, "cell",
+            className, 'cell',
             selected && 'selected',
             editing && 'editing',
             readOnly && 'read-only',
             this.state.updated && 'updated'
           ].filter(a => a).join(' ') }
-        onMouseDown={()=> onMouseDown(row,col)}
-        onDoubleClick={()=> onDoubleClick(row,col)}
-        onMouseOver={()=> onMouseOver(row,col)}
-        onContextMenu={(e) => onContextMenu(e,row,col)}
+        onMouseDown={() => onMouseDown(row, col)}
+        onDoubleClick={() => onDoubleClick(row, col)}
+        onMouseOver={() => onMouseOver(row, col)}
+        onContextMenu={(e) => onContextMenu(e, row, col)}
         colSpan={colSpan || 1}
         rowSpan={rowSpan || 1}
       > 
