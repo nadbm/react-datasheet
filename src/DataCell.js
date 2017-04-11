@@ -39,7 +39,7 @@ export default class DataCell extends PureComponent {
   }
 
   render() {
-    const {row, col, rowSpan, readOnly, colSpan, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick} = this.props;
+    const {row, col, rowSpan, readOnly, colSpan, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu} = this.props;
     return (
       <td 
         className={[ 
@@ -53,6 +53,7 @@ export default class DataCell extends PureComponent {
         onMouseDown={()=> onMouseDown(row,col)}
         onDoubleClick={()=> onDoubleClick(row,col)}
         onMouseOver={()=> onMouseOver(row,col)}
+        onContextMenu={(e) => onContextMenu(e,row,col)}
         colSpan={colSpan || 1}
         rowSpan={rowSpan || 1}
       > 
@@ -75,5 +76,6 @@ DataCell.propTypes = {
   onMouseDown: PropTypes.func.isRequired,
   onDoubleClick: PropTypes.func.isRequired,
   onMouseOver: PropTypes.func.isRequired,
+  onContextMenu: PropTypes.func.isRequired,
   updated: PropTypes.bool
 }
