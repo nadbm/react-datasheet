@@ -1,6 +1,6 @@
 {
   "name": "react-datasheet",
-  "version": "1.2.0",
+  "version": "1.2.3",
   "description": "Excel-like data grid for React",
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "clean": "rimraf dist",
     "build": "babel ./src  --out-dir ./lib && cp src/react-datasheet.css lib",
     "build:watch": "watch 'npm run build' ./src",
+    "prepublish": "npm run build",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "test": "NODE_ENV=test nyc --  mocha ./test/**/*.js --compilers js:babel-register",
     "test:watch": "watch 'npm run test' ./test ./src"
@@ -59,7 +60,7 @@
     "react-dom": "~0.14.8 || ^15.0.0"
   },
   "dependencies": {
-    "babel-loader": "^6.4.1"
   },
+  "files": ["lib"],
   "main": "lib/index.js"
 }

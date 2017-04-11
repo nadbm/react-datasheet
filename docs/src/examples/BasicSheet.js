@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import Datasheet from '../../../lib'; 
+import Datasheet from 'react-datasheet';  
 import React from 'react';
 
 export default class BasicSheet extends React.Component {

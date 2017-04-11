@@ -94,28 +94,29 @@ export default class DataSheet extends PureComponent {
   }
 
   handlePaste(e) {
-    let pasteData = e.clipboardData.getData('text/plain').split('\n').map((row) => row.split('\t'));
-    let columnMaps = [];
-    let start = this.state.start;
+    this.dgDom.removeEventListener('paste', this.handlePaste);
 
+    const start = this.state.start;
+    const pastedMap = []
+    const pasteData = e.clipboardData
+      .getData('text/plain')
+      .split(/\n|\r/)
+      .map((row) => row.split('\t'));
+    
     pasteData.map((row, i) => {
-      let rowMap = [];
+      const rowData = [];
       row.map((pastedData, j) => {
-        let cell = this.props.data[start.i + i] && this.props.data[start.i + i][start.j + j];
-        rowMap.push({cell: cell, data: pastedData});
+        const cell = this.props.data[start.i + i] && this.props.data[start.i + i][start.j + j];
+        rowData.push({cell: cell, data: pastedData});
         if(cell && !cell.readOnly && !this.props.onPaste) {
           this.onChange(start.i + i, start.j + j, pastedData);
         }
       })
-      columnMaps.push(rowMap);
+      pastedMap.push(rowData);
     });
 
-    if (this.props.onPaste) {
-      this.props.onPaste(columnMaps)
-    }
-    ;
+    this.props.onPaste && this.props.onPaste(pastedMap);
     this.setState(this.defaultState);
-    this.dgDom.removeEventListener('paste', this.handlePaste);
   }
 
   handleKeyboardCellMovement(e) {
