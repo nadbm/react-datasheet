@@ -115,6 +115,7 @@ valueRenderer | func | Method to render the value of the cell `function(cell)`. 
 dataRenderer | func | Method to render the underlying value of the cell `function(cell)`. This data is visible once in edit mode.
 onChange | func | onChange handler: `function(cell, i, j, newValue) {}`
 onPaste | func | onPaste handler: `function(array) {}` If set, the function will be called with an array of rows. Each row has an array of objects containing the cell and raw pasted value. If the pasted value cannot be matched with a cell, the cell value will be undefined
+onContextMenu | func | Context menu handler : `function(event, cell, i, j)`
 
 ## Cell Options
 
@@ -127,5 +128,6 @@ key | String | undefined | By default, each cell is given the key of col number 
 className | String | undefined | Additional class names for cells.
 component | ReactElement | undefined | Insert a react element or JSX to this field. This will render on edit mode
 forceComponent | bool | false | Renders what's in component at all times, even when not in edit mode
+disableEvents | bool | false | Makes cell unselectable and read only
 colSpan | number | 1 | The colSpan of the cell's td element
 rowSpan | number | 1 | The rowSpan of the cell's td element

@@ -48,6 +48,7 @@ describe('Component', () => {
         const onMouseDown = sinon.spy();
         const onMouseOver = sinon.spy();
         const onDoubleClick = sinon.spy();
+        const onContextMenu = sinon.spy();
         const wrapper = shallow(
           <DataCell 
             row={2} 
@@ -61,6 +62,7 @@ describe('Component', () => {
             onMouseDown={onMouseDown}
             onDoubleClick={onDoubleClick}
             onMouseOver={onMouseOver}
+            onContextMenu={onContextMenu}
           />
         );
 
@@ -73,10 +75,14 @@ describe('Component', () => {
         wrapper.simulate('mousedown');
         wrapper.simulate('doubleclick');
         wrapper.simulate('mouseover');
+        wrapper.simulate('contextmenu');
 
         expect(onDoubleClick.calledWith(2, 3)).toEqual(true);
         expect(onMouseDown.calledWith(2, 3)).toEqual(true);
         expect(onMouseOver.calledWith(2, 3)).toEqual(true);
+        const args = onContextMenu.getCall(0).args;
+        expect(args[1]).toEqual(2);
+        expect(args[2]).toEqual(3);
         wrapper.unmount();
       })
 
@@ -90,7 +96,9 @@ describe('Component', () => {
           col: 1, 
           onMouseDown: () => {}, 
           onMouseOver: () => {}, 
-          onDoubleClick: () => {}}
+          onDoubleClick: () => {},
+          onContextMenu: () => {},
+        }
         const wrapper = shallow(
           <DataCell 
             {...props}
@@ -121,7 +129,9 @@ describe('Component', () => {
           col: 1, 
           onMouseDown: () => {}, 
           onMouseOver: () => {}, 
-          onDoubleClick: () => {}}
+          onDoubleClick: () => {},
+          onContextMenu: () => {},
+        }
         const wrapper = shallow(
           <DataCell 
             {...props}
@@ -153,7 +163,9 @@ describe('Component', () => {
           onChange: sinon.spy(),
           onMouseDown: () => {}, 
           onDoubleClick: () => {}, 
-          onMouseOver: () => {}}
+          onMouseOver: () => {},
+          onContextMenu: () => {},
+        }
         document.body.innerHTML = '<table><tbody><tr id="root"></tr></tbody></table>'
         wrapper = mount(<DataCell {...props} />, {attachTo: document.getElementById('root')});
       });
@@ -201,6 +213,7 @@ describe('Component', () => {
         const onMouseDown = sinon.spy();
         const onMouseOver = sinon.spy();
         const onDoubleClick = sinon.spy();
+        const onContextMenu = sinon.spy();
         const wrapper = shallow(
           <ComponentCell 
             row={2} 
@@ -217,6 +230,7 @@ describe('Component', () => {
             onMouseDown={onMouseDown}
             onDoubleClick={onDoubleClick}
             onMouseOver={onMouseOver}
+            onContextMenu={onContextMenu}
           />
         );
 
@@ -237,10 +251,14 @@ describe('Component', () => {
         wrapper.simulate('mousedown');
         wrapper.simulate('doubleclick');
         wrapper.simulate('mouseover');
+        wrapper.simulate('contextmenu');
 
         expect(onDoubleClick.calledWith(2, 3)).toEqual(true);
         expect(onMouseDown.calledWith(2, 3)).toEqual(true);
         expect(onMouseOver.calledWith(2, 3)).toEqual(true);
+        const args = onContextMenu.getCall(0).args;
+        expect(args[1]).toEqual(2);
+        expect(args[2]).toEqual(3);
         wrapper.unmount();
 
       })
@@ -261,6 +279,7 @@ describe('Component', () => {
             onMouseDown={()=>{}}
             onDoubleClick={()=>{}}
             onMouseOver={()=>{}}
+            onContextMenu={()=>{}}
           />
         );
         wrapper.setProps({value: 7})
@@ -557,8 +576,6 @@ describe('Component', () => {
       })
     })
     
-
-
     describe("editing", () => {
       let cells = null;
       beforeEach(() => {
@@ -887,6 +904,37 @@ describe('Component', () => {
         expect(data[0][0].data).toEqual('')
         expect(data[0][1].data).toEqual(2)
       });
+    })
+
+    describe("contextmenu", () => {
+      let cells = null;
+      beforeEach(() => {
+        cells = wrapper.find('td');
+      })
+
+      it('starts calls contextmenu with right object', (done) => {
+          const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}]];
+          customWrapper = mount(
+            <DataSheet
+              data = {datacust}
+              valueRenderer = {(cell) => cell.data}
+              onChange = {(cell, i, j, value) => datacust[i][j].data = value}
+              onContextMenu = {(e, cell, i, j) => {
+                try {
+                  expect(cell).toEqual({data: 12, readOnly: true});
+                  done();
+                }
+                catch(err) {
+                  done(err);
+                }
+                
+              }}
+            />
+          );
+          customWrapper.find('td').at(0).simulate('contextmenu');
+      });
+
+
     });
   })
 })

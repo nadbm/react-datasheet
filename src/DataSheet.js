@@ -32,6 +32,7 @@ export default class DataSheet extends PureComponent {
     this.onMouseUp     = this.onMouseUp.bind(this);
     this.onMouseOver   = this.onMouseOver.bind(this);
     this.onDoubleClick = this.onDoubleClick.bind(this);
+    this.onContextMenu = this.onContextMenu.bind(this);
     this.handleKey     = this.handleKey.bind(this);
     this.handleCopy    = this.handleCopy.bind(this);
     this.handlePaste   = this.handlePaste.bind(this);
@@ -221,6 +222,13 @@ export default class DataSheet extends PureComponent {
     }
   }
 
+  onContextMenu(evt, i, j) {
+    let cell = this.props.data[i][j];
+    if (this.props.onContextMenu) {
+      this.props.onContextMenu(evt, cell, i, j);
+    }
+  }
+
   onDoubleClick(i, j) {
     let cell = this.props.data[i][j];
     (!cell.readOnly) ? this.setState({editing: {i:i, j:j}, forceEdit: true, clear: {}}) : null;
@@ -304,7 +312,8 @@ export default class DataSheet extends PureComponent {
                 selected: isSelected(i, j),
                 onMouseDown:   cell.disableEvents ? nullFtn : this.onMouseDown,
                 onDoubleClick: cell.disableEvents ? nullFtn : this.onDoubleClick,
-                onMouseOver:   cell.disableEvents ? nullFtn : this.onMouseOver, 
+                onMouseOver:   cell.disableEvents ? nullFtn : this.onMouseOver,
+                onContextMenu: cell.disableEvents ? nullFtn : this.onContextMenu,
                 editing: isEditing(i, j),
                 colSpan: cell.colSpan, 
                 value: valueRenderer(cell),
@@ -338,7 +347,8 @@ export default class DataSheet extends PureComponent {
 DataSheet.propTypes = {
   data: PropTypes.array.isRequired,           
   className: PropTypes.string,                
-  onChange: PropTypes.func,                   
+  onChange: PropTypes.func,
+  onContextMenu: PropTypes.func,
   valueRenderer: PropTypes.func.isRequired,   
   dataRenderer: PropTypes.func,               
 }
