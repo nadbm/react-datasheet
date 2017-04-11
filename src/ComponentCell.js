@@ -40,7 +40,7 @@ export default class ComponentCell extends PureComponent {
         rowSpan={rowSpan || 1}>
         { ((editing && !readOnly) || forceComponent) ? this.props.component : value }
       </td>
-    )
+    );
   }
 }
 
