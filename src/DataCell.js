@@ -43,7 +43,8 @@ export default class DataCell extends PureComponent {
     return (
       <td 
         className={[ 
-            className, "cell",
+            className,
+            'cell',
             selected && 'selected',
             editing && 'editing',
             readOnly && 'read-only',

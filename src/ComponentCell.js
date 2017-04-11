@@ -24,19 +24,23 @@ export default class ComponentCell extends PureComponent {
     let {row, col, readOnly, forceComponent, rowSpan, colSpan, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick} = this.props;
 
 
-    return <td ref = {(ref) => this._container = ref}
-              className={[
-                className, 'cell',
-                selected && 'selected',
-                this.state.updated && 'updated'
-              ].filter(a => a).join(' ')}
-              onMouseDown={()=> onMouseDown(row,col)}
-              onDoubleClick={()=> onDoubleClick(row,col)}
-              onMouseOver={()=> onMouseOver(row,col)}
-              colSpan={colSpan || 1}
-              rowSpan={rowSpan || 1}>
-              { ((editing && !readOnly) || forceComponent) ? this.props.component : value }
-            </td>;
+    return (
+      <td 
+        className={[
+          className, 
+          'cell',
+          editing && 'editing',
+          selected && 'selected',
+          this.state.updated && 'updated'
+        ].filter(a => a).join(' ')}
+        onMouseDown={()=> onMouseDown(row,col)}
+        onDoubleClick={()=> onDoubleClick(row,col)}
+        onMouseOver={()=> onMouseOver(row,col)}
+        colSpan={colSpan || 1}
+        rowSpan={rowSpan || 1}>
+        { ((editing && !readOnly) || forceComponent) ? this.props.component : value }
+      </td>
+    );
   }
 }
 

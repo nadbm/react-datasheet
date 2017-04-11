@@ -102,7 +102,6 @@ export default class DataSheet extends PureComponent {
       .split(/\n|\r/)
       .map((row) => row.split('\t'));
     
-   
     pasteData.map((row, i) => {
       const rowData = [];
       row.map((pastedData, j) => {
