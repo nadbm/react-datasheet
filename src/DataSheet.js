@@ -11,7 +11,7 @@ const DOWN_KEY          = 40;
 const DELETE_KEY        = 46;
 const BACKSPACE_KEY     =  8;
 
-const isEmpty = (obj) => Object.keys(obj).length === 0
+const isEmpty = (obj) => Object.keys(obj).length === 0;
 
 const range = (start, end) => {
   const array = [];
@@ -20,7 +20,7 @@ const range = (start, end) => {
     inc ? array.push(i) : array.unshift(i)
   }
   return array;
-}
+};
 
 const nullFtn = (obj) => {};
 
@@ -65,7 +65,7 @@ export default class DataSheet extends PureComponent {
   }
 
   pageClick(e) {
-    if(!this.dgDom.contains(e.target)) {
+    if (!this.dgDom.contains(e.target)) {
       this.setState(this.defaultState);
       this.removeAllListeners();
     }
@@ -81,12 +81,10 @@ export default class DataSheet extends PureComponent {
       range(start.j, end.j).map(j => data[i][j])
         .map(cell => {
           let value = dataRenderer ? dataRenderer(cell) : null;
-          if (value === "" || value === null || typeof(value) === "undefined") {
+          if (value === '' || value === null || typeof(value) === 'undefined') {
             return valueRenderer(cell);
           }
-          else {
-            return value;
-          }
+          return value;
         }).join('\t')
     ).join('\n');
     e.clipboardData.setData('text/plain', text);
@@ -97,21 +95,21 @@ export default class DataSheet extends PureComponent {
     this.dgDom.removeEventListener('paste', this.handlePaste);
 
     const start = this.state.start;
-    const pastedMap = []
+    const pastedMap = [];
     const pasteData = e.clipboardData
       .getData('text/plain')
       .split(/\n|\r/)
       .map((row) => row.split('\t'));
-    
+
     pasteData.map((row, i) => {
       const rowData = [];
       row.map((pastedData, j) => {
         const cell = this.props.data[start.i + i] && this.props.data[start.i + i][start.j + j];
         rowData.push({cell: cell, data: pastedData});
-        if(cell && !cell.readOnly && !this.props.onPaste) {
+        if (cell && !cell.readOnly && !this.props.onPaste) {
           this.onChange(start.i + i, start.j + j, pastedData);
         }
-      })
+      });
       pastedMap.push(rowData);
     });
 
@@ -125,40 +123,34 @@ export default class DataSheet extends PureComponent {
     const currentCell = data[start.i][start.j];
     let newLocation = null;
 
-    if(
+    if (
       (this.state.forceEdit || currentCell.component !== undefined) 
       && !isEmpty(this.state.editing) 
-      && e.keyCode !== TAB_KEY) {
+      && e.keyCode !== TAB_KEY
+    ) {
       return false;
-    }
-    else if (e.keyCode === TAB_KEY && !e.shiftKey) {
-      newLocation = { i : start.i, j: start.j + 1}
-      newLocation = typeof(data[newLocation.i][newLocation.j]) !== "undefined" ? newLocation : { i : start.i + 1, j: 0}
-    }
-    else if (e.keyCode === RIGHT_KEY) {
+    } else if (e.keyCode === TAB_KEY && !e.shiftKey) {
+      newLocation = { i : start.i, j: start.j + 1};
+      newLocation = typeof(data[newLocation.i][newLocation.j]) !== 'undefined' ? newLocation : { i : start.i + 1, j: 0}
+    } else if (e.keyCode === RIGHT_KEY) {
       newLocation = {i: start.i, j: start.j + 1}
-    }
-    else if (e.keyCode === LEFT_KEY || e.keyCode === TAB_KEY && e.shiftKey) {
+    } else if (e.keyCode === LEFT_KEY || e.keyCode === TAB_KEY && e.shiftKey) {
       newLocation = { i : start.i, j: start.j - 1}
-    }
-    else if (e.keyCode === UP_KEY) {
+    } else if (e.keyCode === UP_KEY) {
       newLocation = {i: start.i - 1, j: start.j}
-    }
-    else if (e.keyCode === DOWN_KEY) {
+    } else if (e.keyCode === DOWN_KEY) {
       newLocation = {i: start.i + 1, j: start.j}
     }
 
     
-    if(newLocation && data[newLocation.i] && typeof(data[newLocation.i][newLocation.j]) !== "undefined") {
+    if (newLocation && data[newLocation.i] && typeof(data[newLocation.i][newLocation.j]) !== 'undefined') {
       this.setState({start: newLocation, end: newLocation, editing: {}});
     }
-    if(newLocation) { 
+    if (newLocation) {
       e.preventDefault(); 
       return true;
     }
-    else {
-      return false;
-    }
+    return false;
   }
 
   getSelectedCells(data, start, end) {
@@ -189,30 +181,30 @@ export default class DataSheet extends PureComponent {
       190, /* period */ 
       107, /* add */
       109, /* decimal point */
-      110 ].indexOf(e.keyCode) > -1;  
-    if(noCellsSelected || ctrlKeyPressed || this.handleKeyboardCellMovement(e)) {
+      110
+    ].indexOf(e.keyCode) > -1;
+
+    if (noCellsSelected || ctrlKeyPressed || this.handleKeyboardCellMovement(e)) {
       return true;
-    };
+    }
 
     if (deleteKeysPressed && !isEditing) {
       this.getSelectedCells(data, start, end).map(({cell, i, j}) => 
-        (!cell.readOnly) ? this.onChange(i, j, "") : null
+        (!cell.readOnly) ? this.onChange(i, j, '') : null
       );
       e.preventDefault();
-    }
-    else if (enterKeyPressed && isEditing) {
+    } else if (enterKeyPressed && isEditing) {
       this.setState({editing: {}});
-    }
-    else if (enterKeyPressed && !isEditing  && !cell.readOnly) {
+    } else if (enterKeyPressed && !isEditing  && !cell.readOnly) {
       this.setState({editing: start, clear: {}, forceEdit: true});
-    }
-    else if ( numbersPressed  
+    } else if (numbersPressed
       || numPadKeysPressed  
       || lettersPressed 
       || equationKeysPressed 
-      || enterKeyPressed) {
+      || enterKeyPressed
+    ) {
       //empty out cell if user starts typing without pressing enter
-      if(!isEditing && !cell.readOnly) {
+      if (!isEditing && !cell.readOnly) {
         this.setState({
           editing: start, 
           clear: start,
@@ -267,36 +259,30 @@ export default class DataSheet extends PureComponent {
 
   componentDidUpdate(prevProps, prevState) {
     let prevEnd = prevState.end;
-    if(!isEmpty(this.state.end) && !(this.state.end.i == prevEnd.i && this.state.end.j == prevEnd.j)) {
+    if (!isEmpty(this.state.end) && !(this.state.end.i === prevEnd.i && this.state.end.j === prevEnd.j)) {
       this.props.onSelect && this.props.onSelect(this.props.data[this.state.end.i][this.state.end.j]);
     }
   }
 
   render() {
-    const {keyFunction, dataRenderer, valueRenderer, className} = this.props;
+    const {dataRenderer, valueRenderer, className} = this.props;
 
     const isSelected = (i, j) => {
       const start = this.state.start;
       const end = this.state.end;
-      const pos_x = (j >= start.j && j <= end.j)
-      const neg_x = (j <= start.j && j >= end.j)
-      const pos_y = (i >= start.i && i <= end.i);
-      const neg_y = (i <= start.i && i >= end.i);
+      const posX = (j >= start.j && j <= end.j);
+      const negX = (j <= start.j && j >= end.j);
+      const posY = (i >= start.i && i <= end.i);
+      const negY = (i <= start.i && i >= end.i);
 
-      return (pos_x && pos_y) ||
-        (neg_x && pos_y) ||
-        (neg_x && neg_y) ||
-        (pos_x && neg_y);
-    }
+      return (posX && posY) ||
+        (negX && posY) ||
+        (negX && negY) ||
+        (posX && negY);
+    };
 
-    const isEditing = (i, j) => {
-      return this.state.editing.i === i && this.state.editing.j == j;
-    }
-
-    const shouldClear = (i, j) => {
-      return this.state.clear.i === i && this.state.clear.j == j;
-    }
-
+    const isEditing = (i, j) => this.state.editing.i === i && this.state.editing.j === j;
+    const shouldClear = (i, j) =>  this.state.clear.i === i && this.state.clear.j === j;
 
     return <table ref={(r) => this.dgDom = r} className={'data-grid ' + (className ?  className : '')}>
       <tbody>
@@ -304,39 +290,36 @@ export default class DataSheet extends PureComponent {
         <tr key={this.props.keyFn ? this.props.keyFn(i) : i}>
         {
           row.map((cell, j) => {
-              const props = {
-                key: cell.key ? cell.key : j,
-                className: cell.className ? cell.className : '',
-                row: i,
-                col: j,
-                selected: isSelected(i, j),
-                onMouseDown:   cell.disableEvents ? nullFtn : this.onMouseDown,
-                onDoubleClick: cell.disableEvents ? nullFtn : this.onDoubleClick,
-                onMouseOver:   cell.disableEvents ? nullFtn : this.onMouseOver,
-                onContextMenu: cell.disableEvents ? nullFtn : this.onContextMenu,
-                editing: isEditing(i, j),
-                colSpan: cell.colSpan, 
-                value: valueRenderer(cell),
-              }
-              if(cell.component) {
-                return <ComponentCell 
-                  {...props} 
-                  forceComponent={cell.forceComponent || false} 
-                  component={cell.component}
-                />
-              }
-              else {
-                return <DataCell 
-                  {...props}
-                  data     = {dataRenderer ? dataRenderer(cell) : null}
-                  clear    = {shouldClear(i, j)}
-                  rowSpan  = {cell.rowSpan}
-                  onChange = {this.onChange}
-                  readOnly = {cell.readOnly}
-                 /> 
-              }
+            const props = {
+              key: cell.key ? cell.key : j,
+              className: cell.className ? cell.className : '',
+              row: i,
+              col: j,
+              selected: isSelected(i, j),
+              onMouseDown:   cell.disableEvents ? nullFtn : this.onMouseDown,
+              onDoubleClick: cell.disableEvents ? nullFtn : this.onDoubleClick,
+              onMouseOver:   cell.disableEvents ? nullFtn : this.onMouseOver,
+              onContextMenu: cell.disableEvents ? nullFtn : this.onContextMenu,editing: isEditing(i, j),
+              colSpan: cell.colSpan,
+              value: valueRenderer(cell),
+            };
+            if (cell.component) {
+              return <ComponentCell
+                {...props}
+                forceComponent={cell.forceComponent || false}
+                component={cell.component}
+              />
             }
-          )
+            return <DataCell
+              {...props}
+              data     = {dataRenderer ? dataRenderer(cell) : null}
+              clear    = {shouldClear(i, j)}
+              rowSpan  = {cell.rowSpan}
+              onChange = {this.onChange}
+              readOnly = {cell.readOnly}
+             />
+          }
+        )
       }
       </tr>)}
       </tbody>
@@ -351,6 +334,6 @@ DataSheet.propTypes = {
   onContextMenu: PropTypes.func,
   valueRenderer: PropTypes.func.isRequired,   
   dataRenderer: PropTypes.func,               
-}
+};
 
 
