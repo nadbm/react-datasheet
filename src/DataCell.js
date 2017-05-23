@@ -1,4 +1,5 @@
-import React, {PureComponent, PropTypes} from 'react'
+import React, { PureComponent } from 'react'
+import PropTypes from 'prop-types';
 
 export default class DataCell extends PureComponent {
   constructor(props) {
@@ -39,8 +40,8 @@ export default class DataCell extends PureComponent {
   render() {
     const {row, col, rowSpan, readOnly, colSpan, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu} = this.props;
     return (
-      <td 
-        className={[ 
+      <td
+        className={[
           className,
           'cell',
           selected && 'selected',
