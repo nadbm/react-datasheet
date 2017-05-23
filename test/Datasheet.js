@@ -156,8 +156,8 @@ describe('Component', () => {
         props = {
           editing: false, 
           selected: false, 
-          value: 2, 
-          data: 5, 
+          value: '2',
+          data: '5',
           row: 1, 
           col: 2, 
           onChange: sinon.spy(),
@@ -198,6 +198,7 @@ describe('Component', () => {
         expect(wrapper.find('input').node.value).toEqual('2');
         
         wrapper.find('input').node.value = '2';
+        console.log(wrapper.props)
         wrapper.find('input').simulate('change');
         wrapper.setProps({ editing: false, selected: true });
         expect(props.onChange.called).toEqual(false)
@@ -516,7 +517,9 @@ describe('Component', () => {
         customWrapper = mount(
             <DataSheet
               data = {data}
-              onSelect = {(cell) => {
+              onSelect =
+                  /* eslint-disable keyword-spacing */
+              {(cell) => {
                 try {
                   expect(cell).toEqual({data: 4, className: 'test1'});
                   done();  
@@ -826,7 +829,9 @@ describe('Component', () => {
               data = {datacust}
               valueRenderer = {(cell) => cell.data}
               onChange = {(cell, i, j, value) => datacust[i][j].data = value}
-              onPaste = {(pasted) => {
+              onPaste =
+                  /* eslint-disable keyword-spacing */
+              {(pasted) => {
                 try {
                   expect(pasted).toEqual([
                     [

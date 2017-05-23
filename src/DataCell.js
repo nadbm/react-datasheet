@@ -1,4 +1,5 @@
-import React, {PureComponent, PropTypes} from 'react'
+import React, { PureComponent } from 'react'
+import PropTypes from 'prop-types';
 
 export default class DataCell extends PureComponent {
   constructor(props) {
@@ -7,7 +8,6 @@ export default class DataCell extends PureComponent {
   }
 
   componentWillUpdate(nextProps) {
-    const prevProps = this.props;
     if (nextProps.value !== this.props.value) {
       this.setState({updated: true});
       this.timeout = setTimeout(() => this.setState({updated: false}), 700);
@@ -21,9 +21,8 @@ export default class DataCell extends PureComponent {
     if (prevProps.editing === false && this.props.editing === true) {
       if (this.props.clear) {
         this._input.value = '';
-      }
-      else {
-        this._input.value = this.props.data == null ? this.props.value : this.props.data;
+      } else {
+        this._input.value = this.props.data === null ? this.props.value : this.props.data;
       }
       this._input.focus();
     }
@@ -34,29 +33,29 @@ export default class DataCell extends PureComponent {
   }
 
   onChange(value) {
-    const initialData = this.props.data == null ? this.props.value : this.props.data;
-    (value === '' || initialData != value) && this.props.onChange(this.props.row, this.props.col, value);
+    const initialData = this.props.data === null ? this.props.value : this.props.data;
+    (value === '' || initialData !== value) && this.props.onChange(this.props.row, this.props.col, value);
   }
 
   render() {
     const {row, col, rowSpan, readOnly, colSpan, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu} = this.props;
     return (
-      <td 
+      <td
         className={[
-            className,
-            'cell',
-            selected && 'selected',
-            editing && 'editing',
-            readOnly && 'read-only',
-            this.state.updated && 'updated'
-          ].filter(a => a).join(' ') }
-        onMouseDown={() => onMouseDown(row, col)}
-        onDoubleClick={() => onDoubleClick(row, col)}
-        onMouseOver={() => onMouseOver(row, col)}
+          className,
+          'cell',
+          selected && 'selected',
+          editing && 'editing',
+          readOnly && 'read-only',
+          this.state.updated && 'updated'
+        ].filter(a => a).join(' ') }
+        onMouseDown={()=> onMouseDown(row,col)}
+        onDoubleClick={()=> onDoubleClick(row,col)}
+        onMouseOver={()=> onMouseOver(row,col)}
         onContextMenu={(e) => onContextMenu(e, row, col)}
         colSpan={colSpan || 1}
         rowSpan={rowSpan || 1}
-      > 
+      >
         <span style={{display: (editing && selected) ? 'none':'block'}}>
           {value}
         </span>
@@ -78,4 +77,4 @@ DataCell.propTypes = {
   onMouseOver: PropTypes.func.isRequired,
   onContextMenu: PropTypes.func.isRequired,
   updated: PropTypes.bool
-}
+};

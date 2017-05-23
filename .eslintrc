@@ -29,7 +29,7 @@
         "complexity": [1, 12],
         "func-names": 0,
         "guard-for-in": 2,
-        "indent": [2, 4],
+        "indent": [2, 2],
         "max-len": [0, 120, 4],
         "new-cap": [2, {"newIsCap": true, "capIsNew": false}],
         "quotes": [2, "single"],
