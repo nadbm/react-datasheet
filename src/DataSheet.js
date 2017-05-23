@@ -1,4 +1,5 @@
-import React, { PureComponent, PropTypes } from 'react';
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import DataCell from './DataCell';
 import ComponentCell from './ComponentCell';
 
@@ -77,7 +78,7 @@ export default class DataSheet extends PureComponent {
     const {start, end} = this.state;
 
 
-    const text = range(start.i, end.i).map((i) => 
+    const text = range(start.i, end.i).map((i) =>
       range(start.j, end.j).map(j => data[i][j])
         .map(cell => {
           let value = dataRenderer ? dataRenderer(cell) : null;
@@ -124,8 +125,8 @@ export default class DataSheet extends PureComponent {
     let newLocation = null;
 
     if (
-      (this.state.forceEdit || currentCell.component !== undefined) 
-      && !isEmpty(this.state.editing) 
+      (this.state.forceEdit || currentCell.component !== undefined)
+      && !isEmpty(this.state.editing)
       && e.keyCode !== TAB_KEY
     ) {
       return false;
@@ -142,12 +143,12 @@ export default class DataSheet extends PureComponent {
       newLocation = {i: start.i + 1, j: start.j}
     }
 
-    
+
     if (newLocation && data[newLocation.i] && typeof(data[newLocation.i][newLocation.j]) !== 'undefined') {
       this.setState({start: newLocation, end: newLocation, editing: {}});
     }
     if (newLocation) {
-      e.preventDefault(); 
+      e.preventDefault();
       return true;
     }
     return false;
@@ -170,15 +171,15 @@ export default class DataSheet extends PureComponent {
     const noCellsSelected = isEmpty(start);
     const ctrlKeyPressed = e.ctrlKey || e.metaKey;
     const deleteKeysPressed = (e.keyCode === DELETE_KEY || e.keyCode === BACKSPACE_KEY);
-    const enterKeyPressed = e.keyCode === ENTER_KEY; 
+    const enterKeyPressed = e.keyCode === ENTER_KEY;
     const numbersPressed = (e.keyCode >= 48 && e.keyCode <= 57);
     const lettersPressed = (e.keyCode >= 65 && e.keyCode <= 90);
     const numPadKeysPressed = (e.keyCode >= 96 && e.keyCode <= 105);
     const cell = data[start.i][start.j];
     const equationKeysPressed = [
-      187, /* equal */ 
-      189, /* substract */ 
-      190, /* period */ 
+      187, /* equal */
+      189, /* substract */
+      190, /* period */
       107, /* add */
       109, /* decimal point */
       110
@@ -189,7 +190,7 @@ export default class DataSheet extends PureComponent {
     }
 
     if (deleteKeysPressed && !isEditing) {
-      this.getSelectedCells(data, start, end).map(({cell, i, j}) => 
+      this.getSelectedCells(data, start, end).map(({cell, i, j}) =>
         (!cell.readOnly) ? this.onChange(i, j, '') : null
       );
       e.preventDefault();
@@ -198,19 +199,19 @@ export default class DataSheet extends PureComponent {
     } else if (enterKeyPressed && !isEditing  && !cell.readOnly) {
       this.setState({editing: start, clear: {}, forceEdit: true});
     } else if (numbersPressed
-      || numPadKeysPressed  
-      || lettersPressed 
-      || equationKeysPressed 
+      || numPadKeysPressed
+      || lettersPressed
+      || equationKeysPressed
       || enterKeyPressed
     ) {
       //empty out cell if user starts typing without pressing enter
       if (!isEditing && !cell.readOnly) {
         this.setState({
-          editing: start, 
+          editing: start,
           clear: start,
           forceEdit: false
         });
-      } 
+      }
     }
   }
 
@@ -227,7 +228,7 @@ export default class DataSheet extends PureComponent {
   }
 
   onMouseDown(i, j) {
-    let editing = (isEmpty(this.state.editing) || this.state.editing.i !== i || this.state.editing.j !== j) 
+    let editing = (isEmpty(this.state.editing) || this.state.editing.i !== i || this.state.editing.j !== j)
       ? {} : this.state.editing;
     this.setState({selecting: true, start:{i, j}, end:{i, j}, editing: editing, forceEdit: false});
 
@@ -328,12 +329,10 @@ export default class DataSheet extends PureComponent {
 }
 
 DataSheet.propTypes = {
-  data: PropTypes.array.isRequired,           
-  className: PropTypes.string,                
+  data: PropTypes.array.isRequired,
+  className: PropTypes.string,
   onChange: PropTypes.func,
   onContextMenu: PropTypes.func,
-  valueRenderer: PropTypes.func.isRequired,   
-  dataRenderer: PropTypes.func,               
+  valueRenderer: PropTypes.func.isRequired,
+  dataRenderer: PropTypes.func,
 };
-
-
