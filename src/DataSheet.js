@@ -94,28 +94,29 @@ export default class DataSheet extends PureComponent {
 
   handlePaste(e) {
     this.dgDom.removeEventListener('paste', this.handlePaste);
+    
+    if(isEmpty(this.state.editing)) {
+      const start = this.state.start;
+      const pastedMap = [];
+      const pasteData = e.clipboardData
+        .getData('text/plain')
+        .split(/\n|\r/)
+        .map((row) => row.split('\t'));
 
-    const start = this.state.start;
-    const pastedMap = [];
-    const pasteData = e.clipboardData
-      .getData('text/plain')
-      .split(/\n|\r/)
-      .map((row) => row.split('\t'));
-
-    pasteData.map((row, i) => {
-      const rowData = [];
-      row.map((pastedData, j) => {
-        const cell = this.props.data[start.i + i] && this.props.data[start.i + i][start.j + j];
-        rowData.push({cell: cell, data: pastedData});
-        if (cell && !cell.readOnly && !this.props.onPaste) {
-          this.onChange(start.i + i, start.j + j, pastedData);
-        }
+      pasteData.map((row, i) => {
+        const rowData = [];
+        row.map((pastedData, j) => {
+          const cell = this.props.data[start.i + i] && this.props.data[start.i + i][start.j + j];
+          rowData.push({cell: cell, data: pastedData});
+          if (cell && !cell.readOnly && !this.props.onPaste) {
+            this.onChange(start.i + i, start.j + j, pastedData);
+          }
+        });
+        pastedMap.push(rowData);
       });
-      pastedMap.push(rowData);
-    });
-
-    this.props.onPaste && this.props.onPaste(pastedMap);
-    this.setState(this.defaultState);
+      this.props.onPaste && this.props.onPaste(pastedMap);
+      this.setState(this.defaultState);
+    }
   }
 
   handleKeyboardCellMovement(e) {
