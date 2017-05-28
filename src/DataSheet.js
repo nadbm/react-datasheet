@@ -132,12 +132,12 @@ export default class DataSheet extends PureComponent {
     ) {
       return false;
     } else if (e.keyCode === TAB_KEY && !e.shiftKey) {
-      newLocation = { i : start.i, j: start.j + 1};
+      newLocation = {i : start.i, j: start.j + 1};
       newLocation = typeof(data[newLocation.i][newLocation.j]) !== 'undefined' ? newLocation : { i : start.i + 1, j: 0}
     } else if (e.keyCode === RIGHT_KEY) {
       newLocation = {i: start.i, j: start.j + 1}
     } else if (e.keyCode === LEFT_KEY || e.keyCode === TAB_KEY && e.shiftKey) {
-      newLocation = { i : start.i, j: start.j - 1}
+      newLocation = {i : start.i, j: start.j - 1}
     } else if (e.keyCode === UP_KEY) {
       newLocation = {i: start.i - 1, j: start.j}
     } else if (e.keyCode === DOWN_KEY) {

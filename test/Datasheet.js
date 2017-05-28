@@ -822,6 +822,24 @@ describe('Component', () => {
           expect(datacust[0].map(d => d.data)).toEqual([12, '99'])
       });
 
+      it('doesnt auto paste data if cell is editing', () => {
+          const datacust = [[{data: 12, readOnly: false}, {data: 24, readOnly: false}]];
+          customWrapper = mount(
+            <DataSheet
+              data = {datacust}
+              valueRenderer = {(cell) => cell.data}
+              onChange = {(cell, i, j, value) => {datacust[i][j].data = value}}
+            />
+          );
+          customWrapper.find('td').at(1).simulate('doubleclick');
+
+          let evt = document.createEvent("HTMLEvents");
+          evt.initEvent("paste", false, true);
+          evt.clipboardData = { getData: (type)=> '100'};
+
+          expect(datacust[0].map(d => d.data)).toEqual([12, 24])
+      });
+
       it('pastes data properly and fires onPaste function if defined', (done) => {
           const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}]];
           customWrapper = mount(
