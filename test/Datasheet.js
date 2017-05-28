@@ -795,12 +795,17 @@ describe('Component', () => {
       });
       it('pastes data properly', () => {
           cells.at(0).simulate('mouseDown');
+          expect(wrapper.state('end')).toEqual({i: 0, j: 0});
+          
           const evt = document.createEvent("HTMLEvents");
           evt.initEvent("paste", false, true);
           evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
           document.dispatchEvent(evt);
+
           expect(data[0].map(d => d.data)).toEqual(['99', '100']);
           expect(data[1].map(d => d.data)).toEqual(['1001', '1002']);
+          expect(wrapper.state('end')).toEqual({i: 1, j: 1});
+
       });
 
       it('pastes data properly on a different cell', () => {
