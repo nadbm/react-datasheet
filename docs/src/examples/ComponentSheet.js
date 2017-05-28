@@ -1,7 +1,7 @@
 import React from 'react'
 import Select from 'react-select'
 import _ from 'lodash'
-import Datasheet from 'react-datasheet';  
+import Datasheet from '../lib/DataSheet' 
 
 export default class ComponentSheet extends React.Component {
   constructor (props) {

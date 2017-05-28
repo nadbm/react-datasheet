@@ -2,7 +2,7 @@ import React from 'react'
 import Select from 'react-select'
 import _ from 'lodash'
 import 'react-select/dist/react-select.css'
-import  '../../lib/react-datasheet.css'
+import  './lib/react-datasheet.css'
 import {BasicSheet, MathSheet, ComponentSheet} from './examples/index';
 
 export default class App extends React.Component {

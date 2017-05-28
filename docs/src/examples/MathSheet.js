@@ -1,8 +1,7 @@
 import React from 'react';
-import _ from 'lodash'
-import Datasheet from 'react-datasheet';  
+import _ from 'lodash';
 import mathjs from 'mathjs';
-
+import Datasheet from '../lib/DataSheet'
 
 export default class MathSheet extends React.Component {
   constructor(props) {  
