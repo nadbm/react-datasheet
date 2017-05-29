@@ -1,6 +1,6 @@
 {
   "name": "react-datasheet",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "description": "Excel-like data grid for React",
   "repository": {
     "type": "git",
@@ -57,8 +57,8 @@
     "watch": "^1.0.2"
   },
   "peerDependencies": {
-    "react": "~0.14.8 || ^15.0.0",
-    "react-dom": "~0.14.8 || ^15.0.0",
+    "react": ">=15.3.0",
+    "react-dom": ">=15.3.0",
     "prop-types": "^15.5.9"
   },
   "dependencies": {},
