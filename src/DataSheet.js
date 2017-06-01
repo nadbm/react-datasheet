@@ -316,7 +316,7 @@ export default class DataSheet extends PureComponent {
               editing: isEditing(i, j),
               reverting: isReverting(i, j),
               colSpan: cell.colSpan,
-              value: valueRenderer(cell),
+              value: valueRenderer(cell, i, j),
             };
             if (cell.component) {
               return <ComponentCell
@@ -327,7 +327,7 @@ export default class DataSheet extends PureComponent {
             }
             return <DataCell
               {...props}
-              data     = {dataRenderer ? dataRenderer(cell) : null}
+              data     = {dataRenderer ? dataRenderer(cell, i, j) : null}
               clear    = {shouldClear(i, j)}
               rowSpan  = {cell.rowSpan}
               onChange = {this.onChange}

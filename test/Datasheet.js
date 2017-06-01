@@ -405,6 +405,30 @@ describe('Component', () => {
         expect(customWrapper.find('td.cell input').nodes[0].value).toEqual('=+4');
       });
 
+      it('renders proper elements by column', () => {
+        const withDates = data.map((row, index) => [{data: new Date('2017-0' + (index + 1) + '-01')}, ...row]);
+        customWrapper = mount(<DataSheet
+          data = {withDates}
+          valueRenderer = {(cell, i, j) => j === 0 ? cell.data.toGMTString() : cell.data}
+          dataRenderer = {(cell, i, j) => j === 0 ? cell.data.toISOString() : cell.data}
+          onChange = {(cell, i, j, value) => data[i][j].data = value}
+        />);
+        //expect(wrapper.find('td > span').length).toEqual(6);
+        expect(customWrapper.find('td > span').nodes.map(n => n.innerHTML)).toEqual(['Sun, 01 Jan 2017 00:00:00 GMT', '4', '2', 'Wed, 01 Feb 2017 00:00:00 GMT', '3', '5']);
+      });
+
+      it('renders data in the input properly if dataRenderer is set by column', () => {
+        const withDates = data.map((row, index) => [{data: new Date('2017-0' + (index + 1) + '-01')}, ...row]);
+        customWrapper = mount(<DataSheet
+          data = {withDates}
+          valueRenderer = {(cell, i, j) => j === 0 ? cell.data.toGMTString() : cell.data}
+          dataRenderer = {(cell, i, j) => j === 0 ? cell.data.toISOString() : cell.data}
+          onChange = {(cell, i, j, value) => data[i][j].data = value}
+        />);
+        customWrapper.find('td').first().simulate('doubleClick');
+        expect(customWrapper.find('td.cell input').nodes[0].value).toEqual('2017-01-01T00:00:00.000Z');
+      });
+
       it('renders a component properly', () => {
         customWrapper = mount(<DataSheet
           data = {[[{component: <div className={'custom-component'}>COMPONENT RENDERED</div>}]]}
