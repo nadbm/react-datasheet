@@ -15,6 +15,7 @@ import jsdom from 'mocha-jsdom';
 
 const TAB_KEY = 9;
 const ENTER_KEY = 13;
+const ESCAPE_KEY = 27;
 const RIGHT_KEY = 39;
 const LEFT_KEY = 37;
 const UP_KEY = 38;
@@ -50,9 +51,9 @@ describe('Component', () => {
         const onDoubleClick = sinon.spy();
         const onContextMenu = sinon.spy();
         const wrapper = shallow(
-          <DataCell 
-            row={2} 
-            col={3} 
+          <DataCell
+            row={2}
+            col={3}
             rowSpan={4}
             colSpan={5}
             value={5}
@@ -71,7 +72,7 @@ describe('Component', () => {
             <span style={{display:'block'}}>5</span>
             <input style={{display:'none'}}/>
           </td>).html())
-        
+
         wrapper.simulate('mousedown');
         wrapper.simulate('doubleclick');
         wrapper.simulate('mouseover');
@@ -88,19 +89,19 @@ describe('Component', () => {
 
       it('should properly all update functions and render reading mode to editing mode ', () => {
         const props = {
-          editing: false, 
-          selected: false, 
-          value: 5, 
-          data: 5, 
-          row: 1, 
-          col: 1, 
-          onMouseDown: () => {}, 
-          onMouseOver: () => {}, 
+          editing: false,
+          selected: false,
+          value: 5,
+          data: 5,
+          row: 1,
+          col: 1,
+          onMouseDown: () => {},
+          onMouseOver: () => {},
           onDoubleClick: () => {},
           onContextMenu: () => {},
         }
         const wrapper = shallow(
-          <DataCell 
+          <DataCell
             {...props}
           />
         );
@@ -121,19 +122,19 @@ describe('Component', () => {
 
       it('should properly render a flash when value changes', () => {
         const props = {
-          editing: false, 
-          selected: false, 
-          value: 5, 
-          data: 5, 
-          row: 1, 
-          col: 1, 
-          onMouseDown: () => {}, 
-          onMouseOver: () => {}, 
+          editing: false,
+          selected: false,
+          value: 5,
+          data: 5,
+          row: 1,
+          col: 1,
+          onMouseDown: () => {},
+          onMouseOver: () => {},
           onDoubleClick: () => {},
           onContextMenu: () => {},
         }
         const wrapper = shallow(
-          <DataCell 
+          <DataCell
             {...props}
           />
         );
@@ -143,8 +144,8 @@ describe('Component', () => {
             <span style={{display:'block'}}>6</span>
             <input style={{display:'none'}}/>
           </td>).html());
-      })    
-    }) 
+      })
+    })
 
     describe('editing', () => {
       let onChange = null;
@@ -154,15 +155,16 @@ describe('Component', () => {
       beforeEach(() => {
         wrapper && wrapper.detach();
         props = {
-          editing: false, 
-          selected: false, 
+          editing: false,
+          reverting: false,
+          selected: false,
           value: '2',
           data: '5',
-          row: 1, 
-          col: 2, 
+          row: 1,
+          col: 2,
           onChange: sinon.spy(),
-          onMouseDown: () => {}, 
-          onDoubleClick: () => {}, 
+          onMouseDown: () => {},
+          onDoubleClick: () => {},
           onMouseOver: () => {},
           onContextMenu: () => {},
         }
@@ -186,24 +188,24 @@ describe('Component', () => {
         wrapper.setProps({ editing: false, selected: true });
         expect(props.onChange.called).toEqual(true);
         expect(props.onChange.calledWith(props.row, props.col, '6')).toEqual(true);
-      })    
+      })
 
       it('input value should be cleared if we go into editing with clear call', () => {
         wrapper.setProps({ editing: true, selected: true, clear: true});
         expect(wrapper.find('input').node.value).toEqual('');
-      })  
+      })
       it('input value should be set to value if data is null', () => {
         wrapper.setProps({ data: null});
         wrapper.setProps({ editing: true, selected: true});
         expect(wrapper.find('input').node.value).toEqual('2');
-        
+
         wrapper.find('input').node.value = '2';
         console.log(wrapper.props)
         wrapper.find('input').simulate('change');
         wrapper.setProps({ editing: false, selected: true });
         expect(props.onChange.called).toEqual(false)
 
-      }) 
+      })
     })
 
   })
@@ -216,11 +218,11 @@ describe('Component', () => {
         const onDoubleClick = sinon.spy();
         const onContextMenu = sinon.spy();
         const wrapper = shallow(
-          <ComponentCell 
-            row={2} 
+          <ComponentCell
+            row={2}
             col={3}
             readOnly={false}
-            forceComponent={true} 
+            forceComponent={true}
             rowSpan={4}
             colSpan={5}
             value={5}
@@ -263,15 +265,15 @@ describe('Component', () => {
         wrapper.unmount();
 
       })
-    }) 
+    })
     describe('rendering', () => {
       it('should properly render a change (flashing)', (done) => {
         const wrapper = shallow(
-          <ComponentCell 
-            row={2} 
+          <ComponentCell
+            row={2}
             col={3}
             readOnly={false}
-            forceComponent={true} 
+            forceComponent={true}
             value={5}
             className={'test'}
             editing={false}
@@ -301,7 +303,7 @@ describe('Component', () => {
           }
         }, 750)
       })
-    }) 
+    })
   })
 
   describe('Shallow DataSheet component', () => {
@@ -368,11 +370,11 @@ describe('Component', () => {
         customWrapper = null;
       }
     })
-    describe("rendering with varying props", () => {  
+    describe("rendering with varying props", () => {
       it('renders the proper elements', () => {
         expect(wrapper.find('table').length).toEqual(1);
         expect(_.values(wrapper.find('table').node.classList)).toEqual(['data-grid', 'test'])
-    
+
         expect(wrapper.find('td > span').length).toEqual(4);
         expect(wrapper.find('td > span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '3', '5']);
       })
@@ -382,7 +384,7 @@ describe('Component', () => {
         expect(wrapper.find('table tr').at(1).key()).toEqual('custom_key_1');
         expect(wrapper.find(DataCell).at(1).key()).toEqual('custom_key');
       })
-    
+
       it('sets the proper classes for the cells', () => {
         expect(wrapper.find('td').nodes.map(n => _.values(n.classList).sort()))
           .toEqual([
@@ -462,6 +464,7 @@ describe('Component', () => {
           end: {},
           selecting: false,
           editing: {},
+          reverting: {},
           forceEdit: false,
           clear: {}
         })
@@ -470,22 +473,22 @@ describe('Component', () => {
 
     describe("selection", () => {
       it('selects a single field properly', () => {
-    
+
         expect(wrapper.find('td.cell.selected').length).toEqual(0);
         wrapper.find('td').at(1).simulate('mouseDown');
         wrapper.find('td').at(1).simulate('mouseUp');
         expect(wrapper.find('td.cell.selected').length).toEqual(1);
         expect(wrapper.find('td.cell.selected span').nodes[0].innerHTML).toEqual('2');
       });
-    
-    
+
+
       it('selects multiple field properly 2x2 (hold left click)', () => {
         expect(wrapper.find('td.cell.selected').length).toEqual(0);
         wrapper.find('td').at(0).simulate('mouseDown');
         wrapper.find('td').at(3).simulate('mouseOver');
         expect(wrapper.find('td.cell.selected').length).toEqual(4);
         expect(wrapper.find('td.cell.selected span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '3', '5']);
-    
+
         expect(wrapper.state('selecting')).toEqual(true);
         expect(wrapper.state('editing')).toEqual({});
         expect(wrapper.state('start')).toEqual({
@@ -497,11 +500,11 @@ describe('Component', () => {
           j: 1
         });
       });
-    
+
       it('selects multiple field properly 2x2 and stay selected after releasing mouse button', () => {
         let mouseUpEvt = document.createEvent("HTMLEvents");
         mouseUpEvt.initEvent("mouseup", false, true);
-    
+
         expect(wrapper.find('.selected').length).toEqual(0);
         expect(wrapper.find('td.cell').length).toEqual(4);
         wrapper.find('td').at(0).simulate('mouseDown');
@@ -510,7 +513,7 @@ describe('Component', () => {
         expect(wrapper.state('end')).toEqual({ i: 1, j: 1 });
         expect(wrapper.state('selecting')).toEqual(true);
         document.dispatchEvent(mouseUpEvt);
-        expect(wrapper.state('selecting')).toEqual(false);  
+        expect(wrapper.state('selecting')).toEqual(false);
       });
 
       it('calls onSelect prop when a new element is selected', (done) => {
@@ -522,7 +525,7 @@ describe('Component', () => {
               {(cell) => {
                 try {
                   expect(cell).toEqual({data: 4, className: 'test1'});
-                  done();  
+                  done();
                 }
                 catch(err) {
                   done(err)
@@ -530,14 +533,14 @@ describe('Component', () => {
               }}
               valueRenderer = {(cell) => cell.data}
               onChange = {(cell, i, j, value) => custData[i][j].data = value}
-            />);  
+            />);
         customWrapper.find('td').at(0).simulate('mouseDown');
         expect(customWrapper.state('end')).toEqual({i: 0, j: 0});
       });
     });
 
-      
-    describe("keyboard movement", () => { 
+
+    describe("keyboard movement", () => {
       it('moves right with arrow keys', () => {
         wrapper.find('td').at(0).simulate('mouseDown');
         expect(wrapper.state('start')).toEqual({i: 0, j: 0});
@@ -578,7 +581,7 @@ describe('Component', () => {
         expect(wrapper.state('start')).toEqual({i: 0, j: 0});
       })
     })
-    
+
     describe("editing", () => {
       let cells = null;
       beforeEach(() => {
@@ -603,7 +606,6 @@ describe('Component', () => {
       });
 
       it('starts editing when double clicked', () => {
-        expect(wrapper.find('td.cell.selected').length).toEqual(0);
         cells.at(3).simulate('mousedown');
         dispatchKeyDownEvent(ENTER_KEY);
         expect(wrapper.state('editing')).toEqual({
@@ -622,7 +624,7 @@ describe('Component', () => {
       });
 
       it('starts editing certain keys are pressed', () => {
-      //[0  , 9 ,a , z , 0 , 9  , +  , = , decim] 
+      //[0  , 9 ,a , z , 0 , 9  , +  , = , decim]
         [48, 57, 65, 90, 96, 105, 107, 187, 189].map(charCode => {
           cells.at(0).simulate('mousedown');
           dispatchKeyDownEvent(charCode);
@@ -634,7 +636,7 @@ describe('Component', () => {
 
       it('does not start editing if cell is readOnly', () => {
         wrapper.setProps({data: [[{data: 1, readOnly: true},{data: 2, readOnly: true}]]});
-      //[0  , 9 ,a , z , 0 , 9  , +  , = , decim] 
+      //[0  , 9 ,a , z , 0 , 9  , +  , = , decim]
         [48, 57, 65, 90, 96, 105, 107, 187, 189].map(charCode => {
           cells.at(0).simulate('mousedown');
           dispatchKeyDownEvent(charCode);
@@ -664,6 +666,17 @@ describe('Component', () => {
         expect(wrapper.state('editing')).toEqual({})
       });
 
+      it('goes out of edit mode and reverts to original value when ESCAPE is pressed', () => {
+        cells.at(0).simulate('mouseDown');
+        dispatchKeyDownEvent('1'.charCodeAt(0));
+        wrapper.find('td.cell.selected input').node.value = 213;
+        wrapper.find('td.cell.selected input').simulate('change');
+        dispatchKeyDownEvent(ESCAPE_KEY);
+        expect(data[0][0].data).toEqual(4);
+        expect(wrapper.state('editing')).toEqual({});
+        expect(wrapper.state('reverting')).toEqual({ i: 0, j: 0 });
+      });
+
       it('updates value properly after double clicking', () => {
         cells.at(0).simulate('mouseDown');
         cells.at(0).simulate('mouseUp');
@@ -674,10 +687,11 @@ describe('Component', () => {
           end: { i: 0, j: 0 },
           selecting: true,
           editing: { i: 0, j: 0 },
+          reverting: {},
           forceEdit: true,
           clear: {}
         });
-        
+
         cells.at(0).find('input').node.value = 213;
         cells.at(0).find('input').simulate('change');
         dispatchKeyDownEvent(RIGHT_KEY);
@@ -691,10 +705,11 @@ describe('Component', () => {
         cells.at(0).simulate('mouseUp');
         dispatchKeyDownEvent('1'.charCodeAt(0));
         expect(wrapper.state()).toEqual({
-          start: { i: 0, j: 0 }, 
-          end: { i: 0, j: 0 }, 
+          start: { i: 0, j: 0 },
+          end: { i: 0, j: 0 },
           selecting: true,
           editing: { i: 0, j: 0 },
+          reverting: {},
           forceEdit: false,
           clear: { i: 0, j: 0 }
         });
@@ -705,10 +720,11 @@ describe('Component', () => {
         dispatchKeyDownEvent(RIGHT_KEY);
         expect(data[0][0].data).toEqual(213)
         expect(wrapper.state()).toEqual({
-          start: { i: 0, j: 1 }, //RIGHT_KEY movement 
+          start: { i: 0, j: 1 }, //RIGHT_KEY movement
           end: { i: 0, j: 1 }, //RIGHT_KEY movement
           selecting: true,
           editing: {},
+          reverting: {},
           forceEdit: false,
           clear: { i: 0, j: 0 }
         });
@@ -716,26 +732,28 @@ describe('Component', () => {
 
 
       it('doesn\'t moves to the next cell on left/right arrow if cell is a component', () => {
-        data[0][0].component = <div>HELLO</div> 
+        data[0][0].component = <div>HELLO</div>
         wrapper.setProps({data: data});
         expect(wrapper.exists(<div>HELLO</div>)).toEqual(true);
         cells.at(0).simulate('mouseDown');
         cells.at(0).simulate('mouseUp');
         dispatchKeyDownEvent('1'.charCodeAt(0));
         expect(wrapper.state()).toEqual({
-          start: { i: 0, j: 0 }, 
-          end: { i: 0, j: 0 }, 
+          start: { i: 0, j: 0 },
+          end: { i: 0, j: 0 },
           selecting: true,
           editing: { i: 0, j: 0 },
+          reverting: {},
           forceEdit: false,
           clear: { i: 0, j: 0 }
         });
         dispatchKeyDownEvent(RIGHT_KEY);
         expect(wrapper.state()).toEqual({
-          start: { i: 0, j: 0 }, //RIGHT_KEY movement 
+          start: { i: 0, j: 0 }, //RIGHT_KEY movement
           end: { i: 0, j: 0 }, //RIGHT_KEY movement
           selecting: true,
           editing: { i: 0, j: 0 },
+          reverting: {},
           forceEdit: false,
           clear: { i: 0, j: 0 }
         });
@@ -746,7 +764,7 @@ describe('Component', () => {
         const evt = document.createEvent("HTMLEvents");
         evt.initEvent('copy', false, true);
         evt.clipboardData = { setData: (type, text)=> { copied = text}};
-    
+
         cells.at(0).simulate('mouseDown');
         cells.at(3).simulate('mouseOver');
         document.dispatchEvent(evt);
@@ -779,12 +797,12 @@ describe('Component', () => {
         const evt = document.createEvent("HTMLEvents");
         evt.initEvent('copy', false, true);
         evt.clipboardData = { setData: (type, text)=> { pasted = text}};
-        
-        expect(wrapper.state('start')).toEqual({});  
+
+        expect(wrapper.state('start')).toEqual({});
         document.dispatchEvent(evt);
         expect(pasted).toEqual("");
       });
-      
+
       it('does not paste data if no cell is selected', () => {
           const evt = document.createEvent("HTMLEvents");
           evt.initEvent("paste", false, true);
@@ -796,7 +814,7 @@ describe('Component', () => {
       it('pastes data properly', () => {
           cells.at(0).simulate('mouseDown');
           expect(wrapper.state('end')).toEqual({i: 0, j: 0});
-          
+
           const evt = document.createEvent("HTMLEvents");
           evt.initEvent("paste", false, true);
           evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
@@ -860,10 +878,10 @@ describe('Component', () => {
                     [
                       {cell: datacust[0][0], data: '99'},
                       {cell: datacust[0][1], data: '100'}
-                    ], 
+                    ],
                     [
-                      {cell: undefined, data: '1001'}, 
-                      {cell: undefined, data: '1002'}, 
+                      {cell: undefined, data: '1001'},
+                      {cell: undefined, data: '1002'},
                     ]
                   ]);
                   done();
@@ -871,7 +889,7 @@ describe('Component', () => {
                 catch(err) {
                   done(err);
                 }
-                
+
               }}
             />
           );
@@ -881,7 +899,7 @@ describe('Component', () => {
           evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
           document.dispatchEvent(evt);
       });
-      
+
 
 
       it('stops editing on outside page click', () => {
@@ -889,15 +907,16 @@ describe('Component', () => {
         cell.simulate('mouseDown');
         cell.simulate('doubleClick');
         triggerMouseEvent(document, 'mousedown');
-        
+
         expect(wrapper.state()).toEqual({
           start: {},
           end: {},
           selecting: false,
           editing: {},
+          reverting: {},
           forceEdit: false,
           clear: {}
-        });  
+        });
       });
 
       it('pageClick does not execute if the mouse click is within', () => {
@@ -915,9 +934,10 @@ describe('Component', () => {
           end: {i: 0, j: 0},
           selecting: true,
           editing: {},
+          reverting: {},
           forceEdit: false,
           clear: {}
-        });  
+        });
       })
       it('delete on DELETE_KEY', () => {
         const cell = wrapper.find('td').first();
@@ -955,7 +975,7 @@ describe('Component', () => {
                 catch(err) {
                   done(err);
                 }
-                
+
               }}
             />
           );

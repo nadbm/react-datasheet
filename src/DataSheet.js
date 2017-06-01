@@ -5,6 +5,7 @@ import ComponentCell from './ComponentCell';
 
 const TAB_KEY           =  9;
 const ENTER_KEY         = 13;
+const ESCAPE_KEY        = 27;
 const LEFT_KEY          = 37;
 const UP_KEY            = 38;
 const RIGHT_KEY         = 39;
@@ -46,6 +47,7 @@ export default class DataSheet extends PureComponent {
       selecting: false,
       forceEdit: false,
       editing: {},
+      reverting: {},
       clear: {}
     };
     this.state = this.defaultState;
@@ -96,7 +98,7 @@ export default class DataSheet extends PureComponent {
   handlePaste(e) {
     if(isEmpty(this.state.editing)) {
       const start = this.state.start;
-      
+
       const pastedMap = [];
       const pasteData = e.clipboardData
         .getData('text/plain')
@@ -113,7 +115,7 @@ export default class DataSheet extends PureComponent {
             this.onChange(start.i + i, start.j + j, pastedData);
             end = {i: start.i + i, j: start.j + j};
           }
-          
+
         });
         pastedMap.push(rowData);
       });
@@ -176,6 +178,7 @@ export default class DataSheet extends PureComponent {
     const ctrlKeyPressed = e.ctrlKey || e.metaKey;
     const deleteKeysPressed = (e.keyCode === DELETE_KEY || e.keyCode === BACKSPACE_KEY);
     const enterKeyPressed = e.keyCode === ENTER_KEY;
+    const escapeKeyPressed = e.keyCode === ESCAPE_KEY;
     const numbersPressed = (e.keyCode >= 48 && e.keyCode <= 57);
     const lettersPressed = (e.keyCode >= 65 && e.keyCode <= 90);
     const numPadKeysPressed = (e.keyCode >= 96 && e.keyCode <= 105);
@@ -200,9 +203,11 @@ export default class DataSheet extends PureComponent {
       );
       e.preventDefault();
     } else if (enterKeyPressed && isEditing) {
-      this.setState({editing: {}});
+      this.setState({editing: {}, reverting: {}});
+    } else if (escapeKeyPressed && isEditing) {
+      this.setState({editing: {}, reverting: editing});
     } else if (enterKeyPressed && !isEditing  && !cell.readOnly) {
-      this.setState({editing: start, clear: {}, forceEdit: true});
+      this.setState({editing: start, clear: {}, reverting: {}, forceEdit: true});
     } else if (numbersPressed
       || numPadKeysPressed
       || lettersPressed
@@ -214,6 +219,7 @@ export default class DataSheet extends PureComponent {
         this.setState({
           editing: start,
           clear: start,
+          reverting: {},
           forceEdit: false
         });
       }
@@ -288,6 +294,7 @@ export default class DataSheet extends PureComponent {
     };
 
     const isEditing = (i, j) => this.state.editing.i === i && this.state.editing.j === j;
+    const isReverting = (i, j) => this.state.reverting.i === i && this.state.reverting.j === j;
     const shouldClear = (i, j) =>  this.state.clear.i === i && this.state.clear.j === j;
 
     return <table ref={(r) => this.dgDom = r} className={'data-grid ' + (className ?  className : '')}>
@@ -305,7 +312,9 @@ export default class DataSheet extends PureComponent {
               onMouseDown:   cell.disableEvents ? nullFtn : this.onMouseDown,
               onDoubleClick: cell.disableEvents ? nullFtn : this.onDoubleClick,
               onMouseOver:   cell.disableEvents ? nullFtn : this.onMouseOver,
-              onContextMenu: cell.disableEvents ? nullFtn : this.onContextMenu,editing: isEditing(i, j),
+              onContextMenu: cell.disableEvents ? nullFtn : this.onContextMenu,
+              editing: isEditing(i, j),
+              reverting: isReverting(i, j),
               colSpan: cell.colSpan,
               value: valueRenderer(cell),
             };
