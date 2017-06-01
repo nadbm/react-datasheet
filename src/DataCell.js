@@ -15,7 +15,7 @@ export default class DataCell extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.editing === true && this.props.editing === false) {
+    if (prevProps.editing === true && this.props.editing === false && this.props.reverting === false) {
       this.onChange(this._input.value);
     }
     if (prevProps.editing === false && this.props.editing === true) {
