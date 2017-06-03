@@ -804,8 +804,8 @@ describe('Component', () => {
         customWrapper = mount(
           <DataSheet
             data = {data}
-            valueRenderer = {(cell) => cell.data}
-            dataRenderer = {(cell) => "=+" + cell.data}
+            valueRenderer = {(cell, i, j) => cell.data}
+            dataRenderer = {(cell, i, j) => "{" + i + "," + j + "}" + cell.data}
             onChange = {(cell, i, j, value) => data[i][j].data = value}
           />
         );
@@ -813,7 +813,7 @@ describe('Component', () => {
         customWrapper.find('td').at(3).simulate('mouseOver');
 
         document.dispatchEvent(evt);
-        expect(copied).toEqual("=+4\t=+2\n=+3\t=+5");
+        expect(copied).toEqual("{0,0}4\t{0,1}2\n{1,0}3\t{1,1}5");
       })
 
       it('copies no data if there isn\'t anything selected', () => {
