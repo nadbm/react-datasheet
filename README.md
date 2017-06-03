@@ -72,17 +72,18 @@ class App extends React.Component {
 ### Cells with underlying data
 
 There are two values that each cell shows. The first is via ```valueRenderer``` and the second is via ```dataRenderer```. When a cell is in *edit mode*, it will show the value returned from ```dataRenderer```. It needs to return a string as this value is set in an input field.
+Each of these callbacks are passed the cell value as well as the cell's coordinates in the spreadsheet. This allows you to apply formatting logic at rendering time, such as *all cells in the third column should be formatted as dates*.
 
 ```jsx 
 const grid = [
-   [{value:  5, expr: '1 + 4'}, {value:  6, expr: '6'}],
-   [{value:  5, expr: '1 + 4'}, {value:  5, expr: '1 + 4'}]
+   [{value:  5, expr: '1 + 4'}, {value:  6, expr: '6'}, {value: new Date('2008-04-10')}],
+   [{value:  5, expr: '1 + 4'}, {value:  5, expr: '1 + 4'}, {value: new Date('2004-05-28')}]
 ]
 const onChange = (cell, i, j, newValue) => console.log("New expression :" + newValue)
 <ReactDataSheet 
   data={grid}
-  valueRenderer={(cell) => cell.value}
-  dataRenderer={(cell) => cell.expr}
+  valueRenderer={(cell, i, j) => j == 2 ? cell.value.toDateString() : cell.value}
+  dataRenderer={(cell, i, j) => j == 2 ? cell.value.toISOString() : cell.expr}
   onChange={} 
 />
 ```
@@ -112,8 +113,8 @@ This renders a single cell with the value 5. Once in edit mode, the button will 
 Option | Type | Description
 :--- | :---: | :--- 
 data | Array | Array of rows and each row should contain the cell objects to display
-valueRenderer | func | Method to render the value of the cell `function(cell)`. This is visible by default
-dataRenderer | func | Method to render the underlying value of the cell `function(cell)`. This data is visible once in edit mode.
+valueRenderer | func | Method to render the value of the cell `function(cell, i, j)`. This is visible by default
+dataRenderer | func | Method to render the underlying value of the cell `function(cell, i, j)`. This data is visible once in edit mode.
 onChange | func | onChange handler: `function(cell, i, j, newValue) {}`
 onPaste | func | onPaste handler: `function(array) {}` If set, the function will be called with an array of rows. Each row has an array of objects containing the cell and raw pasted value. If the pasted value cannot be matched with a cell, the cell value will be undefined
 onContextMenu | func | Context menu handler : `function(event, cell, i, j)`

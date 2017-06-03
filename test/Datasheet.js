@@ -405,6 +405,30 @@ describe('Component', () => {
         expect(customWrapper.find('td.cell input').nodes[0].value).toEqual('=+4');
       });
 
+      it('renders proper elements by column', () => {
+        const withDates = data.map((row, index) => [{data: new Date('2017-0' + (index + 1) + '-01')}, ...row]);
+        customWrapper = mount(<DataSheet
+          data = {withDates}
+          valueRenderer = {(cell, i, j) => j === 0 ? cell.data.toGMTString() : cell.data}
+          dataRenderer = {(cell, i, j) => j === 0 ? cell.data.toISOString() : cell.data}
+          onChange = {(cell, i, j, value) => data[i][j].data = value}
+        />);
+        //expect(wrapper.find('td > span').length).toEqual(6);
+        expect(customWrapper.find('td > span').nodes.map(n => n.innerHTML)).toEqual(['Sun, 01 Jan 2017 00:00:00 GMT', '4', '2', 'Wed, 01 Feb 2017 00:00:00 GMT', '3', '5']);
+      });
+
+      it('renders data in the input properly if dataRenderer is set by column', () => {
+        const withDates = data.map((row, index) => [{data: new Date('2017-0' + (index + 1) + '-01')}, ...row]);
+        customWrapper = mount(<DataSheet
+          data = {withDates}
+          valueRenderer = {(cell, i, j) => j === 0 ? cell.data.toGMTString() : cell.data}
+          dataRenderer = {(cell, i, j) => j === 0 ? cell.data.toISOString() : cell.data}
+          onChange = {(cell, i, j, value) => data[i][j].data = value}
+        />);
+        customWrapper.find('td').first().simulate('doubleClick');
+        expect(customWrapper.find('td.cell input').nodes[0].value).toEqual('2017-01-01T00:00:00.000Z');
+      });
+
       it('renders a component properly', () => {
         customWrapper = mount(<DataSheet
           data = {[[{component: <div className={'custom-component'}>COMPONENT RENDERED</div>}]]}
@@ -780,8 +804,8 @@ describe('Component', () => {
         customWrapper = mount(
           <DataSheet
             data = {data}
-            valueRenderer = {(cell) => cell.data}
-            dataRenderer = {(cell) => "=+" + cell.data}
+            valueRenderer = {(cell, i, j) => cell.data}
+            dataRenderer = {(cell, i, j) => "{" + i + "," + j + "}" + cell.data}
             onChange = {(cell, i, j, value) => data[i][j].data = value}
           />
         );
@@ -789,7 +813,7 @@ describe('Component', () => {
         customWrapper.find('td').at(3).simulate('mouseOver');
 
         document.dispatchEvent(evt);
-        expect(copied).toEqual("=+4\t=+2\n=+3\t=+5");
+        expect(copied).toEqual("{0,0}4\t{0,1}2\n{1,0}3\t{1,1}5");
       })
 
       it('copies no data if there isn\'t anything selected', () => {

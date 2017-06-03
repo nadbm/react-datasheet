@@ -82,14 +82,14 @@ export default class DataSheet extends PureComponent {
 
 
       const text = range(start.i, end.i).map((i) =>
-        range(start.j, end.j).map(j => data[i][j])
-          .map(cell => {
-            let value = dataRenderer ? dataRenderer(cell) : null;
-            if (value === '' || value === null || typeof(value) === 'undefined') {
-              return valueRenderer(cell);
-            }
-            return value;
-          }).join('\t')
+        range(start.j, end.j).map(j => {
+          const cell = data[i][j];
+          const value = dataRenderer ? dataRenderer(cell, i, j) : null;
+          if (value === '' || value === null || typeof(value) === 'undefined') {
+            return valueRenderer(cell, i, j);
+          }
+          return value;
+        }).join('\t')
       ).join('\n');
       e.clipboardData.setData('text/plain', text);
     }
@@ -316,7 +316,7 @@ export default class DataSheet extends PureComponent {
               editing: isEditing(i, j),
               reverting: isReverting(i, j),
               colSpan: cell.colSpan,
-              value: valueRenderer(cell),
+              value: valueRenderer(cell, i, j),
             };
             if (cell.component) {
               return <ComponentCell
@@ -327,7 +327,7 @@ export default class DataSheet extends PureComponent {
             }
             return <DataCell
               {...props}
-              data     = {dataRenderer ? dataRenderer(cell) : null}
+              data     = {dataRenderer ? dataRenderer(cell, i, j) : null}
               clear    = {shouldClear(i, j)}
               rowSpan  = {cell.rowSpan}
               onChange = {this.onChange}
