@@ -133,3 +133,4 @@ forceComponent | bool | false | Renders what's in component at all times, even w
 disableEvents | bool | false | Makes cell unselectable and read only
 colSpan | number | 1 | The colSpan of the cell's td element
 rowSpan | number | 1 | The rowSpan of the cell's td element
+placeholder | string | undefined | The placeholder text of the cell without a value
