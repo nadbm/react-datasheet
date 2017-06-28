@@ -87,6 +87,50 @@ describe('Component', () => {
         wrapper.unmount();
       })
 
+      it('should properly render a placeholder', () => {
+        const onMouseDown = sinon.spy();
+        const onMouseOver = sinon.spy();
+        const onDoubleClick = sinon.spy();
+        const onContextMenu = sinon.spy();
+        const wrapper = shallow(
+          <DataCell
+            row={2}
+            col={3}
+            rowSpan={4}
+            colSpan={5}
+            placeholder={'test'}
+            className={'test'}
+            editing={false}
+            selected={false}
+            onMouseDown={onMouseDown}
+            onDoubleClick={onDoubleClick}
+            onMouseOver={onMouseOver}
+            onContextMenu={onContextMenu}
+          />
+        );
+
+        expect(wrapper.html()).toEqual(
+          shallow(<td className='test cell' colSpan={5} rowSpan={4}>
+            <span style={{display:'block'}}>
+              <span className="placeholder">test</span>
+            </span>
+            <input style={{display:'none'}}/>
+          </td>).html())
+
+        wrapper.simulate('mousedown');
+        wrapper.simulate('doubleclick');
+        wrapper.simulate('mouseover');
+        wrapper.simulate('contextmenu');
+
+        expect(onDoubleClick.calledWith(2, 3)).toEqual(true);
+        expect(onMouseDown.calledWith(2, 3)).toEqual(true);
+        expect(onMouseOver.calledWith(2, 3)).toEqual(true);
+        const args = onContextMenu.getCall(0).args;
+        expect(args[1]).toEqual(2);
+        expect(args[2]).toEqual(3);
+        wrapper.unmount();
+      })
+
       it('should properly all update functions and render reading mode to editing mode ', () => {
         const props = {
           editing: false,

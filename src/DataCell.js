@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
 export default class DataCell extends PureComponent {
@@ -34,11 +34,11 @@ export default class DataCell extends PureComponent {
 
   onChange(value) {
     const initialData = this.props.data === null ? this.props.value : this.props.data;
-    (value === '' || initialData !== value) && this.props.onChange(this.props.row, this.props.col, value);
+    (value === '' || initialData !== value) && this.props.onChange(this.props.row, this.props.col, value, this.props.placeholder);
   }
 
   render() {
-    const {row, col, rowSpan, readOnly, colSpan, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu} = this.props;
+    const {row, col, rowSpan, readOnly, colSpan, value, placeholder, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu} = this.props;
     return (
       <td
         className={[
@@ -54,10 +54,11 @@ export default class DataCell extends PureComponent {
         onMouseOver={()=> onMouseOver(row,col)}
         onContextMenu={(e) => onContextMenu(e, row, col)}
         colSpan={colSpan || 1}
-        rowSpan={rowSpan || 1}
-      >
-        <span style={{display: (editing && selected) ? 'none':'block'}}>
-          {value}
+        rowSpan={rowSpan || 1}>
+        <span style={{ display: editing && selected ? 'none' : 'block' }}>
+          {!value && placeholder
+            ? <span className="placeholder">{placeholder}</span>
+            : value}
         </span>
         <input style={{display: (editing && selected) ? 'block' : 'none'}} ref={(input) => this._input = input}/>
       </td>

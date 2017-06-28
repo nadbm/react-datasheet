@@ -264,9 +264,9 @@ export default class DataSheet extends PureComponent {
     document.removeEventListener('mouseup', this.onMouseUp);
   }
 
-  onChange(i, j, val) {
-    this.props.onChange(this.props.data[i][j], i, j, val);
-    this.setState({editing: {}});
+  onChange(i, j, val, placeholder) {
+    this.props.onChange(this.props.data[i][j], i, j, val, placeholder);
+    this.setState({ editing: {} });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -317,6 +317,7 @@ export default class DataSheet extends PureComponent {
               reverting: isReverting(i, j),
               colSpan: cell.colSpan,
               value: valueRenderer(cell, i, j),
+              placeholder: cell.placeholder
             };
             if (cell.component) {
               return <ComponentCell
