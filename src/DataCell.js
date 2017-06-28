@@ -34,7 +34,7 @@ export default class DataCell extends PureComponent {
 
   onChange(value) {
     const initialData = this.props.data === null ? this.props.value : this.props.data;
-    (value === '' || initialData !== value) && this.props.onChange(this.props.row, this.props.col, value, this.props.placeholder);
+    (value === '' || initialData !== value) && this.props.onChange(this.props.row, this.props.col, value);
   }
 
   render() {
