@@ -38,12 +38,13 @@ export default class DataCell extends PureComponent {
   }
 
   render() {
-    const {row, col, rowSpan, readOnly, colSpan, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu} = this.props;
+    const {row, col, rowSpan, readOnly, colSpan, width, overflow, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu} = this.props;
+    const style = { width };
     return (
       <td
         className={[
           className,
-          'cell',
+          'cell', overflow,
           selected && 'selected',
           editing && 'editing',
           readOnly && 'read-only',
@@ -55,6 +56,7 @@ export default class DataCell extends PureComponent {
         onContextMenu={(e) => onContextMenu(e, row, col)}
         colSpan={colSpan || 1}
         rowSpan={rowSpan || 1}
+        style={style}
       >
         <span style={{display: (editing && selected) ? 'none':'block'}}>
           {value}
@@ -70,6 +72,8 @@ DataCell.propTypes = {
   col: PropTypes.number.isRequired,
   colSpan: PropTypes.number,
   rowSpan: PropTypes.number,
+  width: PropTypes.string,
+  overflow: PropTypes.oneOf(['wrap', 'nowrap', 'clip']),
   selected: PropTypes.bool.isRequired,
   editing: PropTypes.bool.isRequired,
   onMouseDown: PropTypes.func.isRequired,

@@ -277,7 +277,7 @@ export default class DataSheet extends PureComponent {
   }
 
   render() {
-    const {dataRenderer, valueRenderer, className} = this.props;
+    const {dataRenderer, valueRenderer, className, overflow} = this.props;
 
     const isSelected = (i, j) => {
       const start = this.state.start;
@@ -297,7 +297,7 @@ export default class DataSheet extends PureComponent {
     const isReverting = (i, j) => this.state.reverting.i === i && this.state.reverting.j === j;
     const shouldClear = (i, j) =>  this.state.clear.i === i && this.state.clear.j === j;
 
-    return <table ref={(r) => this.dgDom = r} className={'data-grid ' + (className ?  className : '')}>
+    return <table ref={(r) => this.dgDom = r} className={['data-grid', className, overflow].filter(a => a).join(' ')}>
       <tbody>
       {this.props.data.map((row, i) =>
         <tr key={this.props.keyFn ? this.props.keyFn(i) : i}>
@@ -316,6 +316,8 @@ export default class DataSheet extends PureComponent {
               editing: isEditing(i, j),
               reverting: isReverting(i, j),
               colSpan: cell.colSpan,
+              width: typeof cell.width === 'number' ? cell.width + 'px' : cell.width,
+              overflow: cell.overflow,
               value: valueRenderer(cell, i, j),
             };
             if (cell.component) {
@@ -345,6 +347,7 @@ export default class DataSheet extends PureComponent {
 DataSheet.propTypes = {
   data: PropTypes.array.isRequired,
   className: PropTypes.string,
+  overflow: PropTypes.oneOf(['wrap', 'nowrap', 'clip']),
   onChange: PropTypes.func,
   onContextMenu: PropTypes.func,
   valueRenderer: PropTypes.func.isRequired,
