@@ -115,7 +115,7 @@ Option | Type | Description
 data | Array | Array of rows and each row should contain the cell objects to display
 valueRenderer | func | Method to render the value of the cell `function(cell, i, j)`. This is visible by default
 dataRenderer | func | Method to render the underlying value of the cell `function(cell, i, j)`. This data is visible once in edit mode.
-overflow | 'wrap'|'nowrap'|'clip' | Grid default for how to render overflow text in cells
+overflow | 'wrap'\|'nowrap'\|'clip' | Grid default for how to render overflow text in cells
 onChange | func | onChange handler: `function(cell, i, j, newValue) {}`
 onPaste | func | onPaste handler: `function(array) {}` If set, the function will be called with an array of rows. Each row has an array of objects containing the cell and raw pasted value. If the pasted value cannot be matched with a cell, the cell value will be undefined
 onContextMenu | func | Context menu handler : `function(event, cell, i, j)`
@@ -135,4 +135,4 @@ disableEvents | bool | false | Makes cell unselectable and read only
 colSpan | number | 1 | The colSpan of the cell's td element
 rowSpan | number | 1 | The rowSpan of the cell's td element
 width | number or String | undefined | Sets the cell's td width using a style attribute. Number is interpreted as pixels, strings are used as-is. Note: This will only work if the table does not have a set width.
-overflow | 'wrap'|'nowrap'|'clip' | undefined | How to render overflow text. Overrides grid-level `overflow` option.
+overflow | 'wrap'\|'nowrap'\| 'clip' | undefined | How to render overflow text. Overrides grid-level `overflow` option.
