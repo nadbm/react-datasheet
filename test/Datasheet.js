@@ -57,6 +57,7 @@ describe('Component', () => {
             rowSpan={4}
             colSpan={5}
             value={5}
+            width={'200px'}
             className={'test'}
             editing={false}
             selected={false}
@@ -68,7 +69,7 @@ describe('Component', () => {
         );
 
         expect(wrapper.html()).toEqual(
-          shallow(<td className='test cell' colSpan={5} rowSpan={4}>
+          shallow(<td className='test cell' colSpan={5} rowSpan={4} style={{ width: '200px' }}>
             <span style={{display:'block'}}>5</span>
             <input style={{display:'none'}}/>
           </td>).html())
@@ -226,6 +227,7 @@ describe('Component', () => {
             rowSpan={4}
             colSpan={5}
             value={5}
+            width={'200px'}
             className={'test'}
             editing={false}
             selected={false}
@@ -238,17 +240,17 @@ describe('Component', () => {
         );
 
         expect(wrapper.html()).toEqual(
-          shallow(<td className='test cell' colSpan={5} rowSpan={4}>
+          shallow(<td className='test cell' colSpan={5} rowSpan={4} style={{width: '200px'}}>
             <div>HELLO</div>
           </td>).html())
         wrapper.setProps({forceComponent: false})
         expect(wrapper.html()).toEqual(
-          shallow(<td className='test cell' colSpan={5} rowSpan={4}>
+          shallow(<td className='test cell' colSpan={5} rowSpan={4} style={{width: '200px'}}>
             5
           </td>).html())
         wrapper.setProps({value: 7})
         expect(wrapper.html()).toEqual(
-          shallow(<td className='test cell updated' colSpan={5} rowSpan={4}>
+          shallow(<td className='test cell updated' colSpan={5} rowSpan={4} style={{width: '200px'}}>
             7
           </td>).html())
         wrapper.simulate('mousedown');
@@ -340,7 +342,8 @@ describe('Component', () => {
       data = [
         [{
           className: 'test1',
-          data: 4
+          data: 4,
+          overflow: 'clip'
         }, {
           className: 'test2',
           data: 2,
@@ -348,15 +351,18 @@ describe('Component', () => {
         }],
         [{
           className: 'test3',
-          data: 3
+          data: 3,
+          width: '25%'
         }, {
           className: 'test4',
-          data: 5
+          data: 5,
+          width: 100
         }]
       ];
       component = <DataSheet
         keyFn = {(i) => 'custom_key_' + i}
         className = {'test'}
+        overflow = 'nowrap'
         data = {data}
         valueRenderer = {(cell) => cell.data}
         onChange = {(cell, i, j, value) => data[i][j].data = value}
@@ -373,7 +379,7 @@ describe('Component', () => {
     describe("rendering with varying props", () => {
       it('renders the proper elements', () => {
         expect(wrapper.find('table').length).toEqual(1);
-        expect(_.values(wrapper.find('table').node.classList)).toEqual(['data-grid', 'test'])
+        expect(_.values(wrapper.find('table').node.classList)).toEqual(['data-grid', 'test', 'nowrap'])
 
         expect(wrapper.find('td > span').length).toEqual(4);
         expect(wrapper.find('td > span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '3', '5']);
@@ -388,7 +394,7 @@ describe('Component', () => {
       it('sets the proper classes for the cells', () => {
         expect(wrapper.find('td').nodes.map(n => _.values(n.classList).sort()))
           .toEqual([
-            ['cell', 'test1'],
+            ['cell', 'clip', 'test1'],
             ['cell', 'test2'],
             ['cell', 'test3'],
             ['cell', 'test4']
@@ -548,7 +554,7 @@ describe('Component', () => {
                   /* eslint-disable keyword-spacing */
               {(cell) => {
                 try {
-                  expect(cell).toEqual({data: 4, className: 'test1'});
+                  expect(cell).toEqual({data: 4, className: 'test1', overflow: 'clip'});
                   done();
                 }
                 catch(err) {

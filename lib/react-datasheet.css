@@ -52,3 +52,35 @@ table.data-grid td.cell > input {
   height: 11px;
   background: none;
 }
+
+
+table.data-grid td.cell {
+  vertical-align: bottom;
+}
+
+table.data-grid td.cell,
+table.data-grid.wrap td.cell,
+table.data-grid.wrap td.cell.wrap,
+table.data-grid td.cell.wrap,
+table.data-grid.nowrap td.cell.wrap,
+table.data-grid.clip td.cell.wrap {
+  white-space: normal;
+}
+
+table.data-grid.nowrap td.cell,
+table.data-grid.nowrap td.cell.nowrap,
+table.data-grid td.cell.nowrap,
+table.data-grid.wrap td.cell.nowrap,
+table.data-grid.clip td.cell.nowrap {
+  white-space: nowrap;
+  overflow-x: visible;
+}
+
+table.data-grid.clip td.cell,
+table.data-grid.clip td.cell.clip,
+table.data-grid td.cell.clip,
+table.data-grid.wrap td.cell.clip,
+table.data-grid.nowrap td.cell.clip {
+  white-space: nowrap;
+  overflow-x: hidden;
+}

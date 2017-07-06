@@ -22,15 +22,15 @@ export default class ComponentCell extends PureComponent {
 
   render() {
     let {
-      row, col, readOnly, forceComponent, rowSpan, colSpan, value, className, editing, selected,
+      row, col, readOnly, forceComponent, rowSpan, colSpan, width, overflow, value, className, editing, selected,
       onMouseDown, onMouseOver, onDoubleClick, onContextMenu
     } = this.props;
-
+    const style = { width };
 
     return (
       <td
         className={[
-          className, 'cell',
+          className, 'cell', overflow,
           editing && 'editing', selected && 'selected',
           this.state.updated && 'updated'
         ].filter(a => a).join(' ')}
@@ -38,7 +38,9 @@ export default class ComponentCell extends PureComponent {
         onDoubleClick={() => onDoubleClick(row, col)}
         onMouseOver={() => onMouseOver(row, col)}
         onContextMenu={(e) => onContextMenu(e, row, col)} colSpan={colSpan || 1}
-        rowSpan={rowSpan || 1}>
+        rowSpan={rowSpan || 1}
+        style={style}
+      >
         { ((editing && !readOnly) || forceComponent) ? this.props.component : value }
       </td>
     );
@@ -50,6 +52,8 @@ ComponentCell.propTypes = {
   col: PropTypes.number.isRequired,
   colSpan: PropTypes.number,
   rowSpan: PropTypes.number,
+  width: PropTypes.string,
+  overflow: PropTypes.oneOf(['wrap', 'nowrap', 'clip']),
   className: PropTypes.string,
   selected: PropTypes.bool.isRequired,
   editing: PropTypes.bool.isRequired,
