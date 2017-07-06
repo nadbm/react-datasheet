@@ -134,5 +134,5 @@ forceComponent | bool | false | Renders what's in component at all times, even w
 disableEvents | bool | false | Makes cell unselectable and read only
 colSpan | number | 1 | The colSpan of the cell's td element
 rowSpan | number | 1 | The rowSpan of the cell's td element
-width | number or String | undefined | Sets the cell's td width using a style attribute. Number is interpreted as pixels, strings are used as-is.
+width | number or String | undefined | Sets the cell's td width using a style attribute. Number is interpreted as pixels, strings are used as-is. Note: This will only work if the table does not have a set width.
 overflow | 'wrap'|'nowrap'|'clip' | undefined | How to render overflow text. Overrides grid-level `overflow` option.
