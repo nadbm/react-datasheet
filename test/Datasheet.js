@@ -875,6 +875,25 @@ describe('Component', () => {
           expect(datacust[0].map(d => d.data)).toEqual([12, '99'])
       });
 
+      it('pastes multiple rows correclty on windows', () => {
+          const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}],[{data: 1012, readOnly: true}, {data: 1024, readOnly: false}]];
+          customWrapper = mount(
+            <DataSheet
+              data = {datacust}
+              valueRenderer = {(cell) => cell.data}
+              onChange = {(cell, i, j, value) => datacust[i][j].data = value}
+            />
+          );
+          customWrapper.find('td').at(1).simulate('mouseDown');
+
+          let evt = document.createEvent("HTMLEvents");
+          evt.initEvent("paste", false, true);
+          evt.clipboardData = { getData: (type)=> '99\t100\r\n1001\t1002'};
+          document.dispatchEvent(evt);
+
+          expect(datacust[1].map(d => d.data)).toEqual([1012, '1001'])
+      });
+
       it('doesnt auto paste data if cell is editing', () => {
           const datacust = [[{data: 12, readOnly: false}, {data: 24, readOnly: false}]];
           customWrapper = mount(

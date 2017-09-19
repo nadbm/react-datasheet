@@ -102,7 +102,7 @@ export default class DataSheet extends PureComponent {
       const pastedMap = [];
       const pasteData = e.clipboardData
         .getData('text/plain')
-        .split(/\n|\r/)
+        .split(/\r\n|\n|\r/)
         .map((row) => row.split('\t'));
       let end = {};
 
