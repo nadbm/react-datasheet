@@ -8,10 +8,10 @@ export default class BasicSheet extends React.Component {
     this.state = {
       grid: [
         [
-          {readOnly: true, value: ''}, 
-          {value: 'A', readOnly: true}, 
-          {value: 'B', readOnly: true}, 
-          {value: 'C', readOnly: true}, 
+          {readOnly: true, value: ''},
+          {value: 'A', readOnly: true},
+          {value: 'B', readOnly: true},
+          {value: 'C', readOnly: true},
           {value: 'D', readOnly: true}
         ],
         [{readOnly: true, value: 1}, {value: 1}, {value: 3}, {value: 3}, {value: 3}],
@@ -27,7 +27,7 @@ export default class BasicSheet extends React.Component {
         data={this.state.grid}
         valueRenderer={(cell) => cell.value}
         onContextMenu={(e, cell, i, j) => cell.readOnly ? e.preventDefault() : null}
-        onChange={(modifiedCell, colI, rowJ, value) =>
+        onChange={(modifiedCell, rowI, colJ, value) =>
           this.setState({
             grid: this.state.grid.map((row) =>
               row.map((cell) =>
