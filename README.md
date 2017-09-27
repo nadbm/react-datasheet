@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/nadbm/react-datasheet/badge.svg)](https://coveralls.io/github/nadbm/react-datasheet)
 [![Issue Count](https://codeclimate.com/github/nadbm/react-datasheet/badges/issue_count.svg)](https://codeclimate.com/github/nadbm/react-datasheet)
 # React-Datasheet
-A simple react component to create a spreadsheet. 
+A simple react component to create a spreadsheet.
 
 Demo here: https://nadbm.github.io/react-datasheet/
 
@@ -19,7 +19,7 @@ Current features:
 
 ## Installation
 
-Install from npm: 
+Install from npm:
 ```bash
 $ npm install react-datasheet --save
 ```
@@ -33,7 +33,7 @@ import 'react-datasheet/lib/react-datasheet.css';
 
 ## Usage
 
-React-Datasheet generates a table with the cells. Double-clicking or typing edits the value and if changed, initiates an onChange callback. 
+React-Datasheet generates a table with the cells. Double-clicking or typing edits the value and if changed, initiates an onChange callback.
 
 The data provided should be an array of rows, and each row should include the cells.
 
@@ -51,17 +51,17 @@ class App extends React.Component {
   }
   render () {
     return (
-      <ReactDataSheet 
+      <ReactDataSheet
         data={this.state.grid}
         valueRenderer={(cell) => cell.value}
-        onChange={(cell, colI, rowJ, value) => 
+        onChange={(cell, rowI, colJ, value) =>
           this.setState({
-            grid: this.state.grid.map((col) => 
-              col.map((rowCell) => 
+            grid: this.state.grid.map((col) =>
+              col.map((rowCell) =>
                 (rowCell == cell) ? ({value: value}) : rowCell
               )
             )
-          }) 
+          })
         }
       />
     )
@@ -74,34 +74,34 @@ class App extends React.Component {
 There are two values that each cell shows. The first is via ```valueRenderer``` and the second is via ```dataRenderer```. When a cell is in *edit mode*, it will show the value returned from ```dataRenderer```. It needs to return a string as this value is set in an input field.
 Each of these callbacks are passed the cell value as well as the cell's coordinates in the spreadsheet. This allows you to apply formatting logic at rendering time, such as *all cells in the third column should be formatted as dates*.
 
-```jsx 
+```jsx
 const grid = [
    [{value:  5, expr: '1 + 4'}, {value:  6, expr: '6'}, {value: new Date('2008-04-10')}],
    [{value:  5, expr: '1 + 4'}, {value:  5, expr: '1 + 4'}, {value: new Date('2004-05-28')}]
 ]
 const onChange = (cell, i, j, newValue) => console.log("New expression :" + newValue)
-<ReactDataSheet 
+<ReactDataSheet
   data={grid}
   valueRenderer={(cell, i, j) => j == 2 ? cell.value.toDateString() : cell.value}
   dataRenderer={(cell, i, j) => j == 2 ? cell.value.toISOString() : cell.expr}
-  onChange={} 
+  onChange={}
 />
 ```
 
 ### Cells with underlying component
 
-```jsx 
+```jsx
 const grid = [
    [{
-    value:  5, 
-      component: ( 
+    value:  5,
+      component: (
         <button onClick={() => console.log("clicked")}}>
           Rendered
         </button>
       )
     }]
 ]
-<ReactDataSheet 
+<ReactDataSheet
   data={grid}
   valueRenderer={(cell) => cell.value}
 />
@@ -111,7 +111,7 @@ This renders a single cell with the value 5. Once in edit mode, the button will 
 ## Options
 
 Option | Type | Description
-:--- | :---: | :--- 
+:--- | :---: | :---
 data | Array | Array of rows and each row should contain the cell objects to display
 valueRenderer | func | Method to render the value of the cell `function(cell, i, j)`. This is visible by default
 dataRenderer | func | Method to render the underlying value of the cell `function(cell, i, j)`. This data is visible once in edit mode.
