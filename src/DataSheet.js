@@ -26,6 +26,11 @@ const range = (start, end) => {
 
 const nullFtn = (obj) => {};
 
+const defaultParsePaste = (str) => {
+  return str.split(/\r\n|\n|\r/)
+    .map((row) => row.split('\t'));
+}
+
 export default class DataSheet extends PureComponent {
 
   constructor(props) {
@@ -99,11 +104,10 @@ export default class DataSheet extends PureComponent {
     if(isEmpty(this.state.editing)) {
       const start = this.state.start;
 
+      const parse = this.props.parsePaste || defaultParsePaste;
       const pastedMap = [];
-      const pasteData = e.clipboardData
-        .getData('text/plain')
-        .split(/\r\n|\n|\r/)
-        .map((row) => row.split('\t'));
+      const pasteData = parse(e.clipboardData.getData('text/plain'));
+
       let end = {};
 
       pasteData.map((row, i) => {
@@ -352,4 +356,5 @@ DataSheet.propTypes = {
   onContextMenu: PropTypes.func,
   valueRenderer: PropTypes.func.isRequired,
   dataRenderer: PropTypes.func,
+  parsePaste: PropTypes.func,
 };
