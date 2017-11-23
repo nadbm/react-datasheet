@@ -80,7 +80,7 @@ export default class DataSheet extends PureComponent {
   }
 
   handleCopy(e) {
-    if(isEmpty(this.state.editing)) {
+    if (isEmpty(this.state.editing)) {
       e.preventDefault();
       const {dataRenderer, valueRenderer, data} = this.props;
       const {start, end} = this.state;
@@ -101,7 +101,7 @@ export default class DataSheet extends PureComponent {
   }
 
   handlePaste(e) {
-    if(isEmpty(this.state.editing)) {
+    if (isEmpty(this.state.editing)) {
       const start = this.state.start;
 
       const parse = this.props.parsePaste || defaultParsePaste;
@@ -323,7 +323,9 @@ export default class DataSheet extends PureComponent {
               width: typeof cell.width === 'number' ? cell.width + 'px' : cell.width,
               overflow: cell.overflow,
               value: valueRenderer(cell, i, j),
+              extraAttributes: cell.extraAttributes
             };
+
             if (cell.component) {
               return <ComponentCell
                 {...props}
@@ -331,6 +333,7 @@ export default class DataSheet extends PureComponent {
                 component={cell.component}
               />
             }
+
             return <DataCell
               {...props}
               data     = {dataRenderer ? dataRenderer(cell, i, j) : null}
