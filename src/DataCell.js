@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types';
+import { filterCellExtraAttributes } from './utils/utils';
 
 export default class DataCell extends PureComponent {
   constructor(props) {
@@ -38,8 +39,14 @@ export default class DataCell extends PureComponent {
   }
 
   render() {
-    const {row, col, rowSpan, readOnly, colSpan, width, overflow, value, className, editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu} = this.props;
+    const {
+      row, col, rowSpan, readOnly, colSpan, width, overflow, value, className,
+      editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu,
+      extraAttributes
+    } = this.props;
     const style = { width };
+    const filteredExtraAttribs = filterCellExtraAttributes(extraAttributes);
+
     return (
       <td
         className={[
@@ -57,6 +64,7 @@ export default class DataCell extends PureComponent {
         colSpan={colSpan || 1}
         rowSpan={rowSpan || 1}
         style={style}
+        { ...filteredExtraAttribs }
       >
         <span style={{display: (editing && selected) ? 'none':'block'}}>
           {value}
@@ -80,5 +88,6 @@ DataCell.propTypes = {
   onDoubleClick: PropTypes.func.isRequired,
   onMouseOver: PropTypes.func.isRequired,
   onContextMenu: PropTypes.func.isRequired,
-  updated: PropTypes.bool
+  updated: PropTypes.bool,
+  extraAttributes: PropTypes.object
 };

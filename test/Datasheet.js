@@ -30,7 +30,7 @@ const dispatchKeyDownEvent = (key, shift=false) => {
   Object.defineProperty(e, 'shiftKey', {
     get: () => shift
   });
-  e.initEvent("keydown", true, true);
+  e.initEvent('keydown', true, true);
   document.dispatchEvent(e);
 }
 
