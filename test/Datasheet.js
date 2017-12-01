@@ -434,6 +434,27 @@ describe('Component', () => {
         expect(customWrapper.find('td.cell input').nodes[0].value).toEqual('2017-01-01T00:00:00.000Z');
       });
 
+      it('renders the attributes to the cell if the attributesRenderer is set', () => {
+        customWrapper = mount(<DataSheet
+          data = {data}
+          valueRenderer = {(cell, i, j) => cell.data}
+          dataRenderer = {(cell, i, j) => cell.data}
+          attributesRenderer = {(cell, i, j) => {
+            if (i === 0 && j === 0) {
+              return {'data-hint': 'Not valid'};
+            } else if (i === 1 && j === 1) {
+              return {'data-hint': 'Valid'};
+            }
+
+            return null;
+          }}
+          onChange = {(cell, i, j, value) => data[i][j].data = value}
+        />);
+
+        expect(customWrapper.find('td.cell').first().props()['data-hint']).toEqual('Not valid');
+        expect(customWrapper.find('td.cell').last().props()['data-hint']).toEqual('Valid');
+      });
+
       it('renders a component properly', () => {
         customWrapper = mount(<DataSheet
           data = {[[{component: <div className={'custom-component'}>COMPONENT RENDERED</div>}]]}
