@@ -95,7 +95,7 @@ const grid = [
    [{
     value:  5,
       component: (
-        <button onClick={() => console.log("clicked")}}>
+        <button onClick={() => console.log("clicked")}>
           Rendered
         </button>
       )
