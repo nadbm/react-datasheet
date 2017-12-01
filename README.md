@@ -119,7 +119,7 @@ const grid = [
 <ReactDataSheet
   data={grid}
   valueRenderer={(cell) => cell.value}
-  attributesRender={(cell) => {'data-hint': cell.hint || {}}
+  attributesRenderer={(cell) => {'data-hint': cell.hint || {}}
   ...
 />
 ```
@@ -137,7 +137,7 @@ onChange | func | onChange handler: `function(cell, i, j, newValue) {}`
 onPaste | func | onPaste handler: `function(array) {}` If set, the function will be called with an array of rows. Each row has an array of objects containing the cell and raw pasted value. If the pasted value cannot be matched with a cell, the cell value will be undefined
 onContextMenu | func | Context menu handler : `function(event, cell, i, j)`
 parsePaste | func | `function (string) {}` If set, the function will be called with the raw clipboard data. It should return an array of arrays of strings. This is useful for when the clipboard may have data with irregular field or line delimiters. If not set, rows will be split with line breaks and cells with tabs.
-attributesRender | func | Method to add attributes to the cell `function(cell, i, j)`. The function should return an object where the keys are the attribute names and the values are their values. Example bellow.
+attributesRenderer | func | Method to add attributes to the cell `function(cell, i, j)`. The function should return an object where the keys are the attribute names and the values are their values. Example bellow.
 
 ## Cell Options
 
