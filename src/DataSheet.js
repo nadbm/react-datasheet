@@ -281,7 +281,7 @@ export default class DataSheet extends PureComponent {
   }
 
   render() {
-    const {dataRenderer, valueRenderer, attributesRender, className, overflow} = this.props;
+    const {dataRenderer, valueRenderer, attributesRenderer, className, overflow} = this.props;
 
     const isSelected = (i, j) => {
       const start = this.state.start;
@@ -323,7 +323,7 @@ export default class DataSheet extends PureComponent {
               width: typeof cell.width === 'number' ? cell.width + 'px' : cell.width,
               overflow: cell.overflow,
               value: valueRenderer(cell, i, j),
-              attributes: attributesRender ? attributesRender(cell, i, j) : {}
+              attributes: attributesRenderer ? attributesRenderer(cell, i, j) : {}
             };
 
             if (cell.component) {
@@ -360,5 +360,5 @@ DataSheet.propTypes = {
   valueRenderer: PropTypes.func.isRequired,
   dataRenderer: PropTypes.func,
   parsePaste: PropTypes.func,
-  attributesRender: PropTypes.func
+  attributesRenderer: PropTypes.func
 };
