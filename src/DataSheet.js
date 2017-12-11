@@ -139,7 +139,13 @@ export default class DataSheet extends PureComponent {
       && !isEmpty(this.state.editing)
       && e.keyCode !== TAB_KEY
     ) {
-      return false;
+      // If editing and enter key pressed then go to the next row.
+      if (e.keyCode === ENTER_KEY) {
+        newLocation = {i: start.i + 1, j: start.j}
+        console.log(newLocation, 'NEW newLocation', data[newLocation.i] && data[newLocation.i][newLocation.j])
+      } else {
+        return false;
+      }
     } else if (e.keyCode === TAB_KEY && !e.shiftKey) {
       newLocation = {i : start.i, j: start.j + 1};
       newLocation = typeof(data[newLocation.i][newLocation.j]) !== 'undefined' ? newLocation : { i : start.i + 1, j: 0}
@@ -152,7 +158,6 @@ export default class DataSheet extends PureComponent {
     } else if (e.keyCode === DOWN_KEY) {
       newLocation = {i: start.i + 1, j: start.j}
     }
-
 
     if (newLocation && data[newLocation.i] && typeof(data[newLocation.i][newLocation.j]) !== 'undefined') {
       this.setState({start: newLocation, end: newLocation, editing: {}});
