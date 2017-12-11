@@ -654,7 +654,7 @@ describe('Component', () => {
         });
       });
 
-      it('starts editing when double clicked', () => {
+      it('starts editing when on enter key pressed', () => {
         cells.at(3).simulate('mousedown');
         dispatchKeyDownEvent(ENTER_KEY);
         expect(wrapper.state('editing')).toEqual({
