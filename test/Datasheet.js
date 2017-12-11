@@ -30,7 +30,7 @@ const dispatchKeyDownEvent = (key, shift=false) => {
   Object.defineProperty(e, 'shiftKey', {
     get: () => shift
   });
-  e.initEvent("keydown", true, true);
+  e.initEvent('keydown', true, true);
   document.dispatchEvent(e);
 }
 
@@ -201,7 +201,6 @@ describe('Component', () => {
         expect(wrapper.find('input').node.value).toEqual('2');
 
         wrapper.find('input').node.value = '2';
-        console.log(wrapper.props)
         wrapper.find('input').simulate('change');
         wrapper.setProps({ editing: false, selected: true });
         expect(props.onChange.called).toEqual(false)
@@ -300,7 +299,7 @@ describe('Component', () => {
                 <div>HELLO</div>
               </td>).html())
             done();
-          } catch(e) {
+          } catch (e) {
             done(e)
           }
         }, 750)
@@ -371,12 +370,12 @@ describe('Component', () => {
     });
     afterEach(() => {
       wrapper.instance().removeAllListeners();
-      if(customWrapper) {
+      if (customWrapper) {
         customWrapper.instance().removeAllListeners();
         customWrapper = null;
       }
     })
-    describe("rendering with varying props", () => {
+    describe('rendering with varying props', () => {
       it('renders the proper elements', () => {
         expect(wrapper.find('table').length).toEqual(1);
         expect(_.values(wrapper.find('table').node.classList)).toEqual(['data-grid', 'test', 'nowrap'])
@@ -385,7 +384,7 @@ describe('Component', () => {
         expect(wrapper.find('td > span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '3', '5']);
       })
 
-       it('renders the proper keys', () => {
+      it('renders the proper keys', () => {
         expect(wrapper.find('table tr').at(0).key()).toEqual('custom_key_0');
         expect(wrapper.find('table tr').at(1).key()).toEqual('custom_key_1');
         expect(wrapper.find(DataCell).at(1).key()).toEqual('custom_key');
@@ -435,10 +434,31 @@ describe('Component', () => {
         expect(customWrapper.find('td.cell input').nodes[0].value).toEqual('2017-01-01T00:00:00.000Z');
       });
 
+      it('renders the attributes to the cell if the attributesRenderer is set', () => {
+        customWrapper = mount(<DataSheet
+          data = {data}
+          valueRenderer = {(cell, i, j) => cell.data}
+          dataRenderer = {(cell, i, j) => cell.data}
+          attributesRenderer = {(cell, i, j) => {
+            if (i === 0 && j === 0) {
+              return {'data-hint': 'Not valid'};
+            } else if (i === 1 && j === 1) {
+              return {'data-hint': 'Valid'};
+            }
+
+            return null;
+          }}
+          onChange = {(cell, i, j, value) => data[i][j].data = value}
+        />);
+
+        expect(customWrapper.find('td.cell').first().props()['data-hint']).toEqual('Not valid');
+        expect(customWrapper.find('td.cell').last().props()['data-hint']).toEqual('Valid');
+      });
+
       it('renders a component properly', () => {
         customWrapper = mount(<DataSheet
           data = {[[{component: <div className={'custom-component'}>COMPONENT RENDERED</div>}]]}
-          valueRenderer = {(cell) => "VALUE RENDERED"}
+          valueRenderer = {(cell) => 'VALUE RENDERED'}
           onChange = {(cell, i, j, value) => data[i][j].data = value}
         />);
         expect(customWrapper.find('td').text()).toEqual('VALUE RENDERED');
@@ -446,10 +466,10 @@ describe('Component', () => {
         expect(customWrapper.find('td').text()).toEqual('COMPONENT RENDERED');
       });
 
-       it('forces a component rendering', () => {
+      it('forces a component rendering', () => {
         customWrapper = mount(<DataSheet
           data = {[[{forceComponent: true, component: <div className={'custom-component'}>COMPONENT RENDERED</div>}]]}
-          valueRenderer = {(cell) => "VALUE RENDERED"}
+          valueRenderer = {(cell) => 'VALUE RENDERED'}
           onChange = {(cell, i, j, value) => data[i][j].data = value}
         />);
         expect(customWrapper.find('td').text()).toEqual('COMPONENT RENDERED');
@@ -501,7 +521,7 @@ describe('Component', () => {
       });
     });
 
-    describe("selection", () => {
+    describe('selection', () => {
       it('selects a single field properly', () => {
 
         expect(wrapper.find('td.cell.selected').length).toEqual(0);
@@ -532,8 +552,8 @@ describe('Component', () => {
       });
 
       it('selects multiple field properly 2x2 and stay selected after releasing mouse button', () => {
-        let mouseUpEvt = document.createEvent("HTMLEvents");
-        mouseUpEvt.initEvent("mouseup", false, true);
+        let mouseUpEvt = document.createEvent('HTMLEvents');
+        mouseUpEvt.initEvent('mouseup', false, true);
 
         expect(wrapper.find('.selected').length).toEqual(0);
         expect(wrapper.find('td.cell').length).toEqual(4);
@@ -556,8 +576,7 @@ describe('Component', () => {
                 try {
                   expect(cell).toEqual({data: 4, className: 'test1', overflow: 'clip'});
                   done();
-                }
-                catch(err) {
+                } catch(err) {
                   done(err)
                 }
               }}
@@ -570,7 +589,7 @@ describe('Component', () => {
     });
 
 
-    describe("keyboard movement", () => {
+    describe('keyboard movement', () => {
       it('moves right with arrow keys', () => {
         wrapper.find('td').at(0).simulate('mouseDown');
         expect(wrapper.state('start')).toEqual({i: 0, j: 0});
@@ -612,7 +631,7 @@ describe('Component', () => {
       })
     })
 
-    describe("editing", () => {
+    describe('editing', () => {
       let cells = null;
       beforeEach(() => {
         cells = wrapper.find('td');
@@ -790,28 +809,28 @@ describe('Component', () => {
       });
 
       it('copies the data properly', () => {
-        let copied = "";
-        const evt = document.createEvent("HTMLEvents");
+        let copied = '';
+        const evt = document.createEvent('HTMLEvents');
         evt.initEvent('copy', false, true);
-        evt.clipboardData = { setData: (type, text)=> { copied = text}};
+        evt.clipboardData = { setData: (type, text) => copied = text};
 
         cells.at(0).simulate('mouseDown');
         cells.at(3).simulate('mouseOver');
         document.dispatchEvent(evt);
-        expect(copied).toEqual("4\t2\n3\t5");
+        expect(copied).toEqual('4\t2\n3\t5');
 
       });
 
       it('copies the data from dataRenderer if it exists', () => {
-        let copied = "";
-        const evt = document.createEvent("HTMLEvents");
+        let copied = '';
+        const evt = document.createEvent('HTMLEvents');
         evt.initEvent('copy', false, true);
-        evt.clipboardData = { setData: (type, text)=> { copied = text}};
+        evt.clipboardData = { setData: (type, text) => copied = text};
         customWrapper = mount(
           <DataSheet
             data = {data}
             valueRenderer = {(cell, i, j) => cell.data}
-            dataRenderer = {(cell, i, j) => "{" + i + "," + j + "}" + cell.data}
+            dataRenderer = {(cell, i, j) => `{${ i },${ j }}${ cell.data}`}
             onChange = {(cell, i, j, value) => data[i][j].data = value}
           />
         );
@@ -819,134 +838,132 @@ describe('Component', () => {
         customWrapper.find('td').at(3).simulate('mouseOver');
 
         document.dispatchEvent(evt);
-        expect(copied).toEqual("{0,0}4\t{0,1}2\n{1,0}3\t{1,1}5");
+        expect(copied).toEqual('{0,0}4\t{0,1}2\n{1,0}3\t{1,1}5');
       })
 
       it('copies no data if there isn\'t anything selected', () => {
-        let pasted = "";
-        const evt = document.createEvent("HTMLEvents");
+        let pasted = '';
+        const evt = document.createEvent('HTMLEvents');
         evt.initEvent('copy', false, true);
-        evt.clipboardData = { setData: (type, text)=> { pasted = text}};
+        evt.clipboardData = { setData: (type, text)=> pasted = text};
 
         expect(wrapper.state('start')).toEqual({});
         document.dispatchEvent(evt);
-        expect(pasted).toEqual("");
+        expect(pasted).toEqual('');
       });
 
       it('does not paste data if no cell is selected', () => {
-          const evt = document.createEvent("HTMLEvents");
-          evt.initEvent("paste", false, true);
-          evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
-          document.dispatchEvent(evt);
-          expect(data[0].map(d => d.data)).toEqual([4, 2]);
-          expect(data[1].map(d => d.data)).toEqual([3, 5]);
+        const evt = document.createEvent('HTMLEvents');
+        evt.initEvent('paste', false, true);
+        evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
+        document.dispatchEvent(evt);
+        expect(data[0].map(d => d.data)).toEqual([4, 2]);
+        expect(data[1].map(d => d.data)).toEqual([3, 5]);
       });
       it('pastes data properly', () => {
-          cells.at(0).simulate('mouseDown');
-          expect(wrapper.state('end')).toEqual({i: 0, j: 0});
+        cells.at(0).simulate('mouseDown');
+        expect(wrapper.state('end')).toEqual({i: 0, j: 0});
 
-          const evt = document.createEvent("HTMLEvents");
-          evt.initEvent("paste", false, true);
-          evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
-          document.dispatchEvent(evt);
+        const evt = document.createEvent('HTMLEvents');
+        evt.initEvent('paste', false, true);
+        evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
+        document.dispatchEvent(evt);
 
-          expect(data[0].map(d => d.data)).toEqual(['99', '100']);
-          expect(data[1].map(d => d.data)).toEqual(['1001', '1002']);
-          expect(wrapper.state('end')).toEqual({i: 1, j: 1});
-
+        expect(data[0].map(d => d.data)).toEqual(['99', '100']);
+        expect(data[1].map(d => d.data)).toEqual(['1001', '1002']);
+        expect(wrapper.state('end')).toEqual({i: 1, j: 1});
       });
 
       it('pastes data properly on a different cell', () => {
-          const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}]];
-          customWrapper = mount(
-            <DataSheet
-              data = {datacust}
-              valueRenderer = {(cell) => cell.data}
-              onChange = {(cell, i, j, value) => datacust[i][j].data = value}
-            />
-          );
-          customWrapper.find('td').at(1).simulate('mouseDown');
+        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}]];
+        customWrapper = mount(
+          <DataSheet
+            data = {datacust}
+            valueRenderer = {(cell) => cell.data}
+            onChange = {(cell, i, j, value) => datacust[i][j].data = value}
+          />
+        );
+        customWrapper.find('td').at(1).simulate('mouseDown');
 
-          let evt = document.createEvent("HTMLEvents");
-          evt.initEvent("paste", false, true);
-          evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
-          document.dispatchEvent(evt);
+        let evt = document.createEvent('HTMLEvents');
+        evt.initEvent('paste', false, true);
+        evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
+        document.dispatchEvent(evt);
 
-          expect(datacust[0].map(d => d.data)).toEqual([12, '99'])
+        expect(datacust[0].map(d => d.data)).toEqual([12, '99'])
       });
 
       it('pastes multiple rows correclty on windows', () => {
-          const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}],[{data: 1012, readOnly: true}, {data: 1024, readOnly: false}]];
-          customWrapper = mount(
-            <DataSheet
-              data = {datacust}
-              valueRenderer = {(cell) => cell.data}
-              onChange = {(cell, i, j, value) => datacust[i][j].data = value}
-            />
-          );
-          customWrapper.find('td').at(1).simulate('mouseDown');
+        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}],[{data: 1012, readOnly: true}, {data: 1024, readOnly: false}]];
+        customWrapper = mount(
+          <DataSheet
+            data = {datacust}
+            valueRenderer = {(cell) => cell.data}
+            onChange = {(cell, i, j, value) => datacust[i][j].data = value}
+          />
+        );
+        customWrapper.find('td').at(1).simulate('mouseDown');
 
-          let evt = document.createEvent("HTMLEvents");
-          evt.initEvent("paste", false, true);
-          evt.clipboardData = { getData: (type)=> '99\t100\r\n1001\t1002'};
-          document.dispatchEvent(evt);
+        let evt = document.createEvent('HTMLEvents');
+        evt.initEvent('paste', false, true);
+        evt.clipboardData = { getData: (type)=> '99\t100\r\n1001\t1002'};
+        document.dispatchEvent(evt);
 
-          expect(datacust[1].map(d => d.data)).toEqual([1012, '1001'])
+        expect(datacust[1].map(d => d.data)).toEqual([1012, '1001'])
       });
 
       it('doesnt auto paste data if cell is editing', () => {
-          const datacust = [[{data: 12, readOnly: false}, {data: 24, readOnly: false}]];
-          customWrapper = mount(
-            <DataSheet
-              data = {datacust}
-              valueRenderer = {(cell) => cell.data}
-              onChange = {(cell, i, j, value) => {datacust[i][j].data = value}}
-            />
-          );
-          customWrapper.find('td').at(1).simulate('doubleclick');
+        const datacust = [[{data: 12, readOnly: false}, {data: 24, readOnly: false}]];
+        customWrapper = mount(
+          <DataSheet
+            data = {datacust}
+            valueRenderer = {(cell) => cell.data}
+            onChange = {(cell, i, j, value) => datacust[i][j].data = value}
+          />
+        );
+        customWrapper.find('td').at(1).simulate('doubleclick');
 
-          let evt = document.createEvent("HTMLEvents");
-          evt.initEvent("paste", false, true);
-          evt.clipboardData = { getData: (type)=> '100'};
+        let evt = document.createEvent('HTMLEvents');
+        evt.initEvent('paste', false, true);
+        evt.clipboardData = { getData: (type)=> '100'};
 
-          expect(datacust[0].map(d => d.data)).toEqual([12, 24])
+        expect(datacust[0].map(d => d.data)).toEqual([12, 24])
       });
 
       it('pastes data properly and fires onPaste function if defined', (done) => {
-          const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}]];
-          customWrapper = mount(
-            <DataSheet
-              data = {datacust}
-              valueRenderer = {(cell) => cell.data}
-              onChange = {(cell, i, j, value) => datacust[i][j].data = value}
-              onPaste =
-                  /* eslint-disable keyword-spacing */
-              {(pasted) => {
-                try {
-                  expect(pasted).toEqual([
-                    [
-                      {cell: datacust[0][0], data: '99'},
-                      {cell: datacust[0][1], data: '100'}
-                    ],
-                    [
-                      {cell: undefined, data: '1001'},
-                      {cell: undefined, data: '1002'},
-                    ]
-                  ]);
-                  done();
-                }
-                catch(err) {
-                  done(err);
-                }
+        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}]];
+        customWrapper = mount(
+          <DataSheet
+            data = {datacust}
+            valueRenderer = {(cell) => cell.data}
+            onChange = {(cell, i, j, value) => datacust[i][j].data = value}
+            onPaste =
+                /* eslint-disable keyword-spacing */
+            {(pasted) => {
+              try {
+                expect(pasted).toEqual([
+                  [
+                    {cell: datacust[0][0], data: '99'},
+                    {cell: datacust[0][1], data: '100'}
+                  ],
+                  [
+                    {cell: undefined, data: '1001'},
+                    {cell: undefined, data: '1002'},
+                  ]
+                ]);
+                done();
+              } catch(err) {
+                done(err);
+              }
 
-              }}
-            />
-          );
-          customWrapper.find('td').at(0).simulate('mouseDown');
-          let evt = document.createEvent("HTMLEvents");
-          evt.initEvent("paste", false, true);
-          evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
-          document.dispatchEvent(evt);
+            }}
+          />
+        );
+        customWrapper.find('td').at(0).simulate('mouseDown');
+        let evt = document.createEvent('HTMLEvents');
+        evt.initEvent('paste', false, true);
+        evt.clipboardData = { getData: (type)=> '99\t100\n1001\t1002'};
+        document.dispatchEvent(evt);
       });
 
       it('pastes data properly, using parsePaste if defined', () => {
@@ -964,16 +981,14 @@ describe('Component', () => {
         );
         customWrapper.find('td').at(1).simulate('mouseDown');
 
-        let evt = document.createEvent("HTMLEvents");
-        evt.initEvent("paste", false, true);
+        let evt = document.createEvent('HTMLEvents');
+        evt.initEvent('paste', false, true);
         evt.clipboardData = { getData: (type)=> '99,100--1001,1002'};
         document.dispatchEvent(evt);
 
         expect(datacust[1].map(d => d.data)).toEqual([1012, '1001'])
 
       });
-
-
 
       it('stops editing on outside page click', () => {
         const cell = wrapper.find('td').first();
@@ -997,8 +1012,8 @@ describe('Component', () => {
         cell.simulate('mousedown');
         cell.simulate('mouseup');
 
-        let evt = document.createEvent("HTMLEvents");
-        evt.initEvent("mousedown", false, true);
+        let evt = document.createEvent('HTMLEvents');
+        evt.initEvent('mousedown', false, true);
         Object.defineProperty(evt, 'target', {value: cell.getDOMNode()});
         document.dispatchEvent(evt);
 
@@ -1027,32 +1042,31 @@ describe('Component', () => {
       });
     })
 
-    describe("contextmenu", () => {
+    describe('contextmenu', () => {
       let cells = null;
       beforeEach(() => {
         cells = wrapper.find('td');
       })
 
       it('starts calls contextmenu with right object', (done) => {
-          const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}]];
-          customWrapper = mount(
-            <DataSheet
-              data = {datacust}
-              valueRenderer = {(cell) => cell.data}
-              onChange = {(cell, i, j, value) => datacust[i][j].data = value}
-              onContextMenu = {(e, cell, i, j) => {
-                try {
-                  expect(cell).toEqual({data: 12, readOnly: true});
-                  done();
-                }
-                catch(err) {
-                  done(err);
-                }
+        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}]];
+        customWrapper = mount(
+          <DataSheet
+            data = {datacust}
+            valueRenderer = {(cell) => cell.data}
+            onChange = {(cell, i, j, value) => datacust[i][j].data = value}
+            onContextMenu = {(e, cell, i, j) => {
+              try {
+                expect(cell).toEqual({data: 12, readOnly: true});
+                done();
+              } catch(err) {
+                done(err);
+              }
 
-              }}
-            />
-          );
-          customWrapper.find('td').at(0).simulate('contextmenu');
+            }}
+          />
+        );
+        customWrapper.find('td').at(0).simulate('contextmenu');
       });
 
 

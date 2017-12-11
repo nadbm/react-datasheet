@@ -23,7 +23,7 @@ export default class ComponentCell extends PureComponent {
   render() {
     let {
       row, col, readOnly, forceComponent, rowSpan, colSpan, width, overflow, value, className, editing, selected,
-      onMouseDown, onMouseOver, onDoubleClick, onContextMenu
+      onMouseDown, onMouseOver, onDoubleClick, onContextMenu, attributes
     } = this.props;
     const style = { width };
 
@@ -40,6 +40,7 @@ export default class ComponentCell extends PureComponent {
         onContextMenu={(e) => onContextMenu(e, row, col)} colSpan={colSpan || 1}
         rowSpan={rowSpan || 1}
         style={style}
+        { ...attributes }
       >
         { ((editing && !readOnly) || forceComponent) ? this.props.component : value }
       </td>
@@ -62,5 +63,6 @@ ComponentCell.propTypes = {
   onMouseOver: PropTypes.func.isRequired,
   onContextMenu: PropTypes.func.isRequired,
   updated: PropTypes.bool,
-  forceComponent: PropTypes.bool
+  forceComponent: PropTypes.bool,
+  attributes: PropTypes.object
 };
