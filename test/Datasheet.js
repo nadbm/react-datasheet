@@ -654,7 +654,7 @@ describe('Component', () => {
         });
       });
 
-      it('starts editing when double clicked', () => {
+      it('starts editing when enter key pressed', () => {
         cells.at(3).simulate('mousedown');
         dispatchKeyDownEvent(ENTER_KEY);
         expect(wrapper.state('editing')).toEqual({
@@ -724,6 +724,21 @@ describe('Component', () => {
         expect(data[0][0].data).toEqual(4);
         expect(wrapper.state('editing')).toEqual({});
         expect(wrapper.state('reverting')).toEqual({ i: 0, j: 0 });
+      });
+
+      it('goes to the next row when editing and enter key pressed', () => {
+        cells.at(1).simulate('mousedown');
+        dispatchKeyDownEvent(ENTER_KEY);
+        expect(wrapper.state('editing')).toEqual({
+          i: 0,
+          j: 1
+        });
+
+        const newPosition = {i: 1, j: 1};
+        dispatchKeyDownEvent(ENTER_KEY);
+        expect(wrapper.state('editing')).toEqual({});
+        expect(wrapper.state('start')).toEqual(newPosition);
+        expect(wrapper.state('end')).toEqual(newPosition);
       });
 
       it('updates value properly after double clicking', () => {
