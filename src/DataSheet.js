@@ -142,7 +142,6 @@ export default class DataSheet extends PureComponent {
       // If editing and enter key pressed then go to the next row.
       if (e.keyCode === ENTER_KEY) {
         newLocation = {i: start.i + 1, j: start.j}
-        console.log(newLocation, 'NEW newLocation', data[newLocation.i] && data[newLocation.i][newLocation.j])
       } else {
         return false;
       }
