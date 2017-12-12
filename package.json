@@ -23,7 +23,7 @@
     "build:watch": "watch 'npm run build' ./src",
     "prepublish": "npm run build",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "test": "NODE_ENV=test nyc --  mocha ./test/**/*.js --compilers js:babel-register",
+    "test": "standard src/*.js && NODE_ENV=test nyc --  mocha ./test/**/*.js --compilers js:babel-register",
     "test:watch": "watch 'npm run test' ./test ./src"
   },
   "devDependencies": {
@@ -54,7 +54,8 @@
     "react-dom": "^15.0.0",
     "rimraf": "^2.6.1",
     "sinon": "^1.17.3",
-    "watch": "^1.0.2"
+    "watch": "^1.0.2",
+    "standard": "*"
   },
   "peerDependencies": {
     "react": ">=15.3.0",

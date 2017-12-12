@@ -1,3 +1,3 @@
-import DataSheet from './DataSheet';
+import DataSheet from './DataSheet'
 
-module.exports = DataSheet;
+module.exports = DataSheet

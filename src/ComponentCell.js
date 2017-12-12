@@ -1,31 +1,31 @@
 import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 
 export default class ComponentCell extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = { updated: false };
+  constructor (props) {
+    super(props)
+    this.state = { updated: false }
   }
 
-  componentWillUpdate(nextProps) {
+  componentWillUpdate (nextProps) {
     if (nextProps.value !== this.props.value) {
-      this.setState({ updated: true });
+      this.setState({ updated: true })
       this.timeout = setTimeout(() => {
-        this.setState({ updated: false });
-      }, 700);
+        this.setState({ updated: false })
+      }, 700)
     }
   }
 
-  componentWillUnmount() {
-    clearTimeout(this.timeout);
+  componentWillUnmount () {
+    clearTimeout(this.timeout)
   }
 
-  render() {
+  render () {
     let {
       row, col, readOnly, forceComponent, rowSpan, colSpan, width, overflow, value, className, editing, selected,
       onMouseDown, onMouseOver, onDoubleClick, onContextMenu, attributes
-    } = this.props;
-    const style = { width };
+    } = this.props
+    const style = { width }
 
     return (
       <td
@@ -40,11 +40,11 @@ export default class ComponentCell extends PureComponent {
         onContextMenu={(e) => onContextMenu(e, row, col)} colSpan={colSpan || 1}
         rowSpan={rowSpan || 1}
         style={style}
-        { ...attributes }
+        {...attributes}
       >
         { ((editing && !readOnly) || forceComponent) ? this.props.component : value }
       </td>
-    );
+    )
   }
 }
 
@@ -65,4 +65,4 @@ ComponentCell.propTypes = {
   updated: PropTypes.bool,
   forceComponent: PropTypes.bool,
   attributes: PropTypes.object
-};
+}
