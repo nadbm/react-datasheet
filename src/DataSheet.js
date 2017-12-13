@@ -136,12 +136,7 @@ export default class DataSheet extends PureComponent {
       !isEmpty(editing) &&
       e.keyCode !== TAB_KEY
     ) {
-      // If editing and enter key pressed then go to the next row.
-      if (e.keyCode === ENTER_KEY) {
-        newLocation = {i: start.i + 1, j: start.j}
-      } else {
-        return false
-      }
+      return false
     } else if (e.keyCode === TAB_KEY && !e.shiftKey) {
       newLocation = {i: start.i, j: start.j + 1}
       newLocation = typeof (data[newLocation.i][newLocation.j]) !== 'undefined' ? newLocation : {i: start.i + 1, j: 0}
@@ -207,7 +202,12 @@ export default class DataSheet extends PureComponent {
       )
       e.preventDefault()
     } else if (enterKeyPressed && isEditing) {
-      this.setState({editing: {}, reverting: {}})
+      let newLocation = start
+      if (data[start.i + 1] && data[start.i + 1][start.j]) {
+        // Go to next row once the edit is done
+        newLocation = {i: start.i + 1, j: start.j}
+      }
+      this.setState({editing: {}, reverting: {}, start: newLocation, end: newLocation})
     } else if (escapeKeyPressed && isEditing) {
       this.setState({editing: {}, reverting: editing})
     } else if (enterKeyPressed && !isEditing && !cell.readOnly) {

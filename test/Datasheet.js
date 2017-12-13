@@ -716,6 +716,21 @@ describe('Component', () => {
         expect(wrapper.state('reverting')).toEqual({ i: 0, j: 0 })
       })
 
+      it('goes to the next row when editing and enter key pressed when edit started via double click', () => {
+        cells.at(1).simulate('mousedown')
+        dispatchKeyDownEvent('1'.charCodeAt(0))
+        expect(wrapper.state('editing')).toEqual({
+          i: 0,
+          j: 1
+        })
+
+        const newPosition = {i: 1, j: 1}
+        dispatchKeyDownEvent(ENTER_KEY)
+        expect(wrapper.state('editing')).toEqual({})
+        expect(wrapper.state('start')).toEqual(newPosition)
+        expect(wrapper.state('end')).toEqual(newPosition)
+      })
+
       it('goes to the next row when editing and enter key pressed', () => {
         cells.at(1).simulate('mousedown')
         dispatchKeyDownEvent(ENTER_KEY)
