@@ -329,12 +329,14 @@ export default class DataSheet extends PureComponent {
                   value: valueRenderer(cell, i, j),
                   attributes: attributesRenderer ? attributesRenderer(cell, i, j) : {}
                 }
+                
+                const component = cell.component || props.attributes.component
 
-                if (cell.component) {
+                if (component) {
                   return <ComponentCell
                     {...props}
                     forceComponent={cell.forceComponent || false}
-                    component={cell.component}
+                    component={component}
                   />
                 }
 
