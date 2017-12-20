@@ -59,6 +59,20 @@ export default class DataSheet extends PureComponent {
     this.removeAllListeners = this.removeAllListeners.bind(this)
   }
 
+  componentDidMount () {
+    const {autoFocus, data} = this.props
+    if (autoFocus) {
+      // Find first cell of non-empty row
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].length) {
+          this.onMouseDown(i, 0)
+          this.onMouseUp()
+          break
+        }
+      }
+    }
+  }
+
   removeAllListeners () {
     document.removeEventListener('keydown', this.handleKey)
     document.removeEventListener('mousedown', this.pageClick)
@@ -364,5 +378,6 @@ DataSheet.propTypes = {
   valueRenderer: PropTypes.func.isRequired,
   dataRenderer: PropTypes.func,
   parsePaste: PropTypes.func,
+  autoFocus: PropTypes.bool,
   attributesRenderer: PropTypes.func
 }

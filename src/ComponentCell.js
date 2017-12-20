@@ -26,7 +26,9 @@ export default class ComponentCell extends PureComponent {
       onMouseDown, onMouseOver, onDoubleClick, onContextMenu, attributes
     } = this.props
     const style = { width }
-
+    const component = forceComponent
+      ? React.cloneElement(this.props.component, {editing})
+      : this.props.component
     return (
       <td
         className={[
@@ -42,7 +44,7 @@ export default class ComponentCell extends PureComponent {
         style={style}
         {...attributes}
       >
-        { ((editing && !readOnly) || forceComponent) ? this.props.component : value }
+        { ((editing && !readOnly) || forceComponent) ? component : value }
       </td>
     )
   }
