@@ -1,17 +1,13 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
+import Sheet from './Sheet'
+import Row from './Row'
+import Cell from './Cell'
 import DataCell from './DataCell'
-import ComponentCell from './ComponentCell'
-
-const TAB_KEY = 9
-const ENTER_KEY = 13
-const ESCAPE_KEY = 27
-const LEFT_KEY = 37
-const UP_KEY = 38
-const RIGHT_KEY = 39
-const DOWN_KEY = 40
-const DELETE_KEY = 46
-const BACKSPACE_KEY = 8
+import DataEditor from './DataEditor'
+import ValueViewer from './ValueViewer'
+import { TAB_KEY, ENTER_KEY, DELETE_KEY, ESCAPE_KEY, BACKSPACE_KEY,
+  LEFT_KEY, UP_KEY, DOWN_KEY, RIGHT_KEY } from './keys'
 
 const isEmpty = (obj) => Object.keys(obj).length === 0
 
@@ -23,8 +19,6 @@ const range = (start, end) => {
   }
   return array
 }
-
-const nullFtn = (obj) => {}
 
 const defaultParsePaste = (str) => {
   return str.split(/\r\n|\n|\r/)
@@ -39,11 +33,17 @@ export default class DataSheet extends PureComponent {
     this.onMouseOver = this.onMouseOver.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
-    this.handleKey = this.handleKey.bind(this)
+    this.handleNavigate = this.handleNavigate.bind(this)
+    this.handleKey = this.handleKey.bind(this).bind(this)
+    this.handleComponentKey = this.handleComponentKey.bind(this)
     this.handleCopy = this.handleCopy.bind(this)
     this.handlePaste = this.handlePaste.bind(this)
     this.pageClick = this.pageClick.bind(this)
     this.onChange = this.onChange.bind(this)
+    this.onRevert = this.onRevert.bind(this)
+    this.isSelected = this.isSelected.bind(this)
+    this.isEditing = this.isEditing.bind(this)
+    this.isClearing = this.isClearing.bind(this)
 
     this.defaultState = {
       start: {},
@@ -51,7 +51,6 @@ export default class DataSheet extends PureComponent {
       selecting: false,
       forceEdit: false,
       editing: {},
-      reverting: {},
       clear: {}
     }
     this.state = this.defaultState
@@ -60,19 +59,26 @@ export default class DataSheet extends PureComponent {
   }
 
   removeAllListeners () {
-    document.removeEventListener('keydown', this.handleKey)
     document.removeEventListener('mousedown', this.pageClick)
     document.removeEventListener('mouseup', this.onMouseUp)
     document.removeEventListener('copy', this.handleCopy)
     document.removeEventListener('paste', this.handlePaste)
   }
 
+  componentDidMount () {
+    // Add listener scoped to the DataSheet that catches otherwise unhandled
+    // keyboard events when displaying components
+    this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
+  }
+
   componentWillUnmount () {
+    this.dgDom && this.dgDom.removeEventListener('keydown', this.handleComponentKey)
     this.removeAllListeners()
   }
 
   pageClick (e) {
-    if (!this.dgDom.contains(e.target)) {
+    const element = this.dgDom
+    if (!element.contains(e.target)) {
       this.setState(this.defaultState)
       this.removeAllListeners()
     }
@@ -114,7 +120,7 @@ export default class DataSheet extends PureComponent {
           const cell = this.props.data[start.i + i] && this.props.data[start.i + i][start.j + j]
           rowData.push({cell: cell, data: pastedData})
           if (cell && !cell.readOnly && !this.props.onPaste) {
-            this.onChange(start.i + i, start.j + j, pastedData)
+            this.props.onChange(cell, start.i + i, start.j + j, pastedData)
             end = {i: start.i + i, j: start.j + j}
           }
         })
@@ -125,28 +131,30 @@ export default class DataSheet extends PureComponent {
     }
   }
 
-  handleKeyboardCellMovement (e) {
-    const {start, editing} = this.state
-    const {data} = this.props
-    const currentCell = data[start.i][start.j]
+  handleKeyboardCellMovement (e, {data, start, isEditing, currentCell}) {
+    if (isEditing) {
+      return false
+    }
+    const hasComponent = currentCell && currentCell.component
+    const forceComponent = currentCell && currentCell.forceComponent
+
+    if (hasComponent && (isEditing || forceComponent)) {
+      return false
+    }
+
+    const keyCode = e.which || e.keyCode
     let newLocation = null
 
-    if (
-      (this.state.forceEdit || currentCell.component !== undefined) &&
-      !isEmpty(editing) &&
-      e.keyCode !== TAB_KEY
-    ) {
-      return false
-    } else if (e.keyCode === TAB_KEY && !e.shiftKey) {
+    if (keyCode === TAB_KEY && !e.shiftKey) {
       newLocation = {i: start.i, j: start.j + 1}
       newLocation = typeof (data[newLocation.i][newLocation.j]) !== 'undefined' ? newLocation : {i: start.i + 1, j: 0}
-    } else if (e.keyCode === RIGHT_KEY) {
+    } else if (keyCode === RIGHT_KEY) {
       newLocation = {i: start.i, j: start.j + 1}
-    } else if (e.keyCode === LEFT_KEY || ((e.keyCode === TAB_KEY) && e.shiftKey)) {
+    } else if (keyCode === LEFT_KEY || ((keyCode === TAB_KEY) && e.shiftKey)) {
       newLocation = {i: start.i, j: start.j - 1}
-    } else if (e.keyCode === UP_KEY) {
+    } else if (keyCode === UP_KEY) {
       newLocation = {i: start.i - 1, j: start.j}
-    } else if (e.keyCode === DOWN_KEY) {
+    } else if (keyCode === DOWN_KEY) {
       newLocation = {i: start.i + 1, j: start.j}
     }
 
@@ -171,18 +179,21 @@ export default class DataSheet extends PureComponent {
   }
 
   handleKey (e) {
+    if (e.isPropagationStopped && e.isPropagationStopped()) {
+      return
+    }
+    const keyCode = e.which || e.keyCode
     const {start, end, editing} = this.state
     const data = this.props.data
-    const isEditing = !isEmpty(editing)
-    const noCellsSelected = isEmpty(start)
+    const isEditing = editing && !isEmpty(editing)
+    const noCellsSelected = !start || isEmpty(start)
     const ctrlKeyPressed = e.ctrlKey || e.metaKey
-    const deleteKeysPressed = (e.keyCode === DELETE_KEY || e.keyCode === BACKSPACE_KEY)
-    const enterKeyPressed = e.keyCode === ENTER_KEY
-    const escapeKeyPressed = e.keyCode === ESCAPE_KEY
-    const numbersPressed = (e.keyCode >= 48 && e.keyCode <= 57)
-    const lettersPressed = (e.keyCode >= 65 && e.keyCode <= 90)
-    const numPadKeysPressed = (e.keyCode >= 96 && e.keyCode <= 105)
-    const cell = data[start.i][start.j]
+    const deleteKeysPressed = (keyCode === DELETE_KEY || keyCode === BACKSPACE_KEY)
+    const enterKeyPressed = keyCode === ENTER_KEY
+    const numbersPressed = (keyCode >= 48 && keyCode <= 57)
+    const lettersPressed = (keyCode >= 65 && keyCode <= 90)
+    const numPadKeysPressed = (keyCode >= 96 && keyCode <= 105)
+    const currentCell = !noCellsSelected && data[start.i][start.j]
     const equationKeysPressed = [
       187, /* equal */
       189, /* substract */
@@ -190,44 +201,70 @@ export default class DataSheet extends PureComponent {
       107, /* add */
       109, /* decimal point */
       110
-    ].indexOf(e.keyCode) > -1
+    ].indexOf(keyCode) > -1
 
-    if (noCellsSelected || ctrlKeyPressed || this.handleKeyboardCellMovement(e)) {
+    if (noCellsSelected || ctrlKeyPressed || this.handleKeyboardCellMovement(e, {data, start, isEditing, currentCell})) {
       return true
     }
 
-    if (deleteKeysPressed && !isEditing) {
-      this.getSelectedCells(data, start, end).map(({cell, i, j}) =>
-        (!cell.readOnly) ? this.onChange(i, j, '') : null
-      )
-      e.preventDefault()
-    } else if (enterKeyPressed && isEditing) {
-      let newLocation = start
-      if (data[start.i + 1] && data[start.i + 1][start.j]) {
-        // Go to next row once the edit is done
-        newLocation = {i: start.i + 1, j: start.j}
-      }
-      this.setState({editing: {}, reverting: {}, start: newLocation, end: newLocation})
-    } else if (escapeKeyPressed && isEditing) {
-      this.setState({editing: {}, reverting: editing})
-    } else if (enterKeyPressed && !isEditing && !cell.readOnly) {
-      this.setState({editing: start, clear: {}, reverting: {}, forceEdit: true})
-    } else if (numbersPressed ||
-      numPadKeysPressed ||
-      lettersPressed ||
-      equationKeysPressed ||
-      enterKeyPressed
-    ) {
-      // empty out cell if user starts typing without pressing enter
-      if (!isEditing && !cell.readOnly) {
-        this.setState({
-          editing: start,
-          clear: start,
-          reverting: {},
-          forceEdit: false
-        })
+    if (!isEditing) {
+      if (deleteKeysPressed) {
+        // ugly solution brought to you by https://reactjs.org/docs/react-component.html#setstate
+        // setState in a loop is unreliable
+        setTimeout(() => {
+          this.getSelectedCells(data, start, end).map(({cell, i, j}) =>
+            (!cell.readOnly) ? this.onChange(i, j, '') : null
+          )
+        }, 0)
+        e.preventDefault()
+      } else if (currentCell && !currentCell.readOnly) {
+        if (enterKeyPressed) {
+          this.setState({editing: start, clear: {}, forceEdit: true})
+          e.preventDefault()
+        } else if (numbersPressed ||
+            numPadKeysPressed ||
+            lettersPressed ||
+            equationKeysPressed) {
+          // empty out cell if user starts typing without pressing enter
+          this.setState({editing: start, clear: start, forceEdit: false})
+        }
       }
     }
+  }
+
+  handleComponentKey (e) {
+    // handles keyboard events when editing components
+    const keyCode = e.which || e.keyCode
+    if ([ENTER_KEY, ESCAPE_KEY, TAB_KEY].includes(keyCode)) {
+      const {editing} = this.state
+      if (!isEmpty(editing)) {
+        const {data} = this.props
+        const currentCell = data[editing.i][editing.j]
+        const offset = e.shiftKey ? -1 : 1
+        if (currentCell && currentCell.component) {
+          let func = this.onRevert // ESCAPE_KEY
+          if (keyCode === ENTER_KEY) {
+            func = () => this.handleNavigate({i: offset, j: 0})
+          } else if (keyCode === TAB_KEY) {
+            func = () => this.handleNavigate({i: 0, j: offset})
+          }
+          // setTimeout makes sure that component is done handling the event before we take over
+          setTimeout(func, 1)
+        }
+      }
+    }
+  }
+
+  handleNavigate (offsets) {
+    if (offsets && (offsets.i || offsets.j)) {
+      const {start} = this.state
+      const {data} = this.props
+      const newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
+      if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
+        this.setState({start: newLocation, end: newLocation, editing: {}})
+      }
+    }
+    this.dgDom && this.dgDom.focus()
   }
 
   onContextMenu (evt, i, j) {
@@ -251,8 +288,6 @@ export default class DataSheet extends PureComponent {
 
     // Keep listening to mouse if user releases the mouse (dragging outside)
     document.addEventListener('mouseup', this.onMouseUp)
-    // Listen for any keyboard presses (there is no input so must attach to document)
-    document.addEventListener('keydown', this.handleKey)
     // Listen for any outside mouse clicks
     document.addEventListener('mousedown', this.pageClick)
 
@@ -274,7 +309,12 @@ export default class DataSheet extends PureComponent {
 
   onChange (i, j, val) {
     this.props.onChange(this.props.data[i][j], i, j, val)
-    this.setState({editing: {}})
+    this.onRevert()
+  }
+
+  onRevert () {
+    this.setState({ editing: {} })
+    this.dgDom && this.dgDom.focus()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -284,74 +324,74 @@ export default class DataSheet extends PureComponent {
     }
   }
 
-  render () {
-    const {dataRenderer, valueRenderer, attributesRenderer, className, overflow} = this.props
+  isSelected (i, j) {
+    const start = this.state.start
+    const end = this.state.end
+    const posX = (j >= start.j && j <= end.j)
+    const negX = (j <= start.j && j >= end.j)
+    const posY = (i >= start.i && i <= end.i)
+    const negY = (i <= start.i && i >= end.i)
 
-    const isSelected = (i, j) => {
-      const start = this.state.start
-      const end = this.state.end
-      const posX = (j >= start.j && j <= end.j)
-      const negX = (j <= start.j && j >= end.j)
-      const posY = (i >= start.i && i <= end.i)
-      const negY = (i <= start.i && i >= end.i)
-
-      return (posX && posY) ||
+    return (posX && posY) ||
         (negX && posY) ||
         (negX && negY) ||
         (posX && negY)
-    }
+  }
 
-    const isEditing = (i, j) => this.state.editing.i === i && this.state.editing.j === j
-    const isReverting = (i, j) => this.state.reverting.i === i && this.state.reverting.j === j
-    const shouldClear = (i, j) => this.state.clear.i === i && this.state.clear.j === j
+  isEditing (i, j) {
+    return this.state.editing.i === i && this.state.editing.j === j
+  }
 
-    return <table ref={(r) => { this.dgDom = r }} className={['data-grid', className, overflow].filter(a => a).join(' ')}>
-      <tbody>
-        {this.props.data.map((row, i) =>
-          <tr key={this.props.keyFn ? this.props.keyFn(i) : i}>
-            {
-              row.map((cell, j) => {
-                const props = {
-                  key: cell.key ? cell.key : j,
-                  className: cell.className ? cell.className : '',
-                  row: i,
-                  col: j,
-                  selected: isSelected(i, j),
-                  onMouseDown: cell.disableEvents ? nullFtn : this.onMouseDown,
-                  onDoubleClick: cell.disableEvents ? nullFtn : this.onDoubleClick,
-                  onMouseOver: cell.disableEvents ? nullFtn : this.onMouseOver,
-                  onContextMenu: cell.disableEvents ? nullFtn : this.onContextMenu,
-                  editing: isEditing(i, j),
-                  reverting: isReverting(i, j),
-                  colSpan: cell.colSpan,
-                  width: typeof cell.width === 'number' ? cell.width + 'px' : cell.width,
-                  overflow: cell.overflow,
-                  value: valueRenderer(cell, i, j),
-                  attributes: attributesRenderer ? attributesRenderer(cell, i, j) : {}
-                }
+  isClearing (i, j) {
+    return this.state.clear.i === i && this.state.clear.j === j
+  }
 
-                if (cell.component) {
-                  return <ComponentCell
-                    {...props}
-                    forceComponent={cell.forceComponent || false}
-                    component={cell.component}
-                  />
-                }
+  render () {
+    const {sheetRenderer: SheetRenderer, rowRenderer: RowRenderer, cellRenderer,
+      dataRenderer, valueRenderer, dataEditor, valueViewer, attributesRenderer,
+      className, overflow, data, keyFn} = this.props
+    const {forceEdit} = this.state
 
-                return <DataCell
-                  {...props}
-                  data={dataRenderer ? dataRenderer(cell, i, j) : null}
-                  clear={shouldClear(i, j)}
-                  rowSpan={cell.rowSpan}
-                  onChange={this.onChange}
-                  readOnly={cell.readOnly}
-                 />
+    return (
+      <span ref={r => { this.dgDom = r }} tabIndex='0' className='data-grid-container' onKeyDown={this.handleKey}>
+        <SheetRenderer data={data} className={['data-grid', className, overflow].filter(a => a).join(' ')}>
+          {data.map((row, i) =>
+            <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
+              {
+                row.map((cell, j) => {
+                  return (
+                    <DataCell
+                      key={cell.key ? cell.key : `${i}-${j}`}
+                      row={i}
+                      col={j}
+                      cell={cell}
+                      forceEdit={forceEdit}
+                      onMouseDown={this.onMouseDown}
+                      onMouseOver={this.onMouseOver}
+                      onDoubleClick={this.onDoubleClick}
+                      onContextMenu={this.onContextMenu}
+                      onChange={this.onChange}
+                      onRevert={this.onRevert}
+                      onNavigate={this.handleNavigate}
+                      onKey={this.handleKey}
+                      selected={this.isSelected(i, j)}
+                      editing={this.isEditing(i, j)}
+                      clearing={this.isClearing(i, j)}
+                      attributesRenderer={attributesRenderer}
+                      cellRenderer={cellRenderer}
+                      valueRenderer={valueRenderer}
+                      dataRenderer={dataRenderer}
+                      valueViewer={valueViewer}
+                      dataEditor={dataEditor}
+                    />
+                  )
+                })
               }
-            )
+            </RowRenderer>)
           }
-          </tr>)}
-      </tbody>
-    </table>
+        </SheetRenderer>
+      </span>
+    )
   }
 }
 
@@ -363,6 +403,19 @@ DataSheet.propTypes = {
   onContextMenu: PropTypes.func,
   valueRenderer: PropTypes.func.isRequired,
   dataRenderer: PropTypes.func,
+  sheetRenderer: PropTypes.func.isRequired,
+  rowRenderer: PropTypes.func.isRequired,
+  cellRenderer: PropTypes.func.isRequired,
+  valueViewer: PropTypes.func,
+  dataEditor: PropTypes.func,
   parsePaste: PropTypes.func,
   attributesRenderer: PropTypes.func
+}
+
+DataSheet.defaultProps = {
+  sheetRenderer: Sheet,
+  rowRenderer: Row,
+  cellRenderer: Cell,
+  valueViewer: ValueViewer,
+  dataEditor: DataEditor
 }

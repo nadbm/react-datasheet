@@ -1,15 +1,18 @@
 
-table.data-grid {
+span.data-grid-container, span.data-grid-container:focus {
+  outline: none;
+}
+
+.data-grid-container .data-grid {
   table-layout: fixed;
   border-collapse: collapse;
-
 } 
 
-table.data-grid td.cell.updated {
+.data-grid-container .data-grid .cell.updated {
     background-color: rgba(0, 145, 253, 0.16);
     transition : background-color 0ms ease ;
 }
-table.data-grid td.cell {
+.data-grid-container .data-grid .cell {
   height: 17px;
   user-select: none;
   -moz-user-select: none;
@@ -23,64 +26,67 @@ table.data-grid td.cell {
   border: 1px solid #DDD;
   padding: 0;
 }
-table.data-grid td.cell.selected {
+.data-grid-container .data-grid .cell.selected {
   border: 1px double rgb(33, 133, 208);
   transition: none;
-}
-table.data-grid td.cell.selected {
   box-shadow: inset 0 -100px 0 rgba(33, 133, 208, 0.15);
 }
 
-table.data-grid td.cell.read-only {
+.data-grid-container .data-grid .cell.read-only {
   background: whitesmoke;
   color: #999;
   text-align: center;
 }
 
-table.data-grid td.cell > div.text {
+.data-grid-container .data-grid .cell > .text {
   padding: 2px 5px;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
 
-table.data-grid td.cell > input {
+.data-grid-container .data-grid .cell > input {
   outline: none !important;
   border: 2px solid rgb(33, 133, 208);
   text-align:right;
   width: calc(100% - 6px);
   height: 11px;
   background: none;
+  display: block;
 }
 
 
-table.data-grid td.cell {
+.data-grid-container .data-grid .cell {
   vertical-align: bottom;
 }
 
-table.data-grid td.cell,
-table.data-grid.wrap td.cell,
-table.data-grid.wrap td.cell.wrap,
-table.data-grid td.cell.wrap,
-table.data-grid.nowrap td.cell.wrap,
-table.data-grid.clip td.cell.wrap {
+.data-grid-container .data-grid .cell,
+.data-grid-container .data-grid.wrap .cell,
+.data-grid-container .data-grid.wrap .cell.wrap,
+.data-grid-container .data-grid .cell.wrap,
+.data-grid-container .data-grid.nowrap .cell.wrap,
+.data-grid-container .data-grid.clip .cell.wrap {
   white-space: normal;
 }
 
-table.data-grid.nowrap td.cell,
-table.data-grid.nowrap td.cell.nowrap,
-table.data-grid td.cell.nowrap,
-table.data-grid.wrap td.cell.nowrap,
-table.data-grid.clip td.cell.nowrap {
+.data-grid-container .data-grid.nowrap .cell,
+.data-grid-container .data-grid.nowrap .cell.nowrap,
+.data-grid-container .data-grid .cell.nowrap,
+.data-grid-container .data-grid.wrap .cell.nowrap,
+.data-grid-container .data-grid.clip .cell.nowrap {
   white-space: nowrap;
   overflow-x: visible;
 }
 
-table.data-grid.clip td.cell,
-table.data-grid.clip td.cell.clip,
-table.data-grid td.cell.clip,
-table.data-grid.wrap td.cell.clip,
-table.data-grid.nowrap td.cell.clip {
+.data-grid-container .data-grid.clip .cell,
+.data-grid-container .data-grid.clip .cell.clip,
+.data-grid-container .data-grid .cell.clip,
+.data-grid-container .data-grid.wrap .cell.clip,
+.data-grid-container .data-grid.nowrap .cell.clip {
   white-space: nowrap;
   overflow-x: hidden;
+}
+
+.data-grid-container .data-grid .cell .value-viewer, .data-grid-container .data-grid .cell .data-editor {
+  display: block;
 }

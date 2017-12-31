@@ -18,6 +18,8 @@
   "scripts": {
     "lint": "eslint ./src",
     "lintfix": "eslint ./src --fix",
+    "std": "standard src/*.js",
+    "stdfix": "standard src/*.js --fix",
     "clean": "rimraf dist",
     "build": "babel ./src  --out-dir ./lib && cp src/react-datasheet.css lib",
     "build:watch": "watch 'npm run build' ./src",

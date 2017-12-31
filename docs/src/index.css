@@ -28,6 +28,18 @@ body {
   z-index: 2;
 }
 
+.row-handle.cell {
+  width: 1rem;
+}
+
+tbody .row-handle.cell, thead .cell:not(.row-handle) {
+  cursor: move;
+}
+
+.drop-target .cell, thead .drop-target.read-only.cell {
+  background: rgba(0, 145, 253, 0.16);
+}
+
 .App {
   text-align: center;
 }
@@ -89,7 +101,7 @@ table.data-grid {
 .sheet-container table.data-grid tr td.cell:not(.selected){
   border: 1px solid #ececec;
 }
-.sheet-container table.data-grid tr td.cell{
+.sheet-container table.data-grid tr td.cell, .sheet-container table.data-grid tr th.cell {
   font-size: 12px;
 }
 div.divider {

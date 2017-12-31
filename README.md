@@ -16,6 +16,8 @@ Current features:
 * Deletion using keyboard keys
 * Callbacks for onChange, valueRenderer(visible data)
 * dataRenderer(underlying data in the input, takes the value by default)
+* Supply your own editors and view controls with custom renderers
+* Extensive control over generated markup via custom renderers
 
 
 ## Installation
@@ -126,6 +128,54 @@ const grid = [
 ```
 This render 2 rows, each one with two cells, the cells in the first row will have an attribute data-hint and the other 2 will not.
 
+### Custom renderers
+
+React-Datasheet allows you replace the renderers both for the overall structure (rows, cells, the sheet itself) as well as editors and viewers for individual cells. This allows you to radically refashion the sheet to suit your requirements.
+
+For example, this shows how to add separate headers and a checkbox at the start of each row to control row "selected" state. It also specifies a custom view renderer and a custom editor for the first column of each row:
+
+```jsx
+const columns = getColumnsFromSomewhere()
+const isSelected = yourSelectionFunction
+const selectHandler = yourCallbackFunction
+
+<ReactDataSheet
+  data={grid}
+  valueRenderer={(cell) => cell.value}
+  sheetRenderer={props => (
+    <table className={props.className + ' my-awesome-extra-class'}>
+        <thead>
+            <tr>
+                <th className='action-cell' />
+                {columns.map(col => (<th>{col.name}</th>))}
+            </tr>
+        </thead>
+        <tbody>
+            {props.children}
+        </tbody>
+    </table>
+  )}
+  rowRenderer={props => (
+    <tr>
+        <td className='action-cell'>
+            <input 
+                type='checkbox' 
+                checked={isSelected(props.row)} 
+                onChange={selectHandler} 
+            />
+        </td>
+        {props.children}
+    </tr>
+  )}
+  valueViewer={MyViewComponent}
+  dataEditor={props => (
+    props.col === 0 ? <MyDatePicker {...props} /> : <DataEditor {...props}/>
+  )}
+  ...
+/>
+```
+_Note:_ For brevity, in this example the custom renderers are all defined as arrow functions inside of render, but using a [bound function](https://reactjs.org/docs/faq-functions.html) in the parent component or a separate custom component will let you avoid a lot of needless re-renders.
+
 ## Options
 
 Option | Type | Description
@@ -139,6 +189,11 @@ onPaste | func | onPaste handler: `function(array) {}` If set, the function will
 onContextMenu | func | Context menu handler : `function(event, cell, i, j)`
 parsePaste | func | `function (string) {}` If set, the function will be called with the raw clipboard data. It should return an array of arrays of strings. This is useful for when the clipboard may have data with irregular field or line delimiters. If not set, rows will be split with line breaks and cells with tabs.
 attributesRenderer | func | Method to add attributes to the cell `function(cell, i, j)`. The function should return an object where the keys are the attribute names and the values are their values. Example bellow.
+sheetRenderer | func | Optional function or React Component to render the main sheet element. The default renders a `table` element.
+rowRenderer | func | Optional function or React Component to render each row element. The default renders a `tr` element.
+cellRenderer | func | Optional function or React Component to render each cell element. The default renders a `td` element.
+valueViewer | func | Optional function or React Component to customize the way the value for each cell in the sheet is displayed.
+dataEditor | func | Optional function or React Component to render a custom editor. Affects every cell in the sheet.
 
 ## Cell Options
 
@@ -156,3 +211,82 @@ colSpan | number | 1 | The colSpan of the cell's td element
 rowSpan | number | 1 | The rowSpan of the cell's td element
 width | number or String | undefined | Sets the cell's td width using a style attribute. Number is interpreted as pixels, strings are used as-is. Note: This will only work if the table does not have a set width.
 overflow | 'wrap'\|'nowrap'\| 'clip' | undefined | How to render overflow text. Overrides grid-level `overflow` option.
+valueViewer | func | undefined | Optional function or React Component to customize the way the value for this cell is displayed. Overrides grid-level `valueViewer` option.
+dataEditor | func | undefined | Optional function or React Component to render a custom editor. Overrides grid-level `dataEditor` option.
+
+## Custom Renderers
+
+Each of the following custom renderers should be either a React Component or a function that takes a `props` argument and returns a react element (a.k.a stateless functional component). React-DataSheet will supply certain properties to each renderer.
+
+In some cases React-DataSheet will include event handlers as properties to your custom renderer. You must hook up these handlers to your component or aspects of React-DataSheet's built-in behavior will cease to work.
+
+Except for `valueViewer` and `dataEditor`, each custom renderer will receive react's regular `props.children`. Be sure to render `{props.children}` in your custom renderer.
+
+### Sheet Renderer
+
+The `sheetRenderer` is responsible for laying out the sheet's main parent component. By default, React-DataSheet uses a `table` element. React-DataSheet will supply these properties:
+
+Option | Type |  Description
+:--- | :---  | :--
+data | Array | The same `data` array as from main `ReactDataSheet` component
+className | String | Classes to apply to your top-level element. You can add to these, but your should not overwrite or omit them unless you want to implement your own CSS also.
+children | Array or component | The regular react `props.children`. You must render `{props.children}` within your custom renderer or you won't see your rows and cells.
+
+### Row Renderer
+
+The `rowRenderer` lays out each row in the sheet. By default, React-DataSheet uses a `tr` element. React-DataSheet will supply these properties:
+
+Option | Type |  Description
+:--- | :---  | :--
+row | number | The current row index
+cells | Array | The cells in the current row
+children | Array or component | The regular react `props.children`. You must render `{props.children}` within your custom renderer or you won't see your cells.
+
+### Cell Renderer
+
+The `cellRenderer` creates the container for each cell in the sheet. The default renders a `td` element. React-DataSheet will supply these properties:
+
+Option | Type |  Description
+:--- | :---  | :--
+row | number | The current row index
+col | number | The current column index
+cell | Object | The cell's raw data structure
+className | String | Classes to apply to your cell element. You can add to these, but your should not overwrite or omit them unless you want to implement your own CSS also.
+style | Object | Generated styles that you should apply to your cell element. This may be null or undefined.
+selected | Bool | Is the cell currently selected
+editing | Bool | Is the cell currently being edited
+updated | Bool | Was the cell recently updated
+attributesRenderer | func | As for the main `ReactDataSheet` component
+onMouseDown | func | Event handler important for cell selection behavior
+onMouseOver | func | Event handler important for cell selection behavior
+onDoubleClick | func | Event handler important for editing
+onContextMenu | func | Event handler to launch default content-menu handling. You can safely ignore this handler if you want to provide your own content menu handling.
+children | Array or component | The regular react `props.children`. You must render `{props.children}` within your custom renderer or you won't your cell's data.
+
+### Value Viewer
+
+The `valueViewer` displays your cell's data with a custom component when in view mode. For example, you might show a "three star rating" component instead the number 3. You can specify a `valueViewer` for the entire sheet and/or for an individual cell.
+
+React-DataSheet will supply these properties:
+
+Option | Type |  Description
+:--- | :---  | :--
+value | node | The result of the `valueRenderer` function
+row | number | The current row index
+col | number | The current column index
+cell | Object | The cell's raw data structure
+
+### Data Editor
+
+The `dataEditor` displays your cell's data when in edit mode. You can can use any component you want, as long as you hook up the event handlers that constitute the contract between React-DataSheet and your editor. You can specify a `dataEditor` for the entire sheet and/or for an individual cell.
+
+Option | Type |  Description
+:--- | :---  | :--
+value | String or node | The result of the `dataRenderer` (or `valueRenderer` if none)
+row | number | The current row index
+col | number | The current column index
+cell | Object | The cell's raw data structure
+onChange | func | `function (string) {}` callback for when the user changes the value during editing (for example, each time they type a character into an `input`). `onChange` does not indicate the _final_ edited value. It works just like a [controlled component](https://reactjs.org/docs/forms.html#controlled-components) in a form.
+onKeyDown | func | `function (event) {}` An event handler that you can call to use default React-DataSheet keyboard handling to signal reverting an ongoing edit (Escape key) or completing an edit (Enter or Tab). For most editors based on an `input` element this will probably work. However, if this keyboard handling is unsuitable for your editor you can trigger these changes explicitly using the `onCommit` and `onRevert` callbacks.
+onCommit | func | `function (newValue, [event]) {}` A callback to indicate that editing is over, here is the final value. If you pass a `KeyboardEvent` as the second argument, React-DataSheet will perform default navigation for you (for example, going down to the next row if you hit the enter key). You actually don't need to use `onCommit` if the default keyboard handling is good enough for you.
+onRevert | func | `function () {}` A no-args callback that you can use to indicate that you want to cancel ongoing edits. As with `onCommit`, you don't need to worry about this if the default keyboard handling works for your editor.

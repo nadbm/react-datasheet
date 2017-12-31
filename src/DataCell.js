@@ -1,30 +1,60 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 
+import {ENTER_KEY, ESCAPE_KEY, TAB_KEY, RIGHT_KEY, LEFT_KEY, UP_KEY, DOWN_KEY} from './keys'
+
+import Cell from './Cell'
+import CellShape from './CellShape'
+import DataEditor from './DataEditor'
+import ValueViewer from './ValueViewer'
+import { renderValue, renderData } from './renderHelpers'
+
+function initialData ({cell, row, col, valueRenderer, dataRenderer}) {
+  return renderData(cell, row, col, valueRenderer, dataRenderer)
+}
+
+function initialValue ({cell, row, col, valueRenderer}) {
+  return renderValue(cell, row, col, valueRenderer)
+}
+
+function widthStyle (cell) {
+  const width = typeof cell.width === 'number' ? cell.width + 'px' : cell.width
+  return width ? { width } : null
+}
+
 export default class DataCell extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {updated: false}
+    this.handleChange = this.handleChange.bind(this)
+    this.handleCommit = this.handleCommit.bind(this)
+    this.handleRevert = this.handleRevert.bind(this)
+
+    this.handleKey = this.handleKey.bind(this)
+    this.handleMouseDown = this.handleMouseDown.bind(this)
+    this.handleMouseOver = this.handleMouseOver.bind(this)
+    this.handleContextMenu = this.handleContextMenu.bind(this)
+    this.handleDoubleClick = this.handleDoubleClick.bind(this)
+
+    this.state = {updated: false, reverting: false, value: ''}
   }
 
-  componentWillUpdate (nextProps) {
-    if (nextProps.value !== this.props.value) {
+  componentWillReceiveProps (nextProps) {
+    if (initialValue(nextProps) !== initialValue(this.props)) {
       this.setState({updated: true})
       this.timeout = setTimeout(() => this.setState({updated: false}), 700)
+    }
+    if (nextProps.editing === true && this.props.editing === false) {
+      const value = nextProps.clearing ? '' : initialData(nextProps)
+      this.setState({ value, reverting: false })
     }
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.editing === true && this.props.editing === false && this.props.reverting === false) {
-      this.onChange(this._input.value)
-    }
-    if (prevProps.editing === false && this.props.editing === true) {
-      if (this.props.clear) {
-        this._input.value = ''
-      } else {
-        this._input.value = this.props.data === null ? this.props.value : this.props.data
-      }
-      this._input.focus()
+    if (prevProps.editing === true &&
+        this.props.editing === false &&
+        !this.state.reverting &&
+        this.state.value !== initialData(this.props)) {
+      this.props.onChange(this.props.row, this.props.col, this.state.value)
     }
   }
 
@@ -32,43 +62,156 @@ export default class DataCell extends PureComponent {
     clearTimeout(this.timeout)
   }
 
-  onChange (value) {
-    const initialData = this.props.data === null ? this.props.value : this.props.data;
-    (value === '' || initialData !== value) && this.props.onChange(this.props.row, this.props.col, value)
+  handleChange (value) {
+    this.setState({ value })
+  }
+
+  handleCommit (value, e) {
+    this.setState({ value })
+    const {onChange, onNavigate} = this.props
+    if (value !== initialData(this.props)) {
+      onChange(this.props.row, this.props.col, value)
+    } else {
+      this.handleRevert()
+    }
+    if (e) {
+      const keyCode = e.which || e.keyCode
+      switch (keyCode) {
+        case (ENTER_KEY):
+          return onNavigate({i: e.shiftKey ? -1 : 1, j: 0})
+        case (TAB_KEY):
+          return onNavigate({i: 0, j: e.shiftKey ? -1 : 1})
+        case (LEFT_KEY):
+          return onNavigate({i: 0, j: -1})
+        case (RIGHT_KEY):
+          return onNavigate({i: 0, j: 1})
+        case (UP_KEY):
+          return onNavigate({i: -1, j: 0})
+        case (DOWN_KEY):
+          return onNavigate({i: 1, j: 0})
+        default:
+          break
+      }
+    }
+  }
+
+  handleRevert () {
+    this.setState({reverting: true})
+    this.props.onRevert()
+  }
+
+  handleMouseDown (e) {
+    const {row, col, onMouseDown, cell} = this.props
+    if (!cell.disableEvents) {
+      onMouseDown(row, col)
+    }
+  }
+
+  handleMouseOver (e) {
+    const {row, col, onMouseOver, cell} = this.props
+    if (!cell.disableEvents) {
+      onMouseOver(row, col)
+    }
+  }
+
+  handleDoubleClick (e) {
+    const {row, col, onDoubleClick, cell} = this.props
+    if (!cell.disableEvents) {
+      onDoubleClick(row, col)
+    }
+  }
+
+  handleContextMenu (e) {
+    const {row, col, onContextMenu, cell} = this.props
+    if (!cell.disableEvents) {
+      onContextMenu(e, row, col)
+    }
+  }
+
+  handleKey (e) {
+    const keyCode = e.which || e.keyCode
+    if (keyCode === ESCAPE_KEY) {
+      return this.handleRevert()
+    }
+    const {cell: {component}, forceEdit} = this.props
+    const eatKeys = forceEdit || !!component
+    const commit = keyCode === ENTER_KEY || keyCode === TAB_KEY ||
+      (!eatKeys && [LEFT_KEY, RIGHT_KEY, UP_KEY, DOWN_KEY].includes(keyCode))
+
+    if (commit) {
+      this.handleCommit(this.state.value, e)
+    }
+  }
+
+  renderComponent (editing, cell) {
+    const {component, readOnly, forceComponent} = cell
+    if ((editing && !readOnly) || forceComponent) {
+      return component
+    }
+  }
+
+  renderEditor (editing, cell, row, col, dataEditor) {
+    if (editing) {
+      const Editor = cell.dataEditor || dataEditor || DataEditor
+      return (
+        <Editor
+          cell={cell}
+          row={row}
+          col={col}
+          value={this.state.value}
+          onChange={this.handleChange}
+          onCommit={this.handleCommit}
+          onRevert={this.handleRevert}
+          onKeyDown={this.handleKey}
+        />
+      )
+    }
+  }
+
+  renderViewer (cell, row, col, valueRenderer, valueViewer) {
+    const Viewer = cell.valueViewer || valueViewer || ValueViewer
+    const value = renderValue(cell, row, col, valueRenderer)
+    return <Viewer cell={cell} row={row} col={col} value={value} />
   }
 
   render () {
-    const {
-      row, col, rowSpan, readOnly, colSpan, width, overflow, value, className,
-      editing, selected, onMouseDown, onMouseOver, onDoubleClick, onContextMenu,
-      attributes
-    } = this.props
-    const style = { width }
+    const {row, col, cell, cellRenderer: CellRenderer,
+      valueRenderer, dataEditor, valueViewer, attributesRenderer,
+      selected, editing, onKeyUp} = this.props
+    const {updated} = this.state
+
+    const content = this.renderComponent(editing, cell) ||
+        this.renderEditor(editing, cell, row, col, dataEditor) ||
+        this.renderViewer(cell, row, col, valueRenderer, valueViewer)
+
+    const className = [
+      cell.className,
+      'cell', cell.overflow,
+      selected && 'selected',
+      editing && 'editing',
+      cell.readOnly && 'read-only',
+      updated && 'updated'
+    ].filter(a => a).join(' ')
 
     return (
-      <td
-        className={[
-          className,
-          'cell', overflow,
-          selected && 'selected',
-          editing && 'editing',
-          readOnly && 'read-only',
-          this.state.updated && 'updated'
-        ].filter(a => a).join(' ')}
-        onMouseDown={() => onMouseDown(row, col)}
-        onDoubleClick={() => onDoubleClick(row, col)}
-        onMouseOver={() => onMouseOver(row, col)}
-        onContextMenu={(e) => onContextMenu(e, row, col)}
-        colSpan={colSpan || 1}
-        rowSpan={rowSpan || 1}
-        style={style}
-        {...attributes}
-      >
-        <span style={{display: (editing && selected) ? 'none' : 'block'}}>
-          {value}
-        </span>
-        <input style={{display: (editing && selected) ? 'block' : 'none'}} ref={(input) => { this._input = input }} />
-      </td>
+      <CellRenderer
+        row={row}
+        col={col}
+        cell={cell}
+        selected={selected}
+        editing={editing}
+        updated={updated}
+        attributesRenderer={attributesRenderer}
+        className={className}
+        style={widthStyle(cell)}
+        onMouseDown={this.handleMouseDown}
+        onMouseOver={this.handleMouseOver}
+        onDoubleClick={this.handleDoubleClick}
+        onContextMenu={this.handleContextMenu}
+        onKeyUp={onKeyUp}
+        >
+        {content}
+      </CellRenderer>
     )
   }
 }
@@ -76,16 +219,30 @@ export default class DataCell extends PureComponent {
 DataCell.propTypes = {
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
-  colSpan: PropTypes.number,
-  rowSpan: PropTypes.number,
-  width: PropTypes.string,
-  overflow: PropTypes.oneOf(['wrap', 'nowrap', 'clip']),
-  selected: PropTypes.bool.isRequired,
-  editing: PropTypes.bool.isRequired,
+  cell: PropTypes.shape(CellShape).isRequired,
+  forceEdit: PropTypes.bool,
+  selected: PropTypes.bool,
+  editing: PropTypes.bool,
+  clearing: PropTypes.bool,
+  cellRenderer: PropTypes.func,
+  valueRenderer: PropTypes.func.isRequired,
+  dataRenderer: PropTypes.func,
+  valueViewer: PropTypes.func,
+  dataEditor: PropTypes.func,
+  attributesRenderer: PropTypes.func,
+  onNavigate: PropTypes.func.isRequired,
   onMouseDown: PropTypes.func.isRequired,
-  onDoubleClick: PropTypes.func.isRequired,
   onMouseOver: PropTypes.func.isRequired,
+  onDoubleClick: PropTypes.func.isRequired,
   onContextMenu: PropTypes.func.isRequired,
-  updated: PropTypes.bool,
-  attributes: PropTypes.object
+  onChange: PropTypes.func.isRequired,
+  onRevert: PropTypes.func.isRequired
+}
+
+DataCell.defaultProps = {
+  forceEdit: false,
+  selected: false,
+  editing: false,
+  clearing: false,
+  cellRenderer: Cell
 }

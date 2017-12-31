@@ -1,9 +1,7 @@
 import React from 'react'
-import Select from 'react-select'
-import _ from 'lodash'
 import 'react-select/dist/react-select.css'
 import  './lib/react-datasheet.css'
-import {BasicSheet, MathSheet, ComponentSheet} from './examples/index';
+import {BasicSheet, MathSheet, ComponentSheet, CustomRendererSheet, OverrideEverythingSheet} from './examples/index';
 
 export default class App extends React.Component {
   render () {
@@ -13,16 +11,16 @@ export default class App extends React.Component {
           <h1>React datasheet</h1>
           <h4>Simple and highly customizable excel-like spreadsheet</h4>
           <pre>npm install react-datasheet --save</pre>
-          <a className={'github-link'} href="https://github.com/nadbm/react-datasheet"><span class="hidden-xs"> View on GitHub </span><span class="octicon octicon-mark-github" aria-hidden="true"></span></a>
+          <a className={'github-link'} href="https://github.com/nadbm/react-datasheet"><span className="hidden-xs"> View on GitHub </span><span className="octicon octicon-mark-github" aria-hidden="true"></span></a>
         </div>
         <div className={'container'} >
           <div style={{float: 'right', marginTop: '-20px'}}>
-            <a 
-              className="github-button" 
+            <a
+              className="github-button"
               href="https://github.com/nadbm/react-datasheet"
-              data-style="mega" data-count-href="/nadbm/react-datasheet/stargazers" 
-              data-count-api="/repos/nadbm/react-datasheet#stargazers_count" 
-              data-count-aria-label="# stargazers on GitHub" 
+              data-style="mega" data-count-href="/nadbm/react-datasheet/stargazers"
+              data-count-api="/repos/nadbm/react-datasheet#stargazers_count"
+              data-count-aria-label="# stargazers on GitHub"
               aria-label="Star nadbm/react-datasheet on GitHub">
               Star
             </a>
@@ -50,6 +48,43 @@ export default class App extends React.Component {
           <h3 style={{color: '#e63946'}}>Sheet with components</h3>
           <div className={'sheet-container'}>
             <ComponentSheet />
+          </div>
+          <div className={'divider'} />
+          <h3 style={{color: '#e63946'}}>Sheet with custom renderers</h3>
+          <small>
+            Custom renderers allow you to add significant new capabilities 
+            to your sheets without requiring changes to react-datagrid itself.
+            This example allows you to reorder both the columns and the rows
+            using drag and drop. This is implemented by using custom components
+            to render the main table (including a custom header) and each row.
+            The drag handler for the rows is the gray cell at the beginning of each row.
+          </small>
+          <small>
+            The "Rating" column also shows how to specify custom cell editing and viewing components.
+          </small>
+          <div className={'sheet-container'}>
+            <CustomRendererSheet />
+          </div>
+          <div className={'divider'} />
+          <h3 style={{color: '#e63946'}}>Sheet with custom structure</h3>
+          <small>
+            Ever wish you could <a href="https://github.com/nadbm/react-datasheet/issues/27">customize how data is displayed</a>,
+            or <a href="https://github.com/nadbm/react-datasheet/pull/43">easily add custom attributes to your cells</a>, 
+            or <a href="https://github.com/nadbm/react-datasheet/issues/45">add new behaviors</a> that React-DataSheet 
+            doesn't currently support?
+            This example demonstrates the great flexibility that custom renderers provide.
+            You can completely change the sheet's structure:
+            <ul>
+              <li>Table - similar to the default rendering</li>
+              <li>List - renders the data grid using an html unordered list</li>
+              <li>Div - renders using divs</li>
+            </ul>
+            Although a bit contrived, it shows that you can deeply customize your sheet's markup while
+            still retaining data sheet behavior. This example also adds controls for selecting rows. Note that the 
+            model and controls for row selection are separate from the grid itself.
+          </small>
+          <div className={'sheet-container'}>
+            <OverrideEverythingSheet />
           </div>
           <div className={'divider'} />
         </div>
