@@ -36,9 +36,18 @@ tbody .row-handle.cell, thead .cell:not(.row-handle) {
   cursor: move;
 }
 
-.drop-target .cell, thead .drop-target.read-only.cell {
-  background: rgba(0, 145, 253, 0.16);
+.data-grid-container table.data-grid tr {
+ background: white;
 }
+.data-grid-container table.data-grid .drop-target,  .data-grid-container table.data-grid thead .cell.read-only.drop-target {
+  background: #6F86FC;
+  transition: none;
+  color: white;
+}
+.data-grid-container table.data-grid thead .cell.read-only {
+  transition: none;
+}
+
 
 .App {
   text-align: center;

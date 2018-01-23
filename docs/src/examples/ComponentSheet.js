@@ -1,7 +1,7 @@
 import React from 'react'
 import Select from 'react-select'
 import _ from 'lodash'
-import Datasheet from '../lib/DataSheet' 
+import Datasheet from '../lib/DataSheet'
 
 export default class ComponentSheet extends React.Component {
   constructor (props) {
@@ -49,31 +49,30 @@ export default class ComponentSheet extends React.Component {
     let rows = [
       [{readOnly: true, colSpan: 2, value: 'Shopping List'}],
       [
-        {readOnly: true, value: ''}, 
-        { 
-          value: 'Grocery Item', 
+        {readOnly: true, value: ''},
+        {
+          value: 'Grocery Item',
           component: (
-            <div className={'add-grocery'}> Grocery List 
-              <div className={'add-button'} onClick={()=>{console.log("add");this.setState({items: this.state.items+1})}}> add item</div> 
+            <div className={'add-grocery'}> Grocery List
+              <div className={'add-button'} onClick={() => { console.log('add'); this.setState({items: this.state.items + 1}) }}> add item</div>
             </div>
-          ), 
+          ),
           forceComponent: true
         }]
     ]
     rows = rows.concat(_.range(1, this.state.items + 1).map(id => [{readOnly: true, value: `Item ${id}`}, {value: groceryValue(id), component: component(id)}]))
-    
+
     rows = rows.concat([[{readOnly: true, value: 'Total'}, {readOnly: true, value: `${total.toFixed(2)} $`}]])
     console.log(rows)
     return rows
   }
-
 
   render () {
     return (
       <Datasheet
         data={this.generateGrid()}
         valueRenderer={(cell) => cell.value}
-        onChange={()=>{}}
+        onChange={() => {}}
       />
     )
   }

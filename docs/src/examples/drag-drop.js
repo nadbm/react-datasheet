@@ -3,7 +3,7 @@ import { DragSource, DropTarget } from 'react-dnd'
 /**
  * Specifies which props to inject into your component.
  */
-function rowSourceCollect(connect, _monitor) {
+function rowSourceCollect (connect, _monitor) {
   return {
     // Call this function inside render()
     // to let React DnD handle the drag events:
@@ -17,15 +17,15 @@ function rowSourceCollect(connect, _monitor) {
  * Only `beginDrag` function is required.
  */
 const rowSourceSpec = {
-  beginDrag(props) {
+  beginDrag (props) {
     console.log('beginDrag', props.rowIndex, props)
     return {
       rowIndex: props.rowIndex
     }
-  },
+  }
 }
 
-function rowTargetCollect(connect, monitor) {
+function rowTargetCollect (connect, monitor) {
   return {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver() && monitor.canDrop()
@@ -33,12 +33,12 @@ function rowTargetCollect(connect, monitor) {
 }
 
 const rowTargetSpec = {
-  canDrop(props, monitor) {
+  canDrop (props, monitor) {
     const item = monitor.getItem()
     return props.rowIndex !== item.rowIndex
   },
 
-  drop(props, monitor, component) {
+  drop (props, monitor, component) {
     if (monitor.didDrop()) {
       return
     }
@@ -49,8 +49,7 @@ const rowTargetSpec = {
   }
 }
 
-
-function colSourceCollect(connect, _monitor) {
+function colSourceCollect (connect, _monitor) {
   return {
     // Call this function inside render()
     // to let React DnD handle the drag events:
@@ -59,14 +58,14 @@ function colSourceCollect(connect, _monitor) {
 }
 
 const colSourceSpec = {
-  beginDrag(props) {
+  beginDrag (props) {
     return {
       columnIndex: props.columnIndex
     }
-  },
+  }
 }
 
-function colTargetCollect(connect, monitor) {
+function colTargetCollect (connect, monitor) {
   return {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver() && monitor.canDrop()
@@ -74,13 +73,13 @@ function colTargetCollect(connect, monitor) {
 }
 
 const colTargetSpec = {
-  canDrop(props, monitor) {
+  canDrop (props, monitor) {
     const item = monitor.getItem()
     // return item.row !== props.row
     return props.columnIndex !== item.columnIndex
   },
 
-  drop(props, monitor, component) {
+  drop (props, monitor, component) {
     if (monitor.didDrop()) {
       return
     }

@@ -1,16 +1,15 @@
 import React, { PureComponent } from 'react'
-import { DragDropContextProvider } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
+import { DragDropContextProvider } from 'react-dnd'
+import HTML5Backend from 'react-dnd-html5-backend'
 import Select from 'react-select'
 
-import DataSheet from '../lib';
+import DataSheet from '../lib'
 import {ENTER_KEY, TAB_KEY} from '../lib/keys'
 
 import {
   colDragSource, colDropTarget,
-  rowDragSource, rowDropTarget,
-} from './drag-drop.js';
-
+  rowDragSource, rowDropTarget
+} from './drag-drop.js'
 
 const Header = colDropTarget(colDragSource((props) => {
   const { col, connectDragSource, connectDropTarget, isOver } = props
@@ -22,8 +21,8 @@ const Header = colDropTarget(colDragSource((props) => {
 }))
 
 class SheetRenderer extends PureComponent {
-  render() {
-    const { className, columns, onColumnDrop } = this.props;
+  render () {
+    const { className, columns, onColumnDrop } = this.props
     return (
       <table className={className}>
         <thead>
@@ -45,18 +44,18 @@ class SheetRenderer extends PureComponent {
 }
 
 const RowRenderer = rowDropTarget(rowDragSource((props) => {
-  const { isOver, children, connectDropTarget, connectDragPreview, connectDragSource } = props;
-  const className = isOver ? 'drop-target' : '';
+  const { isOver, children, connectDropTarget, connectDragPreview, connectDragSource } = props
+  const className = isOver ? 'drop-target' : ''
   return connectDropTarget(connectDragPreview(
     <tr className={className}>
-      { connectDragSource(<td className='cell read-only row-handle' key='$$actionCell'> </td>)}
+      { connectDragSource(<td className='cell read-only row-handle' key='$$actionCell' />)}
       { children }
     </tr>
   ))
 }))
 
 class SelectEditor extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
     this.handleKeyDown = this.handleKeyDown.bind(this)
@@ -70,6 +69,7 @@ class SelectEditor extends PureComponent {
     }
     const { e } = this.state
     onCommit(opt.value, e)
+    console.log('COMMITTED', opt.value)
   }
 
   handleKeyDown (e) {
@@ -82,7 +82,7 @@ class SelectEditor extends PureComponent {
     }
   }
 
-  render() {
+  render () {
     return (
       <Select
         autoFocus
@@ -96,7 +96,7 @@ class SelectEditor extends PureComponent {
           {label: '2', value: 2},
           {label: '3', value: 3},
           {label: '4', value: 4},
-          {label: '5', value: 5},
+          {label: '5', value: 5}
         ]}
       />
     )
@@ -104,13 +104,13 @@ class SelectEditor extends PureComponent {
 }
 
 class RangeEditor extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
   }
 
-  componentDidMount() {
-    this._input.focus();
+  componentDidMount () {
+    this._input.focus()
   }
 
   handleChange (e) {
@@ -138,11 +138,10 @@ const FillViewer = props => {
   const { value } = props
   return (
     <div style={{width: '100%'}}>
-      {[1,2,3,4,5].map(v => {
+      {[1, 2, 3, 4, 5].map(v => {
         const backgroundColor = v > value ? 'transparent' : '#007eff'
         return (
-          <div key={v} style={{float: 'left', width: '20%', height: '17px', backgroundColor}}>
-          </div>
+          <div key={v} style={{float: 'left', width: '20%', height: '17px', backgroundColor}} />
         )
       })}
     </div>
@@ -151,7 +150,7 @@ const FillViewer = props => {
 
 class CustomRendererSheet extends PureComponent {
   constructor (props) {
-    super(props);
+    super(props)
     this.state = {
       columns: [
         { label: 'Style', width: '40%' },
@@ -174,7 +173,7 @@ class CustomRendererSheet extends PureComponent {
         [{ value: 'Pale Mild Ale'}, { value: '10 - 20'}, { value: '6 - 9'}, { value: 3, dataEditor: SelectEditor }],
         [{ value: 'Dark Mild Ale'}, { value: '10 - 24'}, { value: '17 - 34'}, { value: 3, dataEditor: SelectEditor }],
         [{ value: 'Brown Ale'}, { value: '12 - 25'}, { value: '12 - 17'}, { value: 3, dataEditor: SelectEditor }]
-      ]
+      ].map((a, i) => a.map((cell, j) => Object.assign(cell, {key: `${i}-${j}`})))
     }
 
     this.handleColumnDrop = this.handleColumnDrop.bind(this)
@@ -184,24 +183,24 @@ class CustomRendererSheet extends PureComponent {
     this.renderRow = this.renderRow.bind(this)
   }
 
-  handleColumnDrop(from, to) {
-    const columns = [...this.state.columns];
-    columns.splice(to, 0, ...columns.splice(from, 1));
+  handleColumnDrop (from, to) {
+    const columns = [...this.state.columns]
+    columns.splice(to, 0, ...columns.splice(from, 1))
     const grid = this.state.grid.map(r => {
-      const row = [...r];
-      row.splice(to, 0, ...row.splice(from, 1));
-      return row;
-    });
-    this.setState({ columns, grid });
+      const row = [...r]
+      row.splice(to, 0, ...row.splice(from, 1))
+      return row
+    })
+    this.setState({ columns, grid })
   }
 
-  handleRowDrop(from, to) {
-    const grid = [ ...this.state.grid ];
-    grid.splice(to, 0, ...grid.splice(from, 1));
-    this.setState({ grid });
+  handleRowDrop (from, to) {
+    const grid = [ ...this.state.grid ]
+    grid.splice(to, 0, ...grid.splice(from, 1))
+    this.setState({ grid })
   }
 
-  handleChange(modifiedCell, i, j, value) {
+  handleChange (modifiedCell, i, j, value) {
     this.setState((prevState) => {
       const grid = [...prevState.grid]
       grid[i] = [...grid[i]]
@@ -219,7 +218,7 @@ class CustomRendererSheet extends PureComponent {
     return <RowRenderer rowIndex={row} onRowDrop={this.handleRowDrop} {...rest} />
   }
 
-  render() {
+  render () {
     return (
       <DragDropContextProvider backend={HTML5Backend}>
         <DataSheet
@@ -230,7 +229,7 @@ class CustomRendererSheet extends PureComponent {
           onChange={this.handleChange}
         />
       </DragDropContextProvider>
-    );
+    )
   }
 }
 
