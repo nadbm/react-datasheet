@@ -67,31 +67,16 @@ export default class DataCell extends PureComponent {
   }
 
   handleCommit (value, e) {
-    this.setState({ value })
     const {onChange, onNavigate} = this.props
     if (value !== initialData(this.props)) {
+      this.setState({ value })
       onChange(this.props.row, this.props.col, value)
     } else {
       this.handleRevert()
     }
     if (e) {
-      const keyCode = e.which || e.keyCode
-      switch (keyCode) {
-        case (ENTER_KEY):
-          return onNavigate({i: e.shiftKey ? -1 : 1, j: 0})
-        case (TAB_KEY):
-          return onNavigate({i: 0, j: e.shiftKey ? -1 : 1})
-        case (LEFT_KEY):
-          return onNavigate({i: 0, j: -1})
-        case (RIGHT_KEY):
-          return onNavigate({i: 0, j: 1})
-        case (UP_KEY):
-          return onNavigate({i: -1, j: 0})
-        case (DOWN_KEY):
-          return onNavigate({i: 1, j: 0})
-        default:
-          break
-      }
+      e.preventDefault()
+      onNavigate(e, true)
     }
   }
 

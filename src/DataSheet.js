@@ -35,7 +35,6 @@ export default class DataSheet extends PureComponent {
     this.onContextMenu = this.onContextMenu.bind(this)
     this.handleNavigate = this.handleNavigate.bind(this)
     this.handleKey = this.handleKey.bind(this).bind(this)
-    this.handleComponentKey = this.handleComponentKey.bind(this)
     this.handleCopy = this.handleCopy.bind(this)
     this.handlePaste = this.handlePaste.bind(this)
     this.pageClick = this.pageClick.bind(this)
@@ -44,6 +43,9 @@ export default class DataSheet extends PureComponent {
     this.isSelected = this.isSelected.bind(this)
     this.isEditing = this.isEditing.bind(this)
     this.isClearing = this.isClearing.bind(this)
+    this.handleComponentKey = this.handleComponentKey.bind(this)
+
+    this.handleKeyboardCellMovement = this.handleKeyboardCellMovement.bind(this)
 
     this.defaultState = {
       start: {},
@@ -131,41 +133,46 @@ export default class DataSheet extends PureComponent {
     }
   }
 
-  handleKeyboardCellMovement (e, {data, start, isEditing, currentCell}) {
-    if (isEditing) {
+  handleKeyboardCellMovement (e, commit = false) {
+    const {start, editing} = this.state
+    const {data} = this.props
+    const isEditing = editing && !isEmpty(editing)
+    const currentCell = data[start.i] && data[start.i][start.j]
+
+    if (isEditing && !commit) {
       return false
     }
     const hasComponent = currentCell && currentCell.component
-    const forceComponent = currentCell && currentCell.forceComponent
-
-    if (hasComponent && (isEditing || forceComponent)) {
-      return false
-    }
 
     const keyCode = e.which || e.keyCode
-    let newLocation = null
 
-    if (keyCode === TAB_KEY && !e.shiftKey) {
-      newLocation = {i: start.i, j: start.j + 1}
-      newLocation = typeof (data[newLocation.i][newLocation.j]) !== 'undefined' ? newLocation : {i: start.i + 1, j: 0}
-    } else if (keyCode === RIGHT_KEY) {
-      newLocation = {i: start.i, j: start.j + 1}
-    } else if (keyCode === LEFT_KEY || ((keyCode === TAB_KEY) && e.shiftKey)) {
-      newLocation = {i: start.i, j: start.j - 1}
-    } else if (keyCode === UP_KEY) {
-      newLocation = {i: start.i - 1, j: start.j}
-    } else if (keyCode === DOWN_KEY) {
-      newLocation = {i: start.i + 1, j: start.j}
-    }
-
-    if (newLocation && data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
-      this.setState({start: newLocation, end: newLocation, editing: {}})
-    }
-    if (newLocation) {
+    if (hasComponent && (isEditing)) { /*
+      if (keyCode === ESCAPE_KEY) {
+        e.preventDefault()
+        this.onRevert()
+      }
+      if (keyCode === ENTER_KEY) {
+        this.handleNavigate(e, {i: e.shiftKey ? -1 : 1, j: 0})
+      } else if (keyCode === TAB_KEY) {
+        this.handleNavigate(e, {i: 0, j: e.shiftKey ? -1 : 1}, true)
+      } */
       e.preventDefault()
-      return true
+      return
     }
-    return false
+
+    if (keyCode === TAB_KEY) {
+      this.handleNavigate(e, {i: 0, j: e.shiftKey ? -1 : 1}, true)
+    } else if (keyCode === RIGHT_KEY) {
+      this.handleNavigate(e, {i: 0, j: 1})
+    } else if (keyCode === LEFT_KEY) {
+      this.handleNavigate(e, {i: 0, j: -1})
+    } else if (keyCode === UP_KEY) {
+      this.handleNavigate(e, {i: -1, j: 0})
+    } else if (keyCode === DOWN_KEY) {
+      this.handleNavigate(e, {i: 1, j: 0})
+    } else if (commit && keyCode === ENTER_KEY) {
+      this.handleNavigate(e, {i: e.shiftKey ? -1 : 1, j: 0})
+    }
   }
 
   getSelectedCells (data, start, end) {
@@ -203,11 +210,12 @@ export default class DataSheet extends PureComponent {
       110
     ].indexOf(keyCode) > -1
 
-    if (noCellsSelected || ctrlKeyPressed || this.handleKeyboardCellMovement(e, {data, start, isEditing, currentCell})) {
+    if (noCellsSelected || ctrlKeyPressed) {
       return true
     }
 
     if (!isEditing) {
+      this.handleKeyboardCellMovement(e)
       if (deleteKeysPressed) {
         // ugly solution brought to you by https://reactjs.org/docs/react-component.html#setstate
         // setState in a loop is unreliable
@@ -232,39 +240,54 @@ export default class DataSheet extends PureComponent {
     }
   }
 
-  handleComponentKey (e) {
-    // handles keyboard events when editing components
-    const keyCode = e.which || e.keyCode
-    if ([ENTER_KEY, ESCAPE_KEY, TAB_KEY].includes(keyCode)) {
-      const {editing} = this.state
-      if (!isEmpty(editing)) {
-        const {data} = this.props
-        const currentCell = data[editing.i][editing.j]
-        const offset = e.shiftKey ? -1 : 1
-        if (currentCell && currentCell.component) {
-          let func = this.onRevert // ESCAPE_KEY
-          if (keyCode === ENTER_KEY) {
-            func = () => this.handleNavigate({i: offset, j: 0})
-          } else if (keyCode === TAB_KEY) {
-            func = () => this.handleNavigate({i: 0, j: offset})
-          }
-          // setTimeout makes sure that component is done handling the event before we take over
-          setTimeout(func, 1)
+  handleNavigate (e, offsets, jumpRow) {
+    if (offsets && (offsets.i || offsets.j)) {
+      const {start} = this.state
+      const {data} = this.props
+      let newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
+      const updateLocation = () => {
+        if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
+          this.setState({start: newLocation, end: newLocation, editing: {}})
+          e.preventDefault()
+          return true
         }
+        return false
+      }
+      if (!updateLocation() && jumpRow) {
+        if (offsets.j < 0) {
+          newLocation = {i: start.i - 1, j: data[0].length - 1}
+        } else {
+          newLocation = {i: start.i + 1, j: 0}
+        }
+        updateLocation()
       }
     }
   }
 
-  handleNavigate (offsets) {
-    if (offsets && (offsets.i || offsets.j)) {
-      const {start} = this.state
-      const {data} = this.props
-      const newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
-      if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
-        this.setState({start: newLocation, end: newLocation, editing: {}})
+  handleComponentKey (e) {
+    // handles keyboard events when editing components
+    const keyCode = e.which || e.keyCode
+    if (![ENTER_KEY, ESCAPE_KEY, TAB_KEY].includes(keyCode)) {
+      return
+    }
+    const {editing} = this.state
+    const {data} = this.props
+    const isEditing = !isEmpty(editing)
+    if (isEditing) {
+      const currentCell = data[editing.i][editing.j]
+      const offset = e.shiftKey ? -1 : 1
+      if (currentCell && currentCell.component && !currentCell.forceComponent) {
+        e.preventDefault()
+        let func = this.onRevert // ESCAPE_KEY
+        if (keyCode === ENTER_KEY) {
+          func = () => this.handleNavigate(e, {i: offset, j: 0})
+        } else if (keyCode === TAB_KEY) {
+          func = () => this.handleNavigate(e, {i: 0, j: offset}, true)
+        }
+        // setTimeout makes sure that component is done handling the event before we take over
+        setTimeout(() => { func(); this.dgDom && this.dgDom.focus() }, 1)
       }
     }
-    this.dgDom && this.dgDom.focus()
   }
 
   onContextMenu (evt, i, j) {
@@ -372,7 +395,7 @@ export default class DataSheet extends PureComponent {
                       onContextMenu={this.onContextMenu}
                       onChange={this.onChange}
                       onRevert={this.onRevert}
-                      onNavigate={this.handleNavigate}
+                      onNavigate={this.handleKeyboardCellMovement}
                       onKey={this.handleKey}
                       selected={this.isSelected(i, j)}
                       editing={this.isEditing(i, j)}
