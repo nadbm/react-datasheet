@@ -25,6 +25,11 @@ const triggerKeyDownEvent = (wrapper, keyCode, options = {}) => {
   wrapper.simulate('keydown', { keyCode, ...options })
 }
 
+const triggerEvent = (node, keyCode) => {
+  node.dispatchEvent(new Event('focus'))
+  node.dispatchEvent(new KeyboardEvent('keydown', { keyCode }))
+}
+
 const triggerMouseEvent = (node, eventType) => {
   const clickEvent = document.createEvent('MouseEvents')
   clickEvent.initEvent(eventType, true, true)
@@ -87,7 +92,7 @@ describe('Component', () => {
           selected: false,
           cell: {
             value: 5,
-            data: 5,
+            data: 5
           },
           row: 1,
           col: 1,
@@ -158,7 +163,7 @@ describe('Component', () => {
           selected: false,
           cell: {
             value: '2',
-            data: '5',
+            data: '5'
           },
           row: 1,
           col: 2,
@@ -226,7 +231,7 @@ describe('Component', () => {
         const onNavigate = sinon.spy()
         const onChange = sinon.spy()
         const onRevert = sinon.spy()
-        const cell= {
+        const cell = {
           foo: 'bar',
           readOnly: false,
           forceComponent: true,
@@ -262,12 +267,12 @@ describe('Component', () => {
         wrapper.setProps({cell: {...cell, forceComponent: false}})
         expect(wrapper.html()).toEqual(
           mount(<td className='test cell' colSpan={5} rowSpan={4} style={{width: '200px'}}>
-            <span className="value-viewer">5</span>
+            <span className='value-viewer'>5</span>
           </td>).html())
         wrapper.setProps({ cell: {...cell, forceComponent: false, value: 7}})
         expect(wrapper.html()).toEqual(
           mount(<td className='test cell updated' colSpan={5} rowSpan={4} style={{width: '200px'}}>
-            <span className="value-viewer">7</span>
+            <span className='value-viewer'>7</span>
           </td>).html())
         wrapper.simulate('mousedown')
         wrapper.simulate('doubleclick')
@@ -501,6 +506,61 @@ describe('Component', () => {
         customWrapper.find('td').first().simulate('doubleClick')
         expect(customWrapper.state('start')).toEqual({i: 0, j: 0})
         expect(customWrapper.find('td').text()).toEqual('COMPONENT RENDERED')
+      })
+
+      it('handles  a custom editable component and exits on ENTER_KEY', (done) => {
+        customWrapper = mount(<DataSheet
+          data={[[{value: 1}, {component: <input className={'custom-component'} />}, {value: 2}]]}
+          valueRenderer={(cell) => 'VALUE RENDERED'}
+          onChange={(cell, i, j, value) => data[i][j].data = value}
+        />)
+        const cell = customWrapper.find('td').at(1)
+        cell.simulate('mouseDown')
+        cell.simulate('doubleClick')
+
+        expect(customWrapper.state('start')).toEqual({i: 0, j: 1})
+        cell.find('.custom-component').first().simulate('doubleClick')
+        triggerEvent(customWrapper.find('.data-grid-container').node, TAB_KEY)
+        setTimeout(() => {
+          expect(customWrapper.state('start')).toEqual({i: 0, j: 2})
+          done()
+        }, 50)
+      })
+
+      it('handles  a custom editable component and exits', (done) => {
+        customWrapper = mount(<DataSheet
+          data={[[{value: 1}, {component: <input className={'custom-component'} />}, {value: 2}]]}
+          valueRenderer={(cell) => 'VALUE RENDERED'}
+          onChange={(cell, i, j, value) => data[i][j].data = value}
+        />)
+        const cell = customWrapper.find('td').at(1)
+
+        const selectCell = () => {
+          cell.simulate('mouseDown')
+          cell.simulate('doubleClick')
+        }
+
+        const checkEnterKey = (callback) => {
+          selectCell()
+          expect(customWrapper.state('start')).toEqual({i: 0, j: 1})
+          cell.find('.custom-component').first().simulate('doubleClick')
+          triggerEvent(customWrapper.find('.data-grid-container').node, ENTER_KEY)
+          setTimeout(() => {
+            expect(customWrapper.state('start')).toEqual({i: 0, j: 1})
+            callback()
+          }, 50)
+        }
+        const checkTabKey = (callback) => {
+          selectCell()
+          expect(customWrapper.state('start')).toEqual({i: 0, j: 1})
+          cell.find('.custom-component').first().simulate('doubleClick')
+          triggerEvent(customWrapper.find('.data-grid-container').node, TAB_KEY)
+          setTimeout(() => {
+            expect(customWrapper.state('start')).toEqual({i: 0, j: 2})
+            callback()
+          }, 50)
+        }
+        checkEnterKey(() => checkTabKey(done))
       })
 
       it('renders a cell with readOnly field properly', () => {
@@ -1169,32 +1229,32 @@ describe('Component', () => {
       })
 
       it('renders a custom header', () => {
-          component = <DataSheet
-            className={'test'}
-            data={data}
-            valueRenderer={(cell) => cell.data}
-            onChange={(cell, i, j, value) => data[i][j].data = value}
-            sheetRenderer={props => {
-              return (
-                <table className={props.className}>
-                  <thead>
-                    <tr>
-                      {columns.map(col => <th key={col}>{col}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {props.children}
-                  </tbody>
-                </table>
-              )
-            }}
+        component = <DataSheet
+          className={'test'}
+          data={data}
+          valueRenderer={(cell) => cell.data}
+          onChange={(cell, i, j, value) => data[i][j].data = value}
+          sheetRenderer={props => {
+            return (
+              <table className={props.className}>
+                <thead>
+                  <tr>
+                    {columns.map(col => <th key={col}>{col}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {props.children}
+                </tbody>
+              </table>
+            )
+          }}
           />
-          wrapper = mount(component)
+        wrapper = mount(component)
           // extra row for header
-          expect(wrapper.find('tr').length).toEqual(3)
-          expect(wrapper.find('th').nodes.map(n => n.innerHTML)).toEqual(columns)
-          expect(wrapper.find('td span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '3', '5'])
-      })      
+        expect(wrapper.find('tr').length).toEqual(3)
+        expect(wrapper.find('th').nodes.map(n => n.innerHTML)).toEqual(columns)
+        expect(wrapper.find('td span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '3', '5'])
+      })
 
       // custom tr
       // custom td
@@ -1228,8 +1288,8 @@ describe('Component', () => {
         wrapper = mount(component)
         expect(wrapper.find('ul.data-grid li').length).toEqual(2)
         expect(wrapper.find('ul.data-grid li div.cell span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '3', '5'])
-        expect(wrapper.find('DataCell').at(1).key()).toEqual('custom_key')      
-        expect(wrapper.find('ul.data-grid li div.cell').at(3).hasClass('test4')).toBe(true)       
+        expect(wrapper.find('DataCell').at(1).key()).toEqual('custom_key')
+        expect(wrapper.find('ul.data-grid li div.cell').at(3).hasClass('test4')).toBe(true)
       })
 
       it('renders custom valueViewers', () => {
@@ -1256,11 +1316,11 @@ describe('Component', () => {
         data[0][0].dataEditor = props => {
           const {value, onKeyDown, onChange} = props
           return (
-            <select 
-                className='data-editor' 
-                value={value} 
-                onChange={e => onChange(e.target.value)} 
-                onKeyDown={onKeyDown}
+            <select
+              className='data-editor'
+              value={value}
+              onChange={e => onChange(e.target.value)}
+              onKeyDown={onKeyDown}
             >
               <option value='1'>1</option>
               <option value='2'>2</option>
@@ -1302,7 +1362,7 @@ describe('Component', () => {
         cells.at(0).simulate('doubleClick')
         expect(wrapper.find('td.cell.selected select').node.value).toEqual('4')
 
-        wrapper.find('td.cell.selected select').simulate('change', {target: { value : '5'}})
+        wrapper.find('td.cell.selected select').simulate('change', {target: { value: '5'}})
         wrapper.find('td.cell.selected select').simulate('keydown', {keyCode: ENTER_KEY})
         expect(data[0][0].data).toEqual(5)
 
@@ -1310,7 +1370,7 @@ describe('Component', () => {
         triggerKeyDownEvent(wrapper, ENTER_KEY)
         const input = cells.at(2).find('input')
         expect(input.node.value).toEqual('3')
-        input.simulate('change', {target: { value : '1'}})
+        input.simulate('change', {target: { value: '1'}})
         triggerKeyDownEvent(input, ENTER_KEY)
         expect(data[1][0].data).toEqual('1')
       })
