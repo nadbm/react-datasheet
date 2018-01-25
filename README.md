@@ -188,12 +188,18 @@ onChange | func | onChange handler: `function(cell, i, j, newValue) {}`
 onPaste | func | onPaste handler: `function(array) {}` If set, the function will be called with an array of rows. Each row has an array of objects containing the cell and raw pasted value. If the pasted value cannot be matched with a cell, the cell value will be undefined
 onContextMenu | func | Context menu handler : `function(event, cell, i, j)`
 parsePaste | func | `function (string) {}` If set, the function will be called with the raw clipboard data. It should return an array of arrays of strings. This is useful for when the clipboard may have data with irregular field or line delimiters. If not set, rows will be split with line breaks and cells with tabs.
-attributesRenderer | func | Method to add attributes to the cell `function(cell, i, j)`. The function should return an object where the keys are the attribute names and the values are their values. Example bellow.
+
+### Advanced options 
+
+The following are optional functions or React Component that can completely override the native renderers of react datasheet. To know which props are passed down, see [custom renderers](https://github.com/nadbm/react-datasheet#custom-renderers-1)
+
+Option | Type | Description
+:--- | :---: | :---
 sheetRenderer | func | Optional function or React Component to render the main sheet element. The default renders a `table` element.
 rowRenderer | func | Optional function or React Component to render each row element. The default renders a `tr` element.
 cellRenderer | func | Optional function or React Component to render each cell element. The default renders a `td` element.
-valueViewer | func | Optional function or React Component to customize the way the value for each cell in the sheet is displayed.
-dataEditor | func | Optional function or React Component to render a custom editor. Affects every cell in the sheet.
+valueViewer | func | Optional function or React Component to customize the way the value for each cell in the sheet is displayed. Affects every cell in the sheet. See [cell options](https://github.com/nadbm/react-datasheet#cell-options) to override individual cells.
+dataEditor | func | Optional function or React Component to render a custom editor. Affects every cell in the sheet. Affects every cell in the sheet. See [cell options](https://github.com/nadbm/react-datasheet#cell-options) to override individual cells.
 
 ## Cell Options
 
@@ -281,7 +287,7 @@ cell | Object | The cell's raw data structure
 The `dataEditor` displays your cell's data when in edit mode. You can can use any component you want, as long as you hook up the event handlers that constitute the contract between React-DataSheet and your editor. You can specify a `dataEditor` for the entire sheet and/or for an individual cell.
 
 Option | Type |  Description
-:--- | :---  | :--
+:--- | :---  | :---
 value | String or node | The result of the `dataRenderer` (or `valueRenderer` if none)
 row | number | The current row index
 col | number | The current column index
