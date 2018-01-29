@@ -4,9 +4,9 @@ import mathjs from 'mathjs';
 import Datasheet from '../lib/DataSheet'
 
 export default class MathSheet extends React.Component {
-  constructor(props) {  
+  constructor(props) {
     super(props)
-    this.onChange = this.onChange.bind(this);
+    this.onCellsChanged = this.onCellsChanged.bind(this);
     this.state = {
       'A1': {key: 'A1', value: '200', expr: '200'},
       'A2': {key: 'A2', value: '200', expr: '=A1', className:'equation'},
@@ -90,11 +90,14 @@ export default class MathSheet extends React.Component {
     return state
   }
 
-  onChange(changeCell, i, j, expr) {
+  onCellsChanged(changes) {
     const state = _.assign({}, this.state)
-    this.cellUpdate(state, changeCell, expr)
+    changes.forEach(({cell, value}) => {
+      this.cellUpdate(state, cell, value)
+    })
     this.setState(state)
   }
+
   render() {
 
     return (
@@ -102,7 +105,7 @@ export default class MathSheet extends React.Component {
         data={this.generateGrid()}
         valueRenderer={(cell) => cell.value}
         dataRenderer={(cell) => cell.expr}
-        onChange={this.onChange}
+        onCellsChanged={this.onCellsChanged}
       />
     )
   }

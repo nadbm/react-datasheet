@@ -71,7 +71,7 @@ export default class OverrideEverythingSheet extends PureComponent {
     this.handleSelect = this.handleSelect.bind(this)
     this.handleSelectAllChanged = this.handleSelectAllChanged.bind(this)
     this.handleSelectChanged = this.handleSelectChanged.bind(this)
-    this.handleChange = this.handleChange.bind(this)
+    this.handleCellsChanged = this.handleCellsChanged.bind(this)
 
     this.sheetRenderer = this.sheetRenderer.bind(this)
     this.rowRenderer = this.rowRenderer.bind(this)
@@ -120,13 +120,21 @@ export default class OverrideEverythingSheet extends PureComponent {
     this.setState({selections})
   }
 
-  handleChange (modifiedCell, i, j, value) {
-    this.setState((prevState) => {
-      const grid = [...prevState.grid]
-      grid[i] = [...grid[i]]
-      grid[i][j] = {...grid[i][j], value}
-      return {grid}
+  handleCellsChanged (changes, additions) {
+    const grid = this.state.grid.map(row => [...row])
+    changes.forEach(({cell, row, col, value}) => {
+      grid[row][col] = {...grid[row][col], value}
     })
+    // paste extended beyond end, so add a new row
+    additions.forEach(({cell, row, col, value}) => {
+      if (!grid[row]) {
+        grid[row] = [{value: ''}, {value: ''}, {value: ''}, {value: 0}]
+      }
+      if (grid[row][col]) {
+        grid[row][col] = {...grid[row][col], value}
+      }
+    })
+    this.setState({grid})
   }
 
   sheetRenderer (props) {
@@ -186,7 +194,7 @@ export default class OverrideEverythingSheet extends PureComponent {
           bodyRenderer={this.bodyRenderer}
           rowRenderer={this.rowRenderer}
           cellRenderer={this.cellRenderer}
-          onChange={this.handleChange}
+          onCellsChanged={this.handleCellsChanged}
           valueRenderer={(cell) => cell.value}
         />
       </div>

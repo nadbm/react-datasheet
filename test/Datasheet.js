@@ -155,6 +155,7 @@ describe('Component', () => {
       let props = null
       let wrapper = null
       jsdom()
+
       beforeEach(() => {
         wrapper && wrapper.detach()
         props = {
@@ -168,11 +169,16 @@ describe('Component', () => {
           row: 1,
           col: 2,
           onChange: sinon.spy(),
-          onRevert: () => {},
-          onMouseDown: () => {},
-          onDoubleClick: () => {},
-          onMouseOver: () => {},
-          onContextMenu: () => {},
+          onRevert: () => {
+          },
+          onMouseDown: () => {
+          },
+          onDoubleClick: () => {
+          },
+          onMouseOver: () => {
+          },
+          onContextMenu: () => {
+          },
           valueRenderer: cell => cell.value,
           dataRenderer: cell => cell.data
         }
@@ -181,35 +187,35 @@ describe('Component', () => {
       })
 
       it('should not call onChange if value is the same', () => {
-        wrapper.setProps({ editing: true, selected: true })
+        wrapper.setProps({editing: true, selected: true})
         expect(wrapper.find('input').node.value).toEqual('5')
         wrapper.find('input').node.value = '5'
         wrapper.find('input').simulate('change')
-        wrapper.setProps({ editing: false, selected: true })
+        wrapper.setProps({editing: false, selected: true})
         expect(props.onChange.called).toEqual(false)
       })
 
       it('should properly call onChange', () => {
-        wrapper.setProps({ editing: true, selected: true })
+        wrapper.setProps({editing: true, selected: true})
         wrapper.find('input').node.value = '6'
         wrapper.find('input').simulate('change')
-        wrapper.setProps({ editing: false, selected: true })
+        wrapper.setProps({editing: false, selected: true})
         expect(props.onChange.called).toEqual(true)
         expect(props.onChange.calledWith(props.row, props.col, '6')).toEqual(true)
       })
 
       it('input value should be cleared if we go into editing with clear call', () => {
-        wrapper.setProps({ editing: true, selected: true, clearing: true})
+        wrapper.setProps({editing: true, selected: true, clearing: true})
         expect(wrapper.find('input').node.value).toEqual('')
       })
       it('input value should be set to value if data is null', () => {
-        wrapper.setProps({cell: { data: null, value: '2'}})
-        wrapper.setProps({ editing: true, selected: true})
+        wrapper.setProps({cell: {data: null, value: '2'}})
+        wrapper.setProps({editing: true, selected: true})
         expect(wrapper.find('input').node.value).toEqual('2')
 
         wrapper.find('input').node.value = '2'
         wrapper.find('input').simulate('change')
-        wrapper.setProps({ editing: false, selected: true })
+        wrapper.setProps({editing: false, selected: true})
         expect(props.onChange.called).toEqual(false)
       })
     })
@@ -1375,5 +1381,272 @@ describe('Component', () => {
         expect(data[1][0].data).toEqual('1')
       })
     })
+  })
+
+  describe('DataSheet change events', () => {
+    let data = []
+    let component = null
+    let wrapper = null
+    let handleChange = null
+    let handlePaste = null
+    let handleCellsChanged = null
+    jsdom()
+
+    const changeData = (changes) => {
+      const newData = data.map(row => [...row])
+      changes.forEach(({cell, row, col, value}) => {
+        newData[row][col] = { data: value }
+      })
+
+      return newData
+    }
+
+    const cellCoords = (cell, data) => {
+      let col = -1, row = -1
+      data.forEach((currentRow, rowIndex) => {
+        if (col < 0) {
+          const colIndex = currentRow.findIndex(element => element === cell)
+          if (colIndex > -1) {
+            col = colIndex
+            row = rowIndex
+          }
+        }
+      })
+      if (row < 0 || col < 0) {
+        throw new Error('Could not find coords for cell ' + JSON.stringify(cell))
+      }
+      return [row, col]
+    }
+
+    beforeEach(() => {
+      data = [
+        [{ data: 4 }, { data: 2 }],
+        [{ data: 3 }, { data: 5 }]
+      ]
+
+      component = <DataSheet
+        data={[[...data[0]], [...data[1]]]}
+        valueRenderer={(cell) => cell.data}
+      />
+      wrapper = mount(component)
+    })
+    afterEach(() => {
+      wrapper.instance().removeAllListeners()
+    })
+
+    describe('onChange with no other handlers', () => {
+      beforeEach(() => {
+        handleChange = sinon.spy((cell, row, col, value) => {
+          const newData = changeData([{cell, row, col, value}])
+          wrapper.setProps({data: newData})
+        })
+        wrapper.setProps({onChange: handleChange})
+      })
+
+      it('should be called once on single cell edit', () => {
+        const td = wrapper.find('td').first()
+        const cell = data[0][0]
+        td.simulate('mouseDown')
+        triggerKeyDownEvent(td, '1'.charCodeAt(0))
+        td.find('input').node.value = '213'
+        td.find('input').simulate('change')
+        td.find('input').simulate('keydown', {keyCode: ENTER_KEY})
+        expect(handleChange.callCount).toEqual(1)
+        expect(handleChange.firstCall.calledWith(cell, 0, 0, '213')).toEqual(true)
+      })
+
+      it('should be called multiple times when pasting', (done) => {
+        wrapper.find('td').at(0).simulate('mouseDown')
+        let evt = document.createEvent('HTMLEvents')
+        evt.initEvent('paste', false, true)
+        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        document.dispatchEvent(evt)
+        setTimeout(() => {
+          expect(handleChange.callCount).toEqual(4)
+          expect(handleChange.firstCall.calledWith(data[0][0], 0, 0, '99')).toEqual(true)
+          expect(handleChange.secondCall.calledWith(data[0][1], 0, 1, '100')).toEqual(true)
+          expect(handleChange.thirdCall.calledWith(data[1][0], 1, 0, '1001')).toEqual(true)
+          expect(handleChange.lastCall.calledWith(data[1][1], 1, 1, '1002')).toEqual(true)
+          done()
+        }, 1)
+      })
+
+      it('should be called multiple times when deleting multiple cells', (done) => {
+        wrapper.find('td').at(0).simulate('mouseDown')
+        wrapper.find('td').at(1).simulate('mouseOver')
+
+        triggerKeyDownEvent(wrapper, DELETE_KEY)
+        setTimeout(() => {
+          expect(handleChange.calledTwice).toEqual(true)
+          expect(handleChange.firstCall.calledWith(data[0][0], 0, 0, '')).toEqual(true)
+          expect(handleChange.secondCall.calledWith(data[0][1], 0, 1, '')).toEqual(true)
+          done()
+        }, 1)
+      })
+    })
+
+    describe('onPaste', () => {
+      beforeEach(() => {
+        handleChange = sinon.spy((cell, row, col, value) => {
+          const newData = changeData([{cell, row, col, value}])
+          wrapper.setProps({data: newData})
+        })
+        handlePaste = sinon.spy(changes => {
+          // really inefficient but does the trick for small test
+          const indexed = []
+          changes.forEach(changedRow => {
+            changedRow.forEach(change => {
+              const [row, col] = cellCoords(change.cell, data)
+              indexed.push({
+                cell: change.cell,
+                value: change.data,
+                row,
+                col
+              })
+            })
+          })
+          const newData = changeData(indexed)
+          wrapper.setProps({data: newData})
+        })
+        wrapper.setProps({onChange: handleChange, onPaste: handlePaste})
+      })
+
+      it('should not be called on single cell edit', () => {
+        const td = wrapper.find('td').first()
+        const cell = data[0][0]
+        td.simulate('mouseDown')
+        triggerKeyDownEvent(td, '1'.charCodeAt(0))
+        td.find('input').node.value = '213'
+        td.find('input').simulate('change')
+        td.find('input').simulate('keydown', {keyCode: ENTER_KEY})
+        expect(handleChange.callCount).toEqual(1)
+        expect(handleChange.firstCall.calledWith(cell, 0, 0, '213')).toEqual(true)
+        expect(handlePaste.notCalled).toEqual(true)
+      })
+
+      it('should be called once when pasting', (done) => {
+        wrapper.find('td').at(0).simulate('mouseDown')
+        let evt = document.createEvent('HTMLEvents')
+        evt.initEvent('paste', false, true)
+        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        document.dispatchEvent(evt)
+        expect(handlePaste.calledOnce).toBe(true)
+        expect(handlePaste.firstCall.calledWith([
+          [{cell: data[0][0], data: '99'}, {cell: data[0][1], data: '100'}],
+          [{cell: data[1][0], data: '1001'}, {cell: data[1][1], data: '1002'}]
+        ])).toBe(true)
+
+        setTimeout(() => {
+          expect(handleChange.called).toBe(false)
+          done()
+        }, 1)
+      })
+
+      it('should be not called when deleting multiple cells', (done) => {
+        wrapper.find('td').at(0).simulate('mouseDown')
+        wrapper.find('td').at(1).simulate('mouseOver')
+
+        triggerKeyDownEvent(wrapper, DELETE_KEY)
+        setTimeout(() => {
+          expect(handleChange.calledTwice).toBe(true)
+          expect(handleChange.firstCall.calledWith(data[0][0], 0, 0, '')).toBe(true)
+          expect(handleChange.secondCall.calledWith(data[0][1], 0, 1, '')).toBe(true)
+          expect(handlePaste.notCalled).toBe(true)
+          done()
+        }, 1)
+      })
+    })
+
+    describe('onCellsChanged', () => {
+      beforeEach(() => {
+        handleChange = sinon.spy()
+        handlePaste = sinon.spy()
+        handleCellsChanged = sinon.spy(changes => {
+          const newData = changeData(changes)
+          wrapper.setProps({data: newData})
+        })
+        wrapper.setProps({onChange: handleChange, onPaste: handlePaste, onCellsChanged: handleCellsChanged})
+      })
+
+      it('should be called on single cell edit', (done) => {
+        const td = wrapper.find('td').first()
+        const cell = data[0][0]
+        td.simulate('mouseDown')
+        triggerKeyDownEvent(td, '1'.charCodeAt(0))
+        td.find('input').node.value = '213'
+        td.find('input').simulate('change')
+        td.find('input').simulate('keydown', {keyCode: ENTER_KEY})
+        expect(handlePaste.called).toBe(false)
+        expect(handleCellsChanged.calledOnce).toBe(true)
+        expect(handleCellsChanged.firstCall.calledWith([{cell, row: 0, col: 0, value: '213'}])).toBe(true)
+
+        setTimeout(() => {
+          expect(handleChange.called).toBe(false)
+          done()
+        }, 1)
+      })
+
+      it('should be called once when pasting', (done) => {
+        wrapper.find('td').at(0).simulate('mouseDown')
+        let evt = document.createEvent('HTMLEvents')
+        evt.initEvent('paste', false, true)
+        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        document.dispatchEvent(evt)
+        expect(handlePaste.called).toBe(false)
+        expect(handleCellsChanged.calledOnce).toBe(true)
+        expect(handleCellsChanged.firstCall.calledWith([
+          {cell: data[0][0], row: 0, col: 0, value: '99'},
+          {cell: data[0][1], row: 0, col: 1, value: '100'},
+          {cell: data[1][0], row: 1, col: 0, value: '1001'},
+          {cell: data[1][1], row: 1, col: 1, value: '1002'}
+        ])).toBe(true)
+
+        setTimeout(() => {
+          expect(handleChange.called).toBe(false)
+          done()
+        }, 1)
+      })
+
+      it('should be called with two arguments if pasted data exceeds bounds', (done) => {
+        wrapper.find('td').at(3).simulate('mouseDown')
+        let evt = document.createEvent('HTMLEvents')
+        evt.initEvent('paste', false, true)
+        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        document.dispatchEvent(evt)
+        expect(handlePaste.called).toBe(false)
+        expect(handleCellsChanged.calledOnce).toBe(true)
+        expect(handleCellsChanged.firstCall.calledWith([
+          {cell: data[1][1], row: 1, col: 1, value: '99'}
+        ], [
+          {row: 1, col: 2, value: '100'},
+          {row: 2, col: 1, value: '1001'},
+          {row: 2, col: 2, value: '1002'}
+        ])).toBe(true)
+
+        setTimeout(() => {
+          expect(handleChange.called).toBe(false)
+          done()
+        }, 1)
+      })
+
+      it('should be called once when deleting multiple cells', (done) => {
+        wrapper.find('td').at(0).simulate('mouseDown')
+        wrapper.find('td').at(1).simulate('mouseOver')
+
+        triggerKeyDownEvent(wrapper, DELETE_KEY)
+
+        expect(handleCellsChanged.calledOnce).toBe(true)
+        expect(handleCellsChanged.calledWith([
+          {cell: data[0][0], row: 0, col: 0, value: ''},
+          {cell: data[0][1], row: 0, col: 1, value: ''}
+        ])).toBe(true)
+        expect(handlePaste.called).toBe(false)
+        setTimeout(() => {
+          expect(handleChange.called).toBe(false)
+          done()
+        }, 1)
+      })
+    })
+
   })
 })

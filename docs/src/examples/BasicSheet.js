@@ -27,15 +27,13 @@ export default class BasicSheet extends React.Component {
         data={this.state.grid}
         valueRenderer={(cell) => cell.value}
         onContextMenu={(e, cell, i, j) => cell.readOnly ? e.preventDefault() : null}
-        onChange={(modifiedCell, rowI, colJ, value) =>
-          this.setState({
-            grid: this.state.grid.map((row) =>
-              row.map((cell) =>
-                (cell === modifiedCell) ? ({value: value}) : cell
-              )
-            )
+        onCellsChanged={changes => {
+          const grid = this.state.grid.map(row => [...row])
+          changes.forEach(({cell, row, col, value}) => {
+            grid[row][col] = {...grid[row][col], value}
           })
-        }
+          this.setState({grid})
+        }}
       />
     )
   }
