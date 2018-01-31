@@ -178,7 +178,7 @@ class CustomRendererSheet extends PureComponent {
 
     this.handleColumnDrop = this.handleColumnDrop.bind(this)
     this.handleRowDrop = this.handleRowDrop.bind(this)
-    this.handleChange = this.handleChange.bind(this)
+    this.handleChanges = this.handleChanges.bind(this)
     this.renderSheet = this.renderSheet.bind(this)
     this.renderRow = this.renderRow.bind(this)
   }
@@ -200,13 +200,14 @@ class CustomRendererSheet extends PureComponent {
     this.setState({ grid })
   }
 
-  handleChange (modifiedCell, i, j, value) {
-    this.setState((prevState) => {
-      const grid = [...prevState.grid]
-      grid[i] = [...grid[i]]
-      grid[i][j] = {...grid[i][j], value}
-      return {grid}
+  handleChanges (changes) {
+    const grid = this.state.grid.map(row => [...row])
+    changes.forEach(({cell, row, col, value}) => {
+      if (grid[row] && grid[row][col]) {
+        grid[row][col] = {...grid[row][col], value}
+      }
     })
+    this.setState({grid})
   }
 
   renderSheet (props) {
@@ -226,7 +227,7 @@ class CustomRendererSheet extends PureComponent {
           valueRenderer={(cell) => cell.value}
           sheetRenderer={this.renderSheet}
           rowRenderer={this.renderRow}
-          onChange={this.handleChange}
+          onCellsChanged={this.handleChanges}
         />
       </DragDropContextProvider>
     )

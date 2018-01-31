@@ -111,25 +111,52 @@ export default class DataSheet extends PureComponent {
       const start = this.state.start
 
       const parse = this.props.parsePaste || defaultParsePaste
-      const pastedMap = []
+      const changes = []
       const pasteData = parse(e.clipboardData.getData('text/plain'))
-
+      // in order of preference
+      const { data, onCellsChanged, onPaste, onChange } = this.props
       let end = {}
-
-      pasteData.map((row, i) => {
-        const rowData = []
-        row.map((pastedData, j) => {
-          const cell = this.props.data[start.i + i] && this.props.data[start.i + i][start.j + j]
-          rowData.push({cell: cell, data: pastedData})
-          if (cell && !cell.readOnly && !this.props.onPaste) {
-            this.props.onChange(cell, start.i + i, start.j + j, pastedData)
+      if (onCellsChanged) {
+        const additions = []
+        pasteData.forEach((row, i) => {
+          row.forEach((value, j) => {
             end = {i: start.i + i, j: start.j + j}
-          }
+            const cell = data[end.i] && data[end.i][end.j]
+            if (!cell) {
+              additions.push({ row: end.i, col: end.j, value })
+            } else if (!cell.readOnly) {
+              changes.push({ cell, row: end.i, col: end.j, value })
+            }
+          })
         })
-        pastedMap.push(rowData)
-      })
-      this.props.onPaste && this.props.onPaste(pastedMap)
-      this.setState({end: end})
+        if (additions.length) {
+          onCellsChanged(changes, additions)
+        } else {
+          onCellsChanged(changes)
+        }
+      } else if (onPaste) {
+        pasteData.forEach((row, i) => {
+          const rowData = []
+          row.forEach((pastedData, j) => {
+            end = {i: start.i + i, j: start.j + j}
+            const cell = data[end.i] && data[end.i][end.j]
+            rowData.push({cell: cell, data: pastedData})
+          })
+          changes.push(rowData)
+        })
+        onPaste(changes)
+      } else if (onChange) {
+        pasteData.forEach((row, i) => {
+          row.forEach((value, j) => {
+            end = {i: start.i + i, j: start.j + j}
+            const cell = data[end.i] && data[end.i][end.j]
+            if (cell && !cell.readOnly) {
+              onChange(cell, end.i, end.j, value)
+            }
+          })
+        })
+      }
+      this.setState({end})
     }
   }
 
@@ -175,23 +202,12 @@ export default class DataSheet extends PureComponent {
     }
   }
 
-  getSelectedCells (data, start, end) {
-    let selected = []
-    range(start.i, end.i).map(i => {
-      range(start.j, end.j).map(j => {
-        selected.push({cell: data[i][j], i, j})
-      })
-    })
-    return selected
-  }
-
   handleKey (e) {
     if (e.isPropagationStopped && e.isPropagationStopped()) {
       return
     }
     const keyCode = e.which || e.keyCode
     const {start, end, editing} = this.state
-    const data = this.props.data
     const isEditing = editing && !isEmpty(editing)
     const noCellsSelected = !start || isEmpty(start)
     const ctrlKeyPressed = e.ctrlKey || e.metaKey
@@ -200,7 +216,7 @@ export default class DataSheet extends PureComponent {
     const numbersPressed = (keyCode >= 48 && keyCode <= 57)
     const lettersPressed = (keyCode >= 65 && keyCode <= 90)
     const numPadKeysPressed = (keyCode >= 96 && keyCode <= 105)
-    const currentCell = !noCellsSelected && data[start.i][start.j]
+    const currentCell = !noCellsSelected && this.props.data[start.i][start.j]
     const equationKeysPressed = [
       187, /* equal */
       189, /* substract */
@@ -217,14 +233,8 @@ export default class DataSheet extends PureComponent {
     if (!isEditing) {
       this.handleKeyboardCellMovement(e)
       if (deleteKeysPressed) {
-        // ugly solution brought to you by https://reactjs.org/docs/react-component.html#setstate
-        // setState in a loop is unreliable
-        setTimeout(() => {
-          this.getSelectedCells(data, start, end).map(({cell, i, j}) =>
-            (!cell.readOnly) ? this.onChange(i, j, '') : null
-          )
-        }, 0)
         e.preventDefault()
+        this.clearSelectedCells(start, end)
       } else if (currentCell && !currentCell.readOnly) {
         if (enterKeyPressed) {
           this.setState({editing: start, clear: {}, forceEdit: true})
@@ -237,6 +247,38 @@ export default class DataSheet extends PureComponent {
           this.setState({editing: start, clear: start, forceEdit: false})
         }
       }
+    }
+  }
+
+  getSelectedCells (data, start, end) {
+    let selected = []
+    range(start.i, end.i).map(row => {
+      range(start.j, end.j).map(col => {
+        if (data[row] && data[row][col]) {
+          selected.push({cell: data[row][col], row, col})
+        }
+      })
+    })
+    return selected
+  }
+
+  clearSelectedCells (start, end) {
+    const {data, onCellsChanged, onChange} = this.props
+    const cells = this.getSelectedCells(data, start, end)
+      .filter(cell => !cell.cell.readOnly)
+      .map(cell => ({...cell, value: ''}))
+    if (onCellsChanged) {
+      onCellsChanged(cells)
+      this.onRevert()
+    } else if (onChange) {
+      // ugly solution brought to you by https://reactjs.org/docs/react-component.html#setstate
+      // setState in a loop is unreliable
+      setTimeout(() => {
+        cells.forEach(({cell, row, col, value}) => {
+          onChange(cell, row, col, value)
+        })
+        this.onRevert()
+      }, 0)
     }
   }
 
@@ -330,8 +372,13 @@ export default class DataSheet extends PureComponent {
     document.removeEventListener('mouseup', this.onMouseUp)
   }
 
-  onChange (i, j, val) {
-    this.props.onChange(this.props.data[i][j], i, j, val)
+  onChange (row, col, value) {
+    const { onChange, onCellsChanged, data } = this.props
+    if (onCellsChanged) {
+      onCellsChanged([{cell: data[row][col], row, col, value}])
+    } else if (onChange) {
+      onChange(data[row][col], row, col, value)
+    }
     this.onRevert()
   }
 
@@ -423,6 +470,7 @@ DataSheet.propTypes = {
   className: PropTypes.string,
   overflow: PropTypes.oneOf(['wrap', 'nowrap', 'clip']),
   onChange: PropTypes.func,
+  onCellsChanged: PropTypes.func,
   onContextMenu: PropTypes.func,
   valueRenderer: PropTypes.func.isRequired,
   dataRenderer: PropTypes.func,

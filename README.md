@@ -14,7 +14,7 @@ Current features:
 * Select cells, copy-paste cells
 * Navigation using keyboard keys
 * Deletion using keyboard keys
-* Callbacks for onChange, valueRenderer(visible data)
+* Callbacks for onCellsChanged, valueRenderer(visible data)
 * dataRenderer(underlying data in the input, takes the value by default)
 * Supply your own editors and view controls with custom renderers
 * Extensive control over generated markup via custom renderers
@@ -36,7 +36,8 @@ import 'react-datasheet/lib/react-datasheet.css';
 
 ## Usage
 
-React-Datasheet generates a table with the cells. Double-clicking or typing edits the value and if changed, initiates an onChange callback.
+React-Datasheet generates a table with the cells. Double-clicking or typing edits the value and if changed, initiates an `onCellsChanged` callback.
+Pasting tabular data or deleting a range of cells also calls `onCellsChanged`.
 
 The data provided should be an array of rows, and each row should include the cells.
 
@@ -57,15 +58,13 @@ class App extends React.Component {
       <ReactDataSheet
         data={this.state.grid}
         valueRenderer={(cell) => cell.value}
-        onChange={(cell, rowI, colJ, value) =>
-          this.setState({
-            grid: this.state.grid.map((col) =>
-              col.map((rowCell) =>
-                (rowCell == cell) ? ({value: value}) : rowCell
-              )
-            )
+        onCellsChanged={changes => {
+          const grid = this.state.grid.map(row => [...row])
+          changes.forEach(({cell, row, col, value}) => {
+            grid[row][col] = {...grid[row][col], value}
           })
-        }
+          this.setState({grid})
+        }}
       />
     )
   }
@@ -82,12 +81,12 @@ const grid = [
    [{value:  5, expr: '1 + 4'}, {value:  6, expr: '6'}, {value: new Date('2008-04-10')}],
    [{value:  5, expr: '1 + 4'}, {value:  5, expr: '1 + 4'}, {value: new Date('2004-05-28')}]
 ]
-const onChange = (cell, i, j, newValue) => console.log("New expression :" + newValue)
+const onCellsChanged = (changes) => changes.forEach(({cell, row, col, value}) => console.log("New expression :" + value))
 <ReactDataSheet
   data={grid}
   valueRenderer={(cell, i, j) => j == 2 ? cell.value.toDateString() : cell.value}
   dataRenderer={(cell, i, j) => j == 2 ? cell.value.toISOString() : cell.expr}
-  onChange={}
+  onCellsChanged={onCellsChanged}
 />
 ```
 
@@ -176,6 +175,7 @@ const selectHandler = yourCallbackFunction
 ```
 _Note:_ For brevity, in this example the custom renderers are all defined as arrow functions inside of render, but using a [bound function](https://reactjs.org/docs/faq-functions.html) in the parent component or a separate custom component will let you avoid a lot of needless re-renders.
 
+
 ## Options
 
 Option | Type | Description
@@ -184,8 +184,7 @@ data | Array | Array of rows and each row should contain the cell objects to dis
 valueRenderer | func | Method to render the value of the cell `function(cell, i, j)`. This is visible by default
 dataRenderer | func | Method to render the underlying value of the cell `function(cell, i, j)`. This data is visible once in edit mode.
 overflow | 'wrap'\|'nowrap'\|'clip' | Grid default for how to render overflow text in cells
-onChange | func | onChange handler: `function(cell, i, j, newValue) {}`
-onPaste | func | onPaste handler: `function(array) {}` If set, the function will be called with an array of rows. Each row has an array of objects containing the cell and raw pasted value. If the pasted value cannot be matched with a cell, the cell value will be undefined
+onCellsChanged | func | onCellsChanged handler: `function(arrayOfChanges[, arrayOfAdditions]) {}`, where changes is an **array** of objects of the shape `{cell, row, col, value}`. See below for more details.
 onContextMenu | func | Context menu handler : `function(event, cell, i, j)`
 parsePaste | func | `function (string) {}` If set, the function will be called with the raw clipboard data. It should return an array of arrays of strings. This is useful for when the clipboard may have data with irregular field or line delimiters. If not set, rows will be split with line breaks and cells with tabs.
 
@@ -201,7 +200,43 @@ cellRenderer | func | Optional function or React Component to render each cell e
 valueViewer | func | Optional function or React Component to customize the way the value for each cell in the sheet is displayed. Affects every cell in the sheet. See [cell options](https://github.com/nadbm/react-datasheet#cell-options) to override individual cells.
 dataEditor | func | Optional function or React Component to render a custom editor. Affects every cell in the sheet. Affects every cell in the sheet. See [cell options](https://github.com/nadbm/react-datasheet#cell-options) to override individual cells.
 
-## Cell Options
+## `onCellsChanged(arrayOfChanges[, arrayOfAdditions])` handler
+
+React-DataSheet will call this callback whenever data in the grid changes:
+
+- When the user enters a new value in a cell
+- When the user hits the delete key with one or more selected cells
+- When the user pastes tabular data into the table
+
+The argument to the callback usually will be one **array** of objects with these properties:
+
+Property | Type | Description
+:--- | :---: | :---
+cell | object | the original cell object you provided in the `data` property. This may be `null` (see below)
+row | number | row index of changed cell
+col | number | column index of changed cell
+value | any | The new cell value. This is usually a string, but a custom editor may provide any type of value.
+
+If the change is the result of a user edit, the array will contain a single change object. If the user pastes data or deletes a range of cells, the array will contain an element for each affected cell.
+
+**Additions:** If the user pastes data that extends beyond the bounds of the grid (for example, pasting two-row-high data on the last line), there will be a second argument to the handler containing an array of objects that represent the out-of-bounds data. These object will have the same properties, except:
+
+- There is no `cell` property
+- either `row` or `col`, or both, will be outside the bounds of your original grid. They will correspond to the indices the new data would occupy if you expanded your grid to hold them.
+
+You can choose to ignore the additions, or you can expand your model to accomodate the new data.
+
+### Deprecated handlers
+
+Previously React-DataSheet supported two change handlers. These are still supported for backwards compatibility, but will be removed at some point in the future.
+
+Option | Type | Description
+:--- | :---: | :---
+onChange | func | onChange handler: `function(cell, i, j, newValue) {}`
+onPaste | func | onPaste handler: `function(array) {}` If set, the function will be called with an array of rows. Each row has an array of objects containing the cell and raw pasted value. If the pasted value cannot be matched with a cell, the cell value will be undefined.
+
+
+## Cell Options 
 
 The cell object is what gets passed back to the onChange callback. They can contain the following options as well
 
