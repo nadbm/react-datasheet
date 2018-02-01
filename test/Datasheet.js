@@ -1100,8 +1100,8 @@ describe('Component', () => {
         triggerMouseEvent(document, 'mousedown')
 
         expect(wrapper.state()).toEqual({
-          start: {},
-          end: {},
+          start: wrapper.state().start,
+          end: wrapper.state().end,
           selecting: false,
           editing: {},
           forceEdit: false,

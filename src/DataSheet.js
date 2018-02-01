@@ -80,8 +80,9 @@ export default class DataSheet extends PureComponent {
 
   pageClick (e) {
     const element = this.dgDom
+    const { start, end } = this.state
     if (!element.contains(e.target)) {
-      this.setState(this.defaultState)
+      this.setState({ ...this.defaultState, ...{ start, end } })
       this.removeAllListeners()
     }
   }
