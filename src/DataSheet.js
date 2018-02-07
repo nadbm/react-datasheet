@@ -388,9 +388,10 @@ export default class DataSheet extends PureComponent {
   }
 
   componentDidUpdate (prevProps, prevState) {
+    let { start, end } = this.state
     let prevEnd = prevState.end
-    if (!isEmpty(this.state.end) && !(this.state.end.i === prevEnd.i && this.state.end.j === prevEnd.j)) {
-      this.props.onSelect && this.props.onSelect(this.props.data[this.state.end.i][this.state.end.j])
+    if (!isEmpty(end) && !(end.i === prevEnd.i && end.j === prevEnd.j)) {
+      this.props.onSelect && this.props.onSelect({ start, end })
     }
   }
 

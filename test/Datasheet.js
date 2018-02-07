@@ -656,9 +656,10 @@ describe('Component', () => {
         customWrapper = mount(
           <DataSheet
             data={data}
-            onSelect={(cell) => {
+            onSelect={({ start, end }) => {
               try {
-                expect(cell).toEqual({data: 4, className: 'test1', overflow: 'clip'})
+                expect(start).toEqual({ i: 0, j: 0 })
+                expect(end).toEqual({ i: 0, j: 0 })
                 done()
               } catch (err) {
                 done(err)
