@@ -8,7 +8,7 @@ export default class ValueViewer extends PureComponent {
     const {value} = this.props
     return (
       <span className='value-viewer'>
-        {(value === null || typeof (value) === 'undefined') ? '' : value}
+        {value}
       </span>
     )
   }
