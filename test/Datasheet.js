@@ -384,7 +384,7 @@ describe('Component', () => {
         }],
         [{
           className: 'test3',
-          data: 3,
+          data: 0,
           width: '25%'
         }, {
           className: 'test4',
@@ -415,7 +415,7 @@ describe('Component', () => {
         expect(_.values(wrapper.find('table').node.classList)).toEqual(['data-grid', 'test', 'nowrap'])
 
         expect(wrapper.find('td.cell span').length).toEqual(4)
-        expect(wrapper.find('td.cell span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '3', '5'])
+        expect(wrapper.find('td.cell span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '0', '5'])
       })
 
       it('renders the proper keys', () => {
@@ -453,7 +453,7 @@ describe('Component', () => {
           onChange={(cell, i, j, value) => data[i][j].data = value}
         />)
         // expect(wrapper.find('td > span').length).toEqual(6);
-        expect(customWrapper.find('td.cell span').nodes.map(n => n.innerHTML)).toEqual(['Sun, 01 Jan 2017 00:00:00 GMT', '4', '2', 'Wed, 01 Feb 2017 00:00:00 GMT', '3', '5'])
+        expect(customWrapper.find('td.cell span').nodes.map(n => n.innerHTML)).toEqual(['Sun, 01 Jan 2017 00:00:00 GMT', '4', '2', 'Wed, 01 Feb 2017 00:00:00 GMT', '0', '5'])
       })
 
       it('renders data in the input properly if dataRenderer is set by column', () => {
@@ -623,7 +623,7 @@ describe('Component', () => {
         wrapper.find('td').at(0).simulate('mouseDown')
         wrapper.find('td').at(3).simulate('mouseOver')
         expect(wrapper.find('td.cell.selected').length).toEqual(4)
-        expect(wrapper.find('td.cell.selected span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '3', '5'])
+        expect(wrapper.find('td.cell.selected span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '0', '5'])
 
         expect(wrapper.state('selecting')).toEqual(true)
         expect(wrapper.state('editing')).toEqual({})
@@ -925,7 +925,7 @@ describe('Component', () => {
         cells.at(0).simulate('mouseDown')
         cells.at(3).simulate('mouseOver')
         document.dispatchEvent(evt)
-        expect(copied).toEqual('4\t2\n3\t5')
+        expect(copied).toEqual('4\t2\n0\t5')
       })
 
       it('copies the data from dataRenderer if it exists', () => {
@@ -945,7 +945,7 @@ describe('Component', () => {
         customWrapper.find('td').at(3).simulate('mouseOver')
 
         document.dispatchEvent(evt)
-        expect(copied).toEqual('{0,0}4\t{0,1}2\n{1,0}3\t{1,1}5')
+        expect(copied).toEqual('{0,0}4\t{0,1}2\n{1,0}0\t{1,1}5')
       })
 
       it('copies no data if there isn\'t anything selected', () => {
@@ -965,7 +965,7 @@ describe('Component', () => {
         evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
         expect(data[0].map(d => d.data)).toEqual([4, 2])
-        expect(data[1].map(d => d.data)).toEqual([3, 5])
+        expect(data[1].map(d => d.data)).toEqual([0, 5])
       })
       it('pastes data properly', () => {
         cells.at(0).simulate('mouseDown')
