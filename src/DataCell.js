@@ -39,10 +39,6 @@ export default class DataCell extends PureComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (initialValue(nextProps) !== initialValue(this.props)) {
-      this.setState({updated: true})
-      this.timeout = setTimeout(() => this.setState({updated: false}), 700)
-    }
     if (nextProps.editing === true && this.props.editing === false) {
       const value = nextProps.clearing ? '' : initialData(nextProps)
       this.setState({ value, reverting: false })
@@ -56,10 +52,6 @@ export default class DataCell extends PureComponent {
         this.state.value !== initialData(this.props)) {
       this.props.onChange(this.props.row, this.props.col, this.state.value)
     }
-  }
-
-  componentWillUnmount () {
-    clearTimeout(this.timeout)
   }
 
   handleChange (value) {
