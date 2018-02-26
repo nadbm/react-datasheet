@@ -29,6 +29,7 @@
     "test:watch": "watch 'npm run test' ./test ./src"
   },
   "devDependencies": {
+    "@types/react": "^16.0.38",
     "babel-cli": "^6.6.4",
     "babel-core": "^6.7.4",
     "babel-eslint": "^6.0.2",
@@ -68,5 +69,6 @@
   "files": [
     "lib"
   ],
-  "main": "lib/index.js"
+  "main": "lib/index.js",
+  "types": "types/react-datasheet.d.ts"
 }
