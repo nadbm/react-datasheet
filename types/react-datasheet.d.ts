@@ -1,8 +1,8 @@
 import {PureComponent, Component, ReactNode, MouseEventHandler} from "react";
 
 declare namespace ReactDataSheet {
-    export interface Cell {
-        //dataEditor
+    export interface Cell<T extends Cell<T>> {
+        dataEditor?: DataEditor<T>
         className?: string | undefined;
         component?: JSX.Element; //this enables the example code in the readme, but the description seems to imply that you can also pass a component in.
         colSpan?: number;
@@ -12,11 +12,11 @@ declare namespace ReactDataSheet {
         overflow?: 'wrap' | 'nowrap' | 'clip';
         readOnly?: boolean;
         rowSpan?: number;
-        // valueViewer?: ValueViewer<T>;
-        width: number | string;
+        valueViewer?: ValueViewer<T>;
+        width?: number | string;
     }
 
-    export interface DataSheetProps<T extends Cell> {
+    export interface DataSheetProps<T extends Cell<T>> {
         attributesRenderer?: AttributesRenderer<T>;
         /** Optional function or React Component to render each cell element. The default renders a td element. */
         cellRenderer?: CellRenderer<T>;
@@ -24,7 +24,7 @@ declare namespace ReactDataSheet {
         /** Array of rows and each row should contain the cell objects to display */
         data: T[][];
         /** Optional function or React Component to render a custom editor. Affects every cell in the sheet. Affects every cell in the sheet. See cell options to override individual cells. */
-        //dataEditor
+        dataEditor?: DataEditor<T>;
         /** Method to render the underlying value of the cell function(cell, i, j). This data is visible once in edit mode. */
         dataRenderer?: DataRenderer<T>;
         /** onCellsChanged handler: function(arrayOfChanges[, arrayOfAdditions]) {}, where changes is an array of objects of the shape {cell, row, col, value} */
@@ -37,7 +37,7 @@ declare namespace ReactDataSheet {
         /** Optional function or React Component to render each row element. The default renders a tr element. */
         rowRenderer?: RowRenderer<T>;
         /** If set, the function will be called with the raw clipboard data. It should return an array of arrays of strings. This is useful for when the clipboard may have data with irregular field or line delimiters. If not set, rows will be split with line breaks and cells with tabs. */
-        //parsePaste
+        parsePaste?: PasteParser;
         /** Optional function or React Component to render the main sheet element. The default renders a table element. */
         sheetRenderer?: SheetRenderer<T>;
         /** Method to render the value of the cell function(cell, i, j). This is visible by default */
@@ -46,15 +46,15 @@ declare namespace ReactDataSheet {
         valueViewer?: ValueViewer<T>;
     }
 
-    export type ValueRenderer<T extends Cell> = (cell: T, row: number, col: number) => string | number | null | void;
+    export type PasteParser = (pastedString: string) => string[][];
 
-    export type DataRenderer<T extends Cell> = (cell: T, row: number, col: number) => string | number | null | void;
+    export type ValueRenderer<T extends Cell<T>> = (cell: T, row: number, col: number) => string | number | null | void;
 
-    export type AttributesRenderer<T extends Cell> = (cell: T, row: number, col: number) => {};
+    export type DataRenderer<T extends Cell<T>> = (cell: T, row: number, col: number) => string | number | null | void;
 
-    export type SheetRenderer<T extends Cell> = (props: SheetRendererArgs<T>) => JSX.Element;
+    export type AttributesRenderer<T extends Cell<T>> = (cell: T, row: number, col: number) => {};
     
-    export interface SheetRendererArgs<T extends Cell> {
+    export interface SheetRendererArgs<T extends Cell<T>> {
         /** The same data array as from main ReactDataSheet component */
         data: T[][];
         /** Classes to apply to your top-level element. You can add to these, but your should not overwrite or omit them unless you want to implement your own CSS also. */
@@ -63,9 +63,9 @@ declare namespace ReactDataSheet {
         children: ReactNode;
     }
 
-    export type RowRenderer<T extends Cell> = (props: RowRendererArgs<T>) => JSX.Element;
+    export type SheetRenderer<T extends Cell<T>> = Component<SheetRendererArgs<T>> | React.SFC<SheetRendererArgs<T>>;
 
-    export interface RowRendererArgs<T extends Cell> {
+    export interface RowRendererArgs<T extends Cell<T>> {
         /** The current row index */
         row: number;
         /** The cells in the current row */
@@ -74,22 +74,24 @@ declare namespace ReactDataSheet {
         children: ReactNode;
     }
 
-    export type CellsChangedHandler<T extends Cell> = (arrayOfChanges: CellsChangedArgs<T>, arrayOfAdditions?: CellAdditionsArgs<T>) => void;
+    export type RowRenderer<T extends Cell<T>> = Component<RowRendererArgs<T>> | React.SFC<RowRendererArgs<T>>;
 
-    export type CellsChangedArgs<T extends Cell> = {
+    export type CellsChangedArgs<T extends Cell<T>> = {
         cell: T;
         row: number;
         col: number;
         value: string | number | null; //is this ever undefined?
     }[];
 
-    export type CellAdditionsArgs<T extends Cell> = {
+    export type CellsChangedHandler<T extends Cell<T>> = (arrayOfChanges: CellsChangedArgs<T>, arrayOfAdditions?: CellAdditionsArgs<T>) => void;
+
+    export type CellAdditionsArgs<T extends Cell<T>> = {
         row: number;
         col: number;
         value: string | number | null; //is this ever undefined?
     }[];
 
-    export interface CellRendererArgs<T extends Cell> {
+    export interface CellRendererArgs<T extends Cell<T>> {
         /** The current row index */
         row: number;
         /** The current column index */
@@ -120,9 +122,9 @@ declare namespace ReactDataSheet {
         children: ReactNode; //Array or component
     }
     
-    export type CellRenderer<T extends Cell> = (props: CellRendererArgs<T>) => JSX.Element;
+    export type CellRenderer<T extends Cell<T>> = Component<CellRendererArgs<T>> | React.SFC<CellRendererArgs<T>>;
 
-    export interface ValueViewerArgs<T extends Cell> {
+    export interface ValueViewerArgs<T extends Cell<T>> {
         /** The result of the valueRenderer function */
         value: ReactNode;
         /** The current row index */
@@ -133,7 +135,28 @@ declare namespace ReactDataSheet {
         cell: T;
     }
 
-    export type ValueViewer<T extends Cell> = (props: ValueViewerArgs<T>) => JSX.Element;
+    export type ValueViewer<T extends Cell<T>> = Component<ValueViewerArgs<T>> | React.SFC<ValueViewerArgs<T>>;
+
+    export interface DataEditorArgs<T> {
+        /** The result of the dataRenderer (or valueRenderer if none) */
+        value: string | JSX.Element;
+        /** The current row index */
+        row: number;
+        /** The current column index */
+        col: number;
+        /** The cell's raw data structure */
+        cell: T;
+        /** function (string) {} callback for when the user changes the value during editing (for example, each time they type a character into an input). onChange does not indicate the final edited value. It works just like a controlled component in a form. */
+        onChange: any //TODO: specify type.	
+        /** function (event) {} An event handler that you can call to use default React-DataSheet keyboard handling to signal reverting an ongoing edit (Escape key) or completing an edit (Enter or Tab). For most editors based on an input element this will probably work. However, if this keyboard handling is unsuitable for your editor you can trigger these changes explicitly using the onCommit and onRevert callbacks. */
+        onKeyDown: any; //TODO: specify type
+        /** function (newValue, [event]) {} A callback to indicate that editing is over, here is the final value. If you pass a KeyboardEvent as the second argument, React-DataSheet will perform default navigation for you (for example, going down to the next row if you hit the enter key). You actually don't need to use onCommit if the default keyboard handling is good enough for you. */
+        onCommit: any; //TODO: specify type
+        /** function () {} A no-args callback that you can use to indicate that you want to cancel ongoing edits. As with onCommit, you don't need to worry about this if the default keyboard handling works for your editor. */
+        onRevert: any; //TODO: specify type	
+    }
+
+    export type DataEditor<T extends Cell<T>> = Component<ValueViewerArgs<T>> | React.SFC<ValueViewerArgs<T>>;
 
     export interface CellReference {
         row: number;
@@ -150,7 +173,7 @@ declare namespace ReactDataSheet {
     }
 }
 
-declare class ReactDataSheet<T extends ReactDataSheet.Cell> extends Component<ReactDataSheet.DataSheetProps<T>, ReactDataSheet.DataSheetState> {
+declare class ReactDataSheet<T extends ReactDataSheet.Cell<T>> extends Component<ReactDataSheet.DataSheetProps<T>, ReactDataSheet.DataSheetState> {
         getSelectedCells: (data: T[][], start: ReactDataSheet.CellReference, end: ReactDataSheet.CellReference) => {cell: T, row: number, col: number};
 }
 
