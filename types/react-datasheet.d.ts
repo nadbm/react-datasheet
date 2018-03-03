@@ -2,17 +2,28 @@ import {PureComponent, Component, ReactNode, MouseEventHandler} from "react";
 
 declare namespace ReactDataSheet {
     export interface Cell<T extends Cell<T>> {
+        /** Optional function or React Component to render a custom editor. Overrides grid-level dataEditor option. Default: undefined. */
         dataEditor?: DataEditor<T>
+        /** Additional class names for cells. Default: undefined. */
         className?: string | undefined;
-        component?: JSX.Element; //this enables the example code in the readme, but the description seems to imply that you can also pass a component in.
+        /** Insert a react element or JSX to this field. This will render on edit mode. Default: undefined. */
+        component?: JSX.Element;
+        /** The colSpan of the cell's td element. Default: 1 */
         colSpan?: number;
+        /** If true, renders what's in component at all times, even when not in edit mode. Default: false. */
         forceComponent?: boolean;
+        /** By default, each cell is given the key of col number and row number. This would override that key. Default: undefined. */
         key?: string | undefined;
-        //disableEvents
+        disableEvents?: boolean;
+        /** How to render overflow text. Overrides grid-level overflow option. Default: undefined. */
         overflow?: 'wrap' | 'nowrap' | 'clip';
+        /** If true, the cell will never go in edit mode. Default: false. */
         readOnly?: boolean;
+        /** The rowSpan of the cell's td element. Default: 1. */
         rowSpan?: number;
+        /** Optional function or React Component to customize the way the value for this cell is displayed. Overrides grid-level valueViewer option. Default: undefined. */
         valueViewer?: ValueViewer<T>;
+        /** Sets the cell's td width using a style attribute. Number is interpreted as pixels, strings are used as-is. Note: This will only work if the table does not have a set width. Default: undefined. */
         width?: number | string;
     }
 
@@ -63,7 +74,7 @@ declare namespace ReactDataSheet {
         children: ReactNode;
     }
 
-    export type SheetRenderer<T extends Cell<T>> = Component<SheetRendererArgs<T>> | React.SFC<SheetRendererArgs<T>>;
+    export type SheetRenderer<T extends Cell<T>> = React.ComponentClass<SheetRendererArgs<T>> | React.SFC<SheetRendererArgs<T>>;
 
     export interface RowRendererArgs<T extends Cell<T>> {
         /** The current row index */
@@ -74,7 +85,7 @@ declare namespace ReactDataSheet {
         children: ReactNode;
     }
 
-    export type RowRenderer<T extends Cell<T>> = Component<RowRendererArgs<T>> | React.SFC<RowRendererArgs<T>>;
+    export type RowRenderer<T extends Cell<T>> = React.ComponentClass<RowRendererArgs<T>> | React.SFC<RowRendererArgs<T>>;
 
     export type CellsChangedArgs<T extends Cell<T>> = {
         cell: T;
@@ -122,7 +133,7 @@ declare namespace ReactDataSheet {
         children: ReactNode; //Array or component
     }
     
-    export type CellRenderer<T extends Cell<T>> = Component<CellRendererArgs<T>> | React.SFC<CellRendererArgs<T>>;
+    export type CellRenderer<T extends Cell<T>> = React.ComponentClass<CellRendererArgs<T>> | React.SFC<CellRendererArgs<T>>;
 
     export interface ValueViewerArgs<T extends Cell<T>> {
         /** The result of the valueRenderer function */
@@ -135,7 +146,7 @@ declare namespace ReactDataSheet {
         cell: T;
     }
 
-    export type ValueViewer<T extends Cell<T>> = Component<ValueViewerArgs<T>> | React.SFC<ValueViewerArgs<T>>;
+    export type ValueViewer<T extends Cell<T>> = React.ComponentClass<ValueViewerArgs<T>> | React.SFC<ValueViewerArgs<T>>;
 
     export interface DataEditorArgs<T> {
         /** The result of the dataRenderer (or valueRenderer if none) */
@@ -146,17 +157,17 @@ declare namespace ReactDataSheet {
         col: number;
         /** The cell's raw data structure */
         cell: T;
-        /** function (string) {} callback for when the user changes the value during editing (for example, each time they type a character into an input). onChange does not indicate the final edited value. It works just like a controlled component in a form. */
-        onChange: any //TODO: specify type.	
-        /** function (event) {} An event handler that you can call to use default React-DataSheet keyboard handling to signal reverting an ongoing edit (Escape key) or completing an edit (Enter or Tab). For most editors based on an input element this will probably work. However, if this keyboard handling is unsuitable for your editor you can trigger these changes explicitly using the onCommit and onRevert callbacks. */
-        onKeyDown: any; //TODO: specify type
+        /** A callback for when the user changes the value during editing (for example, each time they type a character into an input). onChange does not indicate the final edited value. It works just like a controlled component in a form. */
+        onChange: (newValue: string) => void;
+        /** An event handler that you can call to use default React-DataSheet keyboard handling to signal reverting an ongoing edit (Escape key) or completing an edit (Enter or Tab). For most editors based on an input element this will probably work. However, if this keyboard handling is unsuitable for your editor you can trigger these changes explicitly using the onCommit and onRevert callbacks. */
+        onKeyDown: React.KeyboardEventHandler<HTMLElement>;
         /** function (newValue, [event]) {} A callback to indicate that editing is over, here is the final value. If you pass a KeyboardEvent as the second argument, React-DataSheet will perform default navigation for you (for example, going down to the next row if you hit the enter key). You actually don't need to use onCommit if the default keyboard handling is good enough for you. */
-        onCommit: any; //TODO: specify type
+        onCommit: (newValue: string | JSX.Element, event: React.KeyboardEvent<HTMLElement>) => void;
         /** function () {} A no-args callback that you can use to indicate that you want to cancel ongoing edits. As with onCommit, you don't need to worry about this if the default keyboard handling works for your editor. */
-        onRevert: any; //TODO: specify type	
+        onRevert: () => void;
     }
 
-    export type DataEditor<T extends Cell<T>> = Component<ValueViewerArgs<T>> | React.SFC<ValueViewerArgs<T>>;
+    export type DataEditor<T extends Cell<T>> = React.ComponentClass<DataEditorArgs<T>> | React.SFC<ValueViewerArgs<T>>;
 
     export interface CellReference {
         row: number;
