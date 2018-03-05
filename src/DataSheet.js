@@ -82,6 +82,8 @@ export default class DataSheet extends PureComponent {
 
   changeSelection (start = {i: 0, j: 0}, end = start) {
     this.setState({start, end})
+    // Listen for any outside mouse clicks
+    document.addEventListener('mousedown', this.pageClick)
   }
 
   pageClick (e) {
