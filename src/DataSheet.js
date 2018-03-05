@@ -59,7 +59,7 @@ export default class DataSheet extends PureComponent {
     this.state = this.defaultState
 
     this.removeAllListeners = this.removeAllListeners.bind(this)
-    props.refChangeSelection(this.changeSelection);
+    props.refChangeSelection(this.changeSelection)
   }
 
   removeAllListeners () {
@@ -498,5 +498,5 @@ DataSheet.defaultProps = {
   cellRenderer: Cell,
   valueViewer: ValueViewer,
   dataEditor: DataEditor,
-  refChangeSelection: () => {},
+  refChangeSelection: () => {}
 }
