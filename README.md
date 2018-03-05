@@ -70,6 +70,12 @@ class App extends React.Component {
   }
 }
 ```
+### Usage with TypeScript
+
+The library comes with built-in type definitions, so there is no need to download anything separately from `@types`. Most of the defined types are generic, which allows you to define the shape of the data in your `cell` objects. Basic usage looks like this:
+
+
+
 
 ### Cells with underlying data
 

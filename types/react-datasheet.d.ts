@@ -7,9 +7,9 @@ declare namespace ReactDataSheet {
      *      value: number | string | null;
      * }
      */ 
-    export interface Cell<T extends Cell<T>> {
+    export interface Cell<T extends Cell<T>, V = string> {
         /** Optional function or React Component to render a custom editor. Overrides grid-level dataEditor option. Default: undefined. */
-        dataEditor?: DataEditor<T>
+        dataEditor?: DataEditor<T, V>
         /** Additional class names for cells. Default: undefined. */
         className?: string | undefined;
         /** Insert a react element or JSX to this field. This will render on edit mode. Default: undefined. */
@@ -35,7 +35,7 @@ declare namespace ReactDataSheet {
     }
 
     /** Properties of the ReactDataSheet component. */
-    export interface DataSheetProps<T extends Cell<T>> {
+    export interface DataSheetProps<T extends Cell<T>, V = string> {
         /** Optional function to add attributes to the rendered cell element. It should return an object with properties corresponding to the name and vales of the attributes you wish to add. */
         attributesRenderer?: AttributesRenderer<T>;
         /** Optional function or React Component to render each cell element. The default renders a td element. */
@@ -44,11 +44,11 @@ declare namespace ReactDataSheet {
         /** Array of rows and each row should contain the cell objects to display. */
         data: T[][];
         /** Optional function or React Component to render a custom editor. Affects every cell in the sheet. Affects every cell in the sheet. See cell options to override individual cells. */
-        dataEditor?: DataEditor<T>;
+        dataEditor?: DataEditor<T, V>;
         /** Method to render the underlying value of the cell function(cell, i, j). This data is visible once in edit mode. */
         dataRenderer?: DataRenderer<T>;
         /** onCellsChanged handler: function(arrayOfChanges[, arrayOfAdditions]) {}, where changes is an array of objects of the shape {cell, row, col, value}. */
-        onCellsChanged?: CellsChangedHandler<T>;
+        onCellsChanged?: CellsChangedHandler<T, V>;
         /** Context menu handler : function(event, cell, i, j). */
         onContextMenu?: ContextMenuHandler<T>;
         onSelect?: (cell: T) => void;
@@ -124,7 +124,7 @@ declare namespace ReactDataSheet {
     }[];
 
     /** onCellsChanged handler: function(arrayOfChanges[, arrayOfAdditions]) {}, where changes is an array of objects of the shape {cell, row, col, value}. To wire it up, pass your function to the onCellsChanged property of the ReactDataSheet component. */
-    export type CellsChangedHandler<T extends Cell<T>> = (arrayOfChanges: CellsChangedArgs<T>, arrayOfAdditions?: CellAdditionsArgs<T>) => void;
+    export type CellsChangedHandler<T extends Cell<T>, V = string> = (arrayOfChanges: CellsChangedArgs<T, V>, arrayOfAdditions?: CellAdditionsArgs<V>) => void;
 
     /** Context menu handler : function(event, cell, i, j). To wire it up, pass your function to the onContextMenu property of the ReactDataSheet component. */
     export type ContextMenuHandler<T extends Cell<T>> = (event: MouseEvent, cell: T, row : number, col: number) => void;
@@ -180,9 +180,9 @@ declare namespace ReactDataSheet {
     export type ValueViewer<T extends Cell<T>> = React.ComponentClass<ValueViewerProps<T>> | React.SFC<ValueViewerProps<T>>;
 
     /** The properties that will be passed to the DataEditor component or function. */
-    export interface DataEditorProps<T> {
+    export interface DataEditorProps<T, V = string> {
         /** The result of the dataRenderer (or valueRenderer if none) */
-        value: string | JSX.Element;
+        value: V | JSX.Element;
         /** The current row index */
         row: number;
         /** The current column index */
@@ -200,7 +200,7 @@ declare namespace ReactDataSheet {
     }
 
     /** A function or React Component to render a custom editor. If it is passed to the dataEditor property of the ReactDataSheet component, it affects every cell in the sheet. Different editors can also be passed to the dataEditor property of each Cell to control each cell separately. */
-    export type DataEditor<T extends Cell<T>> = React.ComponentClass<DataEditorProps<T>> | React.SFC<ValueViewerProps<T>>;
+    export type DataEditor<T extends Cell<T>, V = string> = React.ComponentClass<DataEditorProps<T, V>> | React.SFC<ValueViewerProps<T>>;
 
     export interface CellReference {
         row: number;
@@ -217,7 +217,7 @@ declare namespace ReactDataSheet {
     }
 }
 
-declare class ReactDataSheet<T extends ReactDataSheet.Cell<T>> extends Component<ReactDataSheet.DataSheetProps<T>, ReactDataSheet.DataSheetState> {
+declare class ReactDataSheet<T extends ReactDataSheet.Cell<T>, V = string> extends Component<ReactDataSheet.DataSheetProps<T, V>, ReactDataSheet.DataSheetState> {
         getSelectedCells: (data: T[][], start: ReactDataSheet.CellReference, end: ReactDataSheet.CellReference) => {cell: T, row: number, col: number};
 }
 
