@@ -227,7 +227,7 @@ If the change is the result of a user edit, the array will contain a single chan
 
 You can choose to ignore the additions, or you can expand your model to accomodate the new data.
 
-## `changeSelection(start[, end]) function`
+## `changeSelection(start[, end])` function
 
 There might be situations where you want to mark some cells as selected on behalf of the user; for such cases you can use `changeSelection()` to do so.
 
