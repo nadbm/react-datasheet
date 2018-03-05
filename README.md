@@ -229,6 +229,10 @@ You can choose to ignore the additions, or you can expand your model to accomoda
 
 ## `changeSelection(start[, end]) function`
 
+There might be situations where you want to mark some cells as selected on behalf of the user; for such cases you can use `changeSelection()` to do so.
+
+The example below shows how you can use this function to select a whole row, a whole column or the whole sheet by clicking the edges of the grid; just like spreadsheet applications:
+
 ```jsx
 const columns = getColumnsFromSomewhere()
 
