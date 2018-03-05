@@ -199,6 +199,7 @@ rowRenderer | func | Optional function or React Component to render each row ele
 cellRenderer | func | Optional function or React Component to render each cell element. The default renders a `td` element.
 valueViewer | func | Optional function or React Component to customize the way the value for each cell in the sheet is displayed. Affects every cell in the sheet. See [cell options](https://github.com/nadbm/react-datasheet#cell-options) to override individual cells.
 dataEditor | func | Optional function or React Component to render a custom editor. Affects every cell in the sheet. Affects every cell in the sheet. See [cell options](https://github.com/nadbm/react-datasheet#cell-options) to override individual cells.
+refChangeSelection | func | ChangeSelection reference : `function(changeSelection)`
 
 ## `onCellsChanged(arrayOfChanges[, arrayOfAdditions])` handler
 
@@ -225,6 +226,53 @@ If the change is the result of a user edit, the array will contain a single chan
 - either `row` or `col`, or both, will be outside the bounds of your original grid. They will correspond to the indices the new data would occupy if you expanded your grid to hold them.
 
 You can choose to ignore the additions, or you can expand your model to accomodate the new data.
+
+## `changeSelection(start[, end]) function`
+
+```jsx
+const columns = getColumnsFromSomewhere()
+
+<ReactDataSheet
+  data={grid}
+  refChangeSelection={changeSelection => this.changeSelection = changeSelection}
+  valueRenderer={(cell) => cell.value}
+  sheetRenderer={props => (
+    <table className={props.className + ' my-awesome-extra-class'}>
+        <thead>
+            <tr>
+                <th
+                  className='action-cell'
+                  onClick={() => this.changeSelection({ i: 0, j: 0 }, { i: grid.length, j: grid[0].length })}
+                />
+                {columns.map((col, index) => (
+                  <th
+                    onClick={() => this.changeSelection({ i: 0, j: index }, { i: grid.length, j: index })}
+                  >{col.name}</th>))}
+            </tr>
+        </thead>
+        <tbody>
+            {props.children}
+        </tbody>
+    </table>
+  )}
+  rowRenderer={({ row, cells, children }) => (
+    <tr>
+        <td
+          className='action-cell'
+          onClick={() => this.changeSelection({ i: row, j: 0 }, { i: row, j: cells.length })}
+        >
+          ...
+        </td>
+        {children}
+    </tr>
+  )}
+  valueViewer={MyViewComponent}
+  dataEditor={props => (
+    props.col === 0 ? <MyDatePicker {...props} /> : <DataEditor {...props}/>
+  )}
+  ...
+/>
+```
 
 ### Deprecated handlers
 
