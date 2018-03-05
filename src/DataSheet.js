@@ -44,6 +44,7 @@ export default class DataSheet extends PureComponent {
     this.isEditing = this.isEditing.bind(this)
     this.isClearing = this.isClearing.bind(this)
     this.handleComponentKey = this.handleComponentKey.bind(this)
+    this.changeSelection = this.changeSelection.bind(this)
 
     this.handleKeyboardCellMovement = this.handleKeyboardCellMovement.bind(this)
 
@@ -58,6 +59,7 @@ export default class DataSheet extends PureComponent {
     this.state = this.defaultState
 
     this.removeAllListeners = this.removeAllListeners.bind(this)
+    props.refChangeSelection(this.changeSelection);
   }
 
   removeAllListeners () {
@@ -76,6 +78,10 @@ export default class DataSheet extends PureComponent {
   componentWillUnmount () {
     this.dgDom && this.dgDom.removeEventListener('keydown', this.handleComponentKey)
     this.removeAllListeners()
+  }
+
+  changeSelection (start = {i: 0, j: 0}, end = start) {
+    this.setState({start, end})
   }
 
   pageClick (e) {
@@ -480,7 +486,8 @@ DataSheet.propTypes = {
   valueViewer: PropTypes.func,
   dataEditor: PropTypes.func,
   parsePaste: PropTypes.func,
-  attributesRenderer: PropTypes.func
+  attributesRenderer: PropTypes.func,
+  refChangeSelection: PropTypes.func
 }
 
 DataSheet.defaultProps = {
@@ -488,5 +495,6 @@ DataSheet.defaultProps = {
   rowRenderer: Row,
   cellRenderer: Cell,
   valueViewer: ValueViewer,
-  dataEditor: DataEditor
+  dataEditor: DataEditor,
+  refChangeSelection: () => {},
 }
