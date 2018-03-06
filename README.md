@@ -90,13 +90,23 @@ interface AppState {
     grid: GridElement[][];
 }
 
+//You can also strongly type all the Components or SFCs that you pass into ReactDataSheet.
+let cellRenderer: ReactDataSheet.CellRenderer<GridElement, number> = (props) => {
+    const backgroundStyle = props.cell.value && props.cell.value < 0 ? {color: 'red'} : undefined;
+    return (
+        <td style={backgroundStyle} className="cell">
+            {props.children}
+        </td>
+    )
+}
+
 export class App extends React.Component<{}, AppState> {
     constructor (props: {}) {
       super(props)
       this.state = {
         grid: [
-          [{value:  1}, {value:  3}],
-          [{value:  2}, {value:  4}]
+          [{value:  1}, {value:  -3}],
+          [{value:  -2}, {value:  4}]
         ]
       }
     }
@@ -112,6 +122,7 @@ export class App extends React.Component<{}, AppState> {
             })
             this.setState({grid})
           }}
+          cellRenderer={cellRenderer}
         />
       )
     }
