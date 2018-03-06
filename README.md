@@ -94,7 +94,7 @@ interface AppState {
 let cellRenderer: ReactDataSheet.CellRenderer<GridElement, number> = (props) => {
     const backgroundStyle = props.cell.value && props.cell.value < 0 ? {color: 'red'} : undefined;
     return (
-        <td style={backgroundStyle} className="cell">
+        <td style={backgroundStyle} onMouseDown={props.onMouseDown} onMouseOver={props.onMouseOver} onDoubleClick={props.onDoubleClick}  className="cell">
             {props.children}
         </td>
     )
