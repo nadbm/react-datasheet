@@ -427,11 +427,11 @@ export default class DataSheet extends PureComponent {
   render () {
     const {sheetRenderer: SheetRenderer, rowRenderer: RowRenderer, cellRenderer,
       dataRenderer, valueRenderer, dataEditor, valueViewer, attributesRenderer,
-      className, overflow, data, keyFn} = this.props
+      containerClassName, className, overflow, data, keyFn} = this.props
     const {forceEdit} = this.state
 
     return (
-      <span ref={r => { this.dgDom = r }} tabIndex='0' className='data-grid-container' onKeyDown={this.handleKey}>
+      <span ref={r => { this.dgDom = r }} tabIndex='0' className={['data-grid-container', containerClassName].filter(a => a).join(' ')} onKeyDown={this.handleKey}>
         <SheetRenderer data={data} className={['data-grid', className, overflow].filter(a => a).join(' ')}>
           {data.map((row, i) =>
             <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
@@ -476,6 +476,7 @@ export default class DataSheet extends PureComponent {
 DataSheet.propTypes = {
   data: PropTypes.array.isRequired,
   className: PropTypes.string,
+  containerClassName: PropTypes.string,
   overflow: PropTypes.oneOf(['wrap', 'nowrap', 'clip']),
   onChange: PropTypes.func,
   onCellsChanged: PropTypes.func,
