@@ -406,7 +406,9 @@ describe('Component', () => {
     afterEach(() => {
       wrapper.instance().removeAllListeners()
       if (customWrapper) {
-        customWrapper.instance().removeAllListeners()
+        if ('removeAllListeners' in customWrapper.instance()) {
+          customWrapper.instance().removeAllListeners()  
+        }
         customWrapper = null
       }
     })
@@ -694,6 +696,79 @@ describe('Component', () => {
         customWrapper.find('td').at(0).simulate('mouseDown')
         expect(selected.end).toEqual({i: 0, j: 0})
       })
+
+      it('selects a single cell if passed in the "selected" prop', () => {
+        customWrapper = mount(
+          <DataSheet
+            data={data}
+            selected={{ start: { i: 0, j: 0 }, end: { i: 0, j: 0 } }}
+            valueRenderer={cell => cell.data}
+            />)
+        expect(customWrapper.find('td.cell.selected').length).toEqual(1)
+      })
+
+      it('selects multiple cells if passed in the "selected" prop', () => {
+        customWrapper = mount(
+          <DataSheet
+            data={data}
+            selected={{ start: { i: 0, j: 0 }, end: { i: 1, j: 1 } }}
+            valueRenderer={cell => cell.data}
+            />)
+        expect(customWrapper.find('td.cell.selected').length).toEqual(4)
+      })
+
+      it('does not select cells if passed "null" in the "selected" prop', () => {
+        customWrapper = mount(
+          <DataSheet
+            data={data}
+            selected={null}
+            valueRenderer={cell => cell.data}
+            />)
+        expect(customWrapper.find('td.cell.selected').length).toEqual(0)
+      })
+
+      it('does not select cells if missing "start" in the "selected" prop', () => {
+        customWrapper = mount(
+          <DataSheet
+            data={data}
+            selected={{ end: { i: 1, j: 1 } }}
+            valueRenderer={cell => cell.data}
+            />)
+        expect(customWrapper.find('td.cell.selected').length).toEqual(0)
+      })
+
+      it('does not select cells if missing "end" in the "selected" prop', () => {
+        customWrapper = mount(
+          <DataSheet
+            data={data}
+            selected={{ start: { i: 0, j: 0 } }}
+            valueRenderer={cell => cell.data}
+            />)
+        expect(customWrapper.find('td.cell.selected').length).toEqual(0)
+      })
+
+      it('selects multiple cells when click and drag over other cells and selection is controlled', () => {
+        customWrapper = mount(
+          <DataSheet
+            data={data}
+            selected={null}
+            onSelect={selected => customWrapper.setProps({ selected })}
+            valueRenderer={cell => cell.data}
+            />)
+        // validate inital state
+        expect(customWrapper.find('td.cell.selected').length).toEqual(0)
+        // perform mouse events
+        let mouseUpEvt = document.createEvent('HTMLEvents')
+        mouseUpEvt.initEvent('mouseup', false, true)
+        customWrapper.find('td').at(0).simulate('mouseDown')
+        customWrapper.find('td').at(3).simulate('mouseOver')
+        document.dispatchEvent(mouseUpEvt)
+        // validate
+        expect(customWrapper.props().selected.start).toEqual({ i: 0, j: 0 })
+        expect(customWrapper.props().selected.end).toEqual({ i: 1, j: 1 })
+        expect(customWrapper.find('td.cell.selected').length).toEqual(4)
+      })
+
     })
 
     describe('keyboard movement', () => {
