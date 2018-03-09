@@ -369,6 +369,7 @@ describe('Component', () => {
     let component = null
     let wrapper = null
     let customWrapper = null
+    let selected = null
     jsdom()
 
     beforeEach(() => {
@@ -670,6 +671,28 @@ describe('Component', () => {
             />)
         customWrapper.find('td').at(0).simulate('mouseDown')
         expect(customWrapper.state('end')).toEqual({i: 0, j: 0})
+      })
+
+      it('calls onSelect prop when a new element is selected and the selection is controlled', (done) => {
+        customWrapper = mount(
+          <DataSheet
+            data={data}
+            selected={selected}
+            onSelect={({ start, end }) => {
+              try {
+                selected = { start, end }
+                expect(start).toEqual({ i: 0, j: 0 })
+                expect(end).toEqual({ i: 0, j: 0 })
+                done()
+              } catch (err) {
+                done(err)
+              }
+            }}
+            valueRenderer={(cell) => cell.data}
+            onChange={(cell, i, j, value) => custData[i][j].data = value}
+            />)
+        customWrapper.find('td').at(0).simulate('mouseDown')
+        expect(selected.end).toEqual({i: 0, j: 0})
       })
     })
 
