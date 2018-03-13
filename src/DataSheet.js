@@ -505,7 +505,16 @@ DataSheet.propTypes = {
   onCellsChanged: PropTypes.func,
   onContextMenu: PropTypes.func,
   onSelect: PropTypes.func,
-  selected: PropTypes.object,
+  selected: PropTypes.shape({
+    start: PropTypes.shape({
+      i: PropTypes.number,
+      j: PropTypes.number
+    }),
+    end: PropTypes.shape({
+      i: PropTypes.number,
+      j: PropTypes.number
+    })
+  }),
   valueRenderer: PropTypes.func.isRequired,
   dataRenderer: PropTypes.func,
   sheetRenderer: PropTypes.func.isRequired,

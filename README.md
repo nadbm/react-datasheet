@@ -199,7 +199,7 @@ rowRenderer | func | Optional function or React Component to render each row ele
 cellRenderer | func | Optional function or React Component to render each cell element. The default renders a `td` element.
 valueViewer | func | Optional function or React Component to customize the way the value for each cell in the sheet is displayed. Affects every cell in the sheet. See [cell options](https://github.com/nadbm/react-datasheet#cell-options) to override individual cells.
 dataEditor | func | Optional function or React Component to render a custom editor. Affects every cell in the sheet. Affects every cell in the sheet. See [cell options](https://github.com/nadbm/react-datasheet#cell-options) to override individual cells.
-selected | object | Optional. Wheter the selection is controlled or uncontrolled. Must be an object of this format: `{ start: { i: number, j; number }, end: { i: number, j: number } }`, or `null` for no selection.
+selected | object | Optional. Whether the selection is controlled or uncontrolled. Must be an object of this format: `{ start: { i: number, j; number }, end: { i: number, j: number } }`, or `null` for no selection.
 onSelect | func | Optional. `function ({ start, end }) {}` Triggered on every selection change. `start` and `end` have the same format as the `selected` prop. 
 
 ## `onCellsChanged(arrayOfChanges[, arrayOfAdditions])` handler
