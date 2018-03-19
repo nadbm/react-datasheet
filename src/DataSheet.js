@@ -78,6 +78,39 @@ export default class DataSheet extends PureComponent {
     this.removeAllListeners()
   }
 
+  isSelectionControlled () {
+    return ('selected' in this.props)
+  }
+
+  getState () {
+    let state = this.state
+    if (this.isSelectionControlled()) {
+      let { start, end } = this.props.selected || {}
+      start = start || this.defaultState.start
+      end = end || this.defaultState.end
+      state = { ...state, start, end }
+    }
+    return state
+  }
+
+  _setState (state) {
+    if (this.isSelectionControlled() && (('start' in state) || ('end' in state))) {
+      let { start, end, ...rest } = state
+      let { selected, onSelect } = this.props
+      selected = selected || {}
+      if (!start) {
+        start = 'start' in selected ? selected.start : this.defaultState.start
+      }
+      if (!end) {
+        end = 'end' in selected ? selected.end : this.defaultState.end
+      }
+      onSelect && onSelect({ start, end })
+      this.setState(rest)
+    } else {
+      this.setState(state)
+    }
+  }
+
   pageClick (e) {
     const element = this.dgDom
     if (!element.contains(e.target)) {
@@ -90,7 +123,7 @@ export default class DataSheet extends PureComponent {
     if (isEmpty(this.state.editing)) {
       e.preventDefault()
       const {dataRenderer, valueRenderer, data} = this.props
-      const {start, end} = this.state
+      const {start, end} = this.getState()
 
       const text = range(start.i, end.i).map((i) =>
         range(start.j, end.j).map(j => {
@@ -108,8 +141,7 @@ export default class DataSheet extends PureComponent {
 
   handlePaste (e) {
     if (isEmpty(this.state.editing)) {
-      const start = this.state.start
-
+      const { start } = this.getState()
       const parse = this.props.parsePaste || defaultParsePaste
       const changes = []
       const pasteData = parse(e.clipboardData.getData('text/plain'))
@@ -156,12 +188,12 @@ export default class DataSheet extends PureComponent {
           })
         })
       }
-      this.setState({end})
+      this._setState({end})
     }
   }
 
   handleKeyboardCellMovement (e, commit = false) {
-    const {start, editing} = this.state
+    const {start, editing} = this.getState()
     const {data} = this.props
     const isEditing = editing && !isEmpty(editing)
     const currentCell = data[start.i] && data[start.i][start.j]
@@ -207,7 +239,7 @@ export default class DataSheet extends PureComponent {
       return
     }
     const keyCode = e.which || e.keyCode
-    const {start, end, editing} = this.state
+    const {start, end, editing} = this.getState()
     const isEditing = editing && !isEmpty(editing)
     const noCellsSelected = !start || isEmpty(start)
     const ctrlKeyPressed = e.ctrlKey || e.metaKey
@@ -237,14 +269,14 @@ export default class DataSheet extends PureComponent {
         this.clearSelectedCells(start, end)
       } else if (currentCell && !currentCell.readOnly) {
         if (enterKeyPressed) {
-          this.setState({editing: start, clear: {}, forceEdit: true})
+          this._setState({editing: start, clear: {}, forceEdit: true})
           e.preventDefault()
         } else if (numbersPressed ||
             numPadKeysPressed ||
             lettersPressed ||
             equationKeysPressed) {
           // empty out cell if user starts typing without pressing enter
-          this.setState({editing: start, clear: start, forceEdit: false})
+          this._setState({editing: start, clear: start, forceEdit: false})
         }
       }
     }
@@ -284,12 +316,12 @@ export default class DataSheet extends PureComponent {
 
   handleNavigate (e, offsets, jumpRow) {
     if (offsets && (offsets.i || offsets.j)) {
-      const {start} = this.state
+      const {start} = this.getState()
       const {data} = this.props
       let newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
       const updateLocation = () => {
         if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
-          this.setState({start: newLocation, end: newLocation, editing: {}})
+          this._setState({start: newLocation, end: newLocation, editing: {}})
           e.preventDefault()
           return true
         }
@@ -342,14 +374,14 @@ export default class DataSheet extends PureComponent {
   onDoubleClick (i, j) {
     let cell = this.props.data[i][j]
     if (!cell.readOnly) {
-      this.setState({editing: {i: i, j: j}, forceEdit: true, clear: {}})
+      this._setState({editing: {i: i, j: j}, forceEdit: true, clear: {}})
     }
   }
 
   onMouseDown (i, j) {
     let editing = (isEmpty(this.state.editing) || this.state.editing.i !== i || this.state.editing.j !== j)
       ? {} : this.state.editing
-    this.setState({selecting: true, start: {i, j}, end: {i, j}, editing: editing, forceEdit: false})
+    this._setState({selecting: true, start: {i, j}, end: {i, j}, editing: editing, forceEdit: false})
 
     // Keep listening to mouse if user releases the mouse (dragging outside)
     document.addEventListener('mouseup', this.onMouseUp)
@@ -363,12 +395,12 @@ export default class DataSheet extends PureComponent {
 
   onMouseOver (i, j) {
     if (this.state.selecting && isEmpty(this.state.editing)) {
-      this.setState({end: {i, j}})
+      this._setState({end: {i, j}})
     }
   }
 
   onMouseUp () {
-    this.setState({selecting: false})
+    this._setState({selecting: false})
     document.removeEventListener('mouseup', this.onMouseUp)
   }
 
@@ -383,20 +415,20 @@ export default class DataSheet extends PureComponent {
   }
 
   onRevert () {
-    this.setState({ editing: {} })
+    this._setState({ editing: {} })
     this.dgDom && this.dgDom.focus()
   }
 
   componentDidUpdate (prevProps, prevState) {
+    let { start, end } = this.state
     let prevEnd = prevState.end
-    if (!isEmpty(this.state.end) && !(this.state.end.i === prevEnd.i && this.state.end.j === prevEnd.j)) {
-      this.props.onSelect && this.props.onSelect(this.props.data[this.state.end.i][this.state.end.j])
+    if (!isEmpty(end) && !(end.i === prevEnd.i && end.j === prevEnd.j) && !this.isSelectionControlled()) {
+      this.props.onSelect && this.props.onSelect({ start, end })
     }
   }
 
   isSelected (i, j) {
-    const start = this.state.start
-    const end = this.state.end
+    const {start, end} = this.getState()
     const posX = (j >= start.j && j <= end.j)
     const negX = (j <= start.j && j >= end.j)
     const posY = (i >= start.i && i <= end.i)
@@ -472,6 +504,17 @@ DataSheet.propTypes = {
   onChange: PropTypes.func,
   onCellsChanged: PropTypes.func,
   onContextMenu: PropTypes.func,
+  onSelect: PropTypes.func,
+  selected: PropTypes.shape({
+    start: PropTypes.shape({
+      i: PropTypes.number,
+      j: PropTypes.number
+    }),
+    end: PropTypes.shape({
+      i: PropTypes.number,
+      j: PropTypes.number
+    })
+  }),
   valueRenderer: PropTypes.func.isRequired,
   dataRenderer: PropTypes.func,
   sheetRenderer: PropTypes.func.isRequired,
