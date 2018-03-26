@@ -34,6 +34,14 @@ declare namespace ReactDataSheet {
         width?: number | string;
     }
 
+    export interface Location {
+        i: number,
+        j: number
+    }
+    export interface Selection {
+        start: Location,
+        end: Location
+    }
     /** Properties of the ReactDataSheet component. */
     export interface DataSheetProps<T extends Cell<T, V>, V = string> {
         /** Optional function to add attributes to the rendered cell element. It should return an object with properties corresponding to the name and vales of the attributes you wish to add. */
@@ -51,7 +59,6 @@ declare namespace ReactDataSheet {
         onCellsChanged?: CellsChangedHandler<T, V>;
         /** Context menu handler : function(event, cell, i, j). */
         onContextMenu?: ContextMenuHandler<T, V>;
-        onSelect?: (cell: T) => void;
         /** Grid default for how to render overflow text in cells. */
         overflow?: 'wrap' | 'nowrap' | 'clip';
         /** Optional function or React Component to render each row element. The default renders a <tr> element. */
@@ -64,6 +71,10 @@ declare namespace ReactDataSheet {
         valueRenderer: ValueRenderer<T, V>;
         /** Optional function or React Component to customize the way the value for each cell in the sheet is displayed. Affects every cell in the sheet. See cell options to override individual cells. */
         valueViewer?: ValueViewer<T, V>;
+        /** Optional. Passing a selection format will make the selection controlled, pass a null for usual behaviour**/
+        selected?: Selection | null; 
+        /** Optional. Calls the function whenever the user changes selection**/
+        onSelect?: (selection: Selection) => void;
     }
 
     /** A function to process the raw clipboard data. It should return an array of arrays of strings. This is useful for when the clipboard may have data with irregular field or line delimiters. If not set, rows will be split with line breaks and cells with tabs. To wire it up pass your function to the parsePaste property of the ReactDataSheet component. */
