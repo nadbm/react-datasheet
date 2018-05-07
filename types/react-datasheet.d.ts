@@ -211,7 +211,7 @@ declare namespace ReactDataSheet {
     }
 
     /** A function or React Component to render a custom editor. If it is passed to the dataEditor property of the ReactDataSheet component, it affects every cell in the sheet. Different editors can also be passed to the dataEditor property of each Cell to control each cell separately. */
-    export type DataEditor<T extends Cell<T, V>, V = string> = React.ComponentClass<DataEditorProps<T, V>> | React.SFC<ValueViewerProps<T, V>>;
+    export type DataEditor<T extends Cell<T, V>, V = string> = React.ComponentClass<DataEditorProps<T, V>> | React.SFC<DataEditorProps<T, V>>;
 
     export interface CellReference {
         row: number;
