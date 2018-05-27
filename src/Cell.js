@@ -4,6 +4,23 @@ import PropTypes from 'prop-types'
 import CellShape from './CellShape'
 
 export default class Cell extends PureComponent {
+
+  scrollToSelected = () => {
+    if (this.props.selected) {
+      this.cellItem.scrollIntoView();
+    }
+  };
+
+  componentDidMount = () => {
+    document.addEventListener('click', this.scrollToSelected);
+    document.addEventListener('keydown', this.scrollToSelected);
+  };
+
+  componentWillUnmount = () => {
+    document.removeEventListener('click', this.scrollToSelected);
+    document.removeEventListener('keydown', this.scrollToSelected);
+  };
+
   render () {
     const {
           cell, row, col, attributesRenderer,
@@ -15,6 +32,7 @@ export default class Cell extends PureComponent {
 
     return (
       <td
+        ref={node => (this.cellItem = node)}
         className={className}
         onMouseDown={onMouseDown}
         onMouseOver={onMouseOver}
