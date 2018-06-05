@@ -126,7 +126,7 @@ export default class OverrideEverythingSheet extends PureComponent {
       grid[row][col] = {...grid[row][col], value}
     })
     // paste extended beyond end, so add a new row
-    additions.forEach(({cell, row, col, value}) => {
+    additions && additions.forEach(({cell, row, col, value}) => {
       if (!grid[row]) {
         grid[row] = [{value: ''}, {value: ''}, {value: ''}, {value: 0}]
       }
