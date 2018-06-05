@@ -35,7 +35,7 @@ export default class DataCell extends PureComponent {
     this.handleContextMenu = this.handleContextMenu.bind(this)
     this.handleDoubleClick = this.handleDoubleClick.bind(this)
 
-    this.state = {updated: false, reverting: false, value: ''}
+    this.state = {updated: false, reverting: false, value: '', committing: false}
   }
 
   componentWillReceiveProps (nextProps) {
@@ -53,6 +53,7 @@ export default class DataCell extends PureComponent {
     if (prevProps.editing === true &&
         this.props.editing === false &&
         !this.state.reverting &&
+        !this.state.committing &&
         this.state.value !== initialData(this.props)) {
       this.props.onChange(this.props.row, this.props.col, this.state.value)
     }
@@ -63,13 +64,13 @@ export default class DataCell extends PureComponent {
   }
 
   handleChange (value) {
-    this.setState({ value })
+    this.setState({ value, committing: false })
   }
 
   handleCommit (value, e) {
     const {onChange, onNavigate} = this.props
     if (value !== initialData(this.props)) {
-      this.setState({ value })
+      this.setState({ value, committing: true })
       onChange(this.props.row, this.props.col, value)
     } else {
       this.handleRevert()

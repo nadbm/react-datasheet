@@ -294,6 +294,7 @@ describe('Component', () => {
         wrapper.detach()
       })
     })
+
     describe('rendering', () => {
       it('should properly render a change (flashing)', (done) => {
         const cell = {
@@ -407,7 +408,7 @@ describe('Component', () => {
       wrapper.instance().removeAllListeners()
       if (customWrapper) {
         if ('removeAllListeners' in customWrapper.instance()) {
-          customWrapper.instance().removeAllListeners()  
+          customWrapper.instance().removeAllListeners()
         }
         customWrapper = null
       }
@@ -768,7 +769,6 @@ describe('Component', () => {
         expect(customWrapper.props().selected.end).toEqual({ i: 1, j: 1 })
         expect(customWrapper.find('td.cell.selected').length).toEqual(4)
       })
-
     })
 
     describe('keyboard movement', () => {
@@ -1662,7 +1662,9 @@ describe('Component', () => {
         handlePaste = sinon.spy()
         handleCellsChanged = sinon.spy(changes => {
           const newData = changeData(changes)
-          wrapper.setProps({data: newData})
+          setTimeout(() => {
+            wrapper.setProps({data: newData})
+          }, 5)
         })
         wrapper.setProps({onChange: handleChange, onPaste: handlePaste, onCellsChanged: handleCellsChanged})
       })
@@ -1691,19 +1693,20 @@ describe('Component', () => {
         evt.initEvent('paste', false, true)
         evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
-        expect(handlePaste.called).toBe(false)
-        expect(handleCellsChanged.calledOnce).toBe(true)
-        expect(handleCellsChanged.firstCall.calledWith([
-          {cell: data[0][0], row: 0, col: 0, value: '99'},
-          {cell: data[0][1], row: 0, col: 1, value: '100'},
-          {cell: data[1][0], row: 1, col: 0, value: '1001'},
-          {cell: data[1][1], row: 1, col: 1, value: '1002'}
-        ])).toBe(true)
 
         setTimeout(() => {
+          expect(handlePaste.called).toBe(false)
+          expect(handleCellsChanged.calledOnce).toBe(true)
+
+          expect(handleCellsChanged.firstCall.calledWith([
+            {cell: data[0][0], row: 0, col: 0, value: '99'},
+            {cell: data[0][1], row: 0, col: 1, value: '100'},
+            {cell: data[1][0], row: 1, col: 0, value: '1001'},
+            {cell: data[1][1], row: 1, col: 1, value: '1002'}
+          ])).toBe(true)
           expect(handleChange.called).toBe(false)
           done()
-        }, 1)
+        }, 200)
       })
 
       it('should be called with two arguments if pasted data exceeds bounds', (done) => {
@@ -1713,19 +1716,19 @@ describe('Component', () => {
         evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
         expect(handlePaste.called).toBe(false)
-        expect(handleCellsChanged.calledOnce).toBe(true)
-        expect(handleCellsChanged.firstCall.calledWith([
-          {cell: data[1][1], row: 1, col: 1, value: '99'}
-        ], [
-          {row: 1, col: 2, value: '100'},
-          {row: 2, col: 1, value: '1001'},
-          {row: 2, col: 2, value: '1002'}
-        ])).toBe(true)
 
         setTimeout(() => {
+          expect(handleCellsChanged.calledOnce).toBe(true)
+          expect(handleCellsChanged.firstCall.calledWith([
+            {cell: data[1][1], row: 1, col: 1, value: '99'}
+          ], [
+            {row: 1, col: 2, value: '100'},
+            {row: 2, col: 1, value: '1001'},
+            {row: 2, col: 2, value: '1002'}
+          ])).toBe(true)
           expect(handleChange.called).toBe(false)
           done()
-        }, 1)
+        }, 100)
       })
 
       it('should be called once when deleting multiple cells', (done) => {
@@ -1734,18 +1737,17 @@ describe('Component', () => {
 
         triggerKeyDownEvent(wrapper, DELETE_KEY)
 
-        expect(handleCellsChanged.calledOnce).toBe(true)
-        expect(handleCellsChanged.calledWith([
-          {cell: data[0][0], row: 0, col: 0, value: ''},
-          {cell: data[0][1], row: 0, col: 1, value: ''}
-        ])).toBe(true)
-        expect(handlePaste.called).toBe(false)
         setTimeout(() => {
+          expect(handleCellsChanged.calledOnce).toBe(true)
+          expect(handleCellsChanged.calledWith([
+            {cell: data[0][0], row: 0, col: 0, value: ''},
+            {cell: data[0][1], row: 0, col: 1, value: ''}
+          ])).toBe(true)
+          expect(handlePaste.called).toBe(false)
           expect(handleChange.called).toBe(false)
           done()
-        }, 1)
+        }, 100)
       })
     })
-
   })
 })
