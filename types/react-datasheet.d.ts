@@ -75,6 +75,8 @@ declare namespace ReactDataSheet {
         selected?: Selection | null; 
         /** Optional. Calls the function whenever the user changes selection**/
         onSelect?: (selection: Selection) => void;
+        /** Optional. Function to set row key. **/ 
+        keyFn?: (row: number) => number; 
     }
 
     /** A function to process the raw clipboard data. It should return an array of arrays of strings. This is useful for when the clipboard may have data with irregular field or line delimiters. If not set, rows will be split with line breaks and cells with tabs. To wire it up pass your function to the parsePaste property of the ReactDataSheet component. */
