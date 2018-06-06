@@ -523,7 +523,8 @@ DataSheet.propTypes = {
   valueViewer: PropTypes.func,
   dataEditor: PropTypes.func,
   parsePaste: PropTypes.func,
-  attributesRenderer: PropTypes.func
+  attributesRenderer: PropTypes.func,
+  keyFn: PropTypes.func
 }
 
 DataSheet.defaultProps = {
