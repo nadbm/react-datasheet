@@ -1687,28 +1687,6 @@ describe('Component', () => {
         }, 1)
       })
 
-      it('should be called once when pasting', (done) => {
-        wrapper.find('td').at(0).simulate('mouseDown')
-        let evt = document.createEvent('HTMLEvents')
-        evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
-        document.dispatchEvent(evt)
-
-        setTimeout(() => {
-          expect(handlePaste.called).toBe(false)
-          expect(handleCellsChanged.calledOnce).toBe(true)
-
-          expect(handleCellsChanged.firstCall.calledWith([
-            {cell: data[0][0], row: 0, col: 0, value: '99'},
-            {cell: data[0][1], row: 0, col: 1, value: '100'},
-            {cell: data[1][0], row: 1, col: 0, value: '1001'},
-            {cell: data[1][1], row: 1, col: 1, value: '1002'}
-          ])).toBe(true)
-          expect(handleChange.called).toBe(false)
-          done()
-        }, 200)
-      })
-
       it('should be called with two arguments if pasted data exceeds bounds', (done) => {
         wrapper.find('td').at(3).simulate('mouseDown')
         let evt = document.createEvent('HTMLEvents')
@@ -1716,7 +1694,6 @@ describe('Component', () => {
         evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
         expect(handlePaste.called).toBe(false)
-
         setTimeout(() => {
           expect(handleCellsChanged.calledOnce).toBe(true)
           expect(handleCellsChanged.firstCall.calledWith([
@@ -1725,6 +1702,26 @@ describe('Component', () => {
             {row: 1, col: 2, value: '100'},
             {row: 2, col: 1, value: '1001'},
             {row: 2, col: 2, value: '1002'}
+          ])).toBe(true)
+          expect(handleChange.called).toBe(false)
+          done()
+        }, 100)
+      })
+
+      it('should be called once when pasting', (done) => {
+        wrapper.find('td').at(0).simulate('mouseDown')
+        let evt = document.createEvent('HTMLEvents')
+        evt.initEvent('paste', false, true)
+        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        document.dispatchEvent(evt)
+        expect(handlePaste.called).toBe(false)
+        setTimeout(() => {
+          expect(handleCellsChanged.calledOnce).toBe(true)
+          expect(handleCellsChanged.firstCall.calledWith([
+            {cell: data[0][0], row: 0, col: 0, value: '99'},
+            {cell: data[0][1], row: 0, col: 1, value: '100'},
+            {cell: data[1][0], row: 1, col: 0, value: '1001'},
+            {cell: data[1][1], row: 1, col: 1, value: '1002'}
           ])).toBe(true)
           expect(handleChange.called).toBe(false)
           done()
