@@ -95,14 +95,14 @@ const onCellsChanged = (changes) => changes.forEach(({cell, row, col, value}) =>
 
 ```jsx
 const grid = [
-   [{
+  [{
     value:  5,
-      component: (
-        <button onClick={() => console.log("clicked")}>
-          Rendered
-        </button>
-      )
-    }]
+    component: (
+      <button onClick={() => console.log("clicked")}>
+        Rendered
+      </button>
+    )
+  }]
 ]
 <ReactDataSheet
   data={grid}
