@@ -247,6 +247,7 @@ export default class DataSheet extends PureComponent {
     const enterKeyPressed = keyCode === ENTER_KEY
     const numbersPressed = (keyCode >= 48 && keyCode <= 57)
     const lettersPressed = (keyCode >= 65 && keyCode <= 90)
+    const latin1Supplement = (keyCode >= 160 && keyCode <= 255)
     const numPadKeysPressed = (keyCode >= 96 && keyCode <= 105)
     const currentCell = !noCellsSelected && this.props.data[start.i][start.j]
     const equationKeysPressed = [
@@ -274,6 +275,7 @@ export default class DataSheet extends PureComponent {
         } else if (numbersPressed ||
             numPadKeysPressed ||
             lettersPressed ||
+            latin1Supplement ||
             equationKeysPressed) {
           // empty out cell if user starts typing without pressing enter
           this._setState({editing: start, clear: start, forceEdit: false})
