@@ -19,7 +19,7 @@ const CellShape = {
   key: PropTypes.string,
   className: PropTypes.string,
   component: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
-  componentProps: PropType.object,
+  componentProps: PropTypes.object,
   forceComponent: PropTypes.bool,
   disableEvents: PropTypes.bool,
   colSpan: PropTypes.number,
