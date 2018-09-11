@@ -130,8 +130,11 @@ export default class DataCell extends PureComponent {
   }
 
   renderComponent (editing, cell) {
-    const {component, readOnly, forceComponent} = cell
+    const {component, componentProps, readOnly, forceComponent} = cell
     if ((editing && !readOnly) || forceComponent) {
+      if(componentProps && typeof component === 'function') {
+        return React.createElement(component, componentProps);
+      }
       return component
     }
   }
