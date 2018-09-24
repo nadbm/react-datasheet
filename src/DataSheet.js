@@ -208,16 +208,7 @@ export default class DataSheet extends PureComponent {
 
     const keyCode = e.which || e.keyCode
 
-    if (hasComponent && (isEditing)) { /*
-      if (keyCode === ESCAPE_KEY) {
-        e.preventDefault()
-        this.onRevert()
-      }
-      if (keyCode === ENTER_KEY) {
-        this.handleNavigate(e, {i: e.shiftKey ? -1 : 1, j: 0})
-      } else if (keyCode === TAB_KEY) {
-        this.handleNavigate(e, {i: 0, j: e.shiftKey ? -1 : 1}, true)
-      } */
+    if (hasComponent && (isEditing)) {
       e.preventDefault()
       return
     }
