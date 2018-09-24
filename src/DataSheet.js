@@ -142,12 +142,10 @@ export default class DataSheet extends PureComponent {
   handlePaste (e) {
     if (isEmpty(this.state.editing)) {
       let { start, end } = this.getState()
-      if (end) {
-        [start, end] = [
-          { i: Math.min(start.i, end.i), j: Math.min(start.j, end.j) },
-          { i: Math.max(start.i, end.i), j: Math.max(start.j, end.j) }
-        ]
-      }
+
+      start = { i: Math.min(start.i, end.i), j: Math.min(start.j, end.j) }
+      end = { i: Math.max(start.i, end.i), j: Math.max(start.j, end.j) }
+
       const parse = this.props.parsePaste || defaultParsePaste
       const changes = []
       const pasteData = parse(e.clipboardData.getData('text/plain'))
