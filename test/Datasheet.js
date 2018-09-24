@@ -1118,6 +1118,54 @@ describe('Component', () => {
         expect(datacust[1].map(d => d.data)).toEqual([1012, '1001'])
       })
 
+      it('pastes multiple rows correclty when multiple cells are selected', () => {
+        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}, {data: 25, readOnly: false}], [{data: 1012, readOnly: true}, {data: 1024, readOnly: false}, {data: 1036, readOnly: false}]]
+        customWrapper = mount(
+          <DataSheet
+            data={datacust}
+            valueRenderer={(cell) => cell.data}
+            onChange={(cell, i, j, value) => datacust[i][j].data = value}
+          />
+        )
+        customWrapper.find('td').at(1).simulate('mouseDown')
+
+        wrapper.setState({
+          start: { i: 1, j: 0 },
+          end: { i: 2, j: 0 }
+        })
+
+        let evt = document.createEvent('HTMLEvents')
+        evt.initEvent('paste', false, true)
+        evt.clipboardData = { getData: (type) => '99\t100\t101\r\n1001\t1002\t1003'}
+        document.dispatchEvent(evt)
+
+        expect(datacust[1].map(d => d.data)).toEqual([1012, '1001', '1002'])
+      })
+
+      it('pastes multiple rows correclty when multiple cells are selected from bottom up', () => {
+        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}, {data: 25, readOnly: false}], [{data: 1012, readOnly: true}, {data: 1024, readOnly: false}, {data: 1036, readOnly: false}]]
+        customWrapper = mount(
+          <DataSheet
+            data={datacust}
+            valueRenderer={(cell) => cell.data}
+            onChange={(cell, i, j, value) => datacust[i][j].data = value}
+          />
+        )
+        customWrapper.find('td').at(1).simulate('mouseDown')
+
+        wrapper.setState({
+          start: { i: 2, j: 0 },
+          end: { i: 1, j: 0 }
+        })
+
+        let evt = document.createEvent('HTMLEvents')
+        evt.initEvent('paste', false, true)
+        evt.clipboardData = { getData: (type) => '99\t100\t101\r\n1001\t1002\t1003'}
+        document.dispatchEvent(evt)
+
+        expect(datacust[1].map(d => d.data)).toEqual([1012, '1001', '1002'])
+      })
+
       it('doesnt auto paste data if cell is editing', () => {
         const datacust = [[{data: 12, readOnly: false}, {data: 24, readOnly: false}]]
         customWrapper = mount(
