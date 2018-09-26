@@ -1,5 +1,7 @@
+import 'babel-polyfill'
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
+import clipboard from 'clipboard-polyfill'
 import Sheet from './Sheet'
 import Row from './Row'
 import Cell from './Cell'
@@ -7,7 +9,7 @@ import DataCell from './DataCell'
 import DataEditor from './DataEditor'
 import ValueViewer from './ValueViewer'
 import { TAB_KEY, ENTER_KEY, DELETE_KEY, ESCAPE_KEY, BACKSPACE_KEY,
-  LEFT_KEY, UP_KEY, DOWN_KEY, RIGHT_KEY } from './keys'
+  LEFT_KEY, UP_KEY, DOWN_KEY, RIGHT_KEY, C_KEY, V_KEY } from './keys'
 
 const isEmpty = (obj) => Object.keys(obj).length === 0
 
@@ -63,8 +65,6 @@ export default class DataSheet extends PureComponent {
   removeAllListeners () {
     document.removeEventListener('mousedown', this.pageClick)
     document.removeEventListener('mouseup', this.onMouseUp)
-    document.removeEventListener('copy', this.handleCopy)
-    document.removeEventListener('paste', this.handlePaste)
   }
 
   componentDidMount () {
@@ -135,11 +135,11 @@ export default class DataSheet extends PureComponent {
           return value
         }).join('\t')
       ).join('\n')
-      e.clipboardData.setData('text/plain', text)
+      clipboard.writeText(text)
     }
   }
 
-  handlePaste (e) {
+  handlePaste (text) {
     if (isEmpty(this.state.editing)) {
       let { start, end } = this.getState()
 
@@ -148,7 +148,7 @@ export default class DataSheet extends PureComponent {
 
       const parse = this.props.parsePaste || defaultParsePaste
       const changes = []
-      const pasteData = parse(e.clipboardData.getData('text/plain'))
+      const pasteData = parse(text)
       // in order of preference
       const { data, onCellsChanged, onPaste, onChange } = this.props
       if (onCellsChanged) {
@@ -253,7 +253,17 @@ export default class DataSheet extends PureComponent {
       110
     ].indexOf(keyCode) > -1
 
-    if (noCellsSelected || ctrlKeyPressed) {
+    if (noCellsSelected) {
+      return true
+    }
+
+    // Copy paste handlers
+    if (ctrlKeyPressed) {
+      if (keyCode === C_KEY) {
+        this.handleCopy(e)
+      } else if (keyCode === V_KEY) {
+        clipboard.readText().then(this.handlePaste)
+      }
       return true
     }
 
@@ -383,10 +393,6 @@ export default class DataSheet extends PureComponent {
     document.addEventListener('mouseup', this.onMouseUp)
     // Listen for any outside mouse clicks
     document.addEventListener('mousedown', this.pageClick)
-
-    // Copy paste event handler
-    document.addEventListener('copy', this.handleCopy)
-    document.addEventListener('paste', this.handlePaste)
   }
 
   onMouseOver (i, j) {

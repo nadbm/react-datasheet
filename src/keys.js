@@ -7,3 +7,5 @@ export const RIGHT_KEY = 39
 export const DOWN_KEY = 40
 export const DELETE_KEY = 46
 export const BACKSPACE_KEY = 8
+export const C_KEY = 67
+export const V_KEY = 86

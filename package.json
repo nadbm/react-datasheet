@@ -39,6 +39,7 @@
     "babel-preset-react": "^6.23.0",
     "babel-preset-stage-2": "^6.5.0",
     "chai": "^3.5.0",
+    "clipboard-polyfill": "^2.5.4",
     "coveralls": "^3.0.1",
     "cross-env": "^4.0.0",
     "enzyme": "^2.2.0",
