@@ -1,15 +1,15 @@
-import React from 'react';
-import _ from 'lodash';
-import mathjs from 'mathjs';
+import React from 'react'
+import _ from 'lodash'
+import mathjs from 'mathjs'
 import Datasheet from '../lib/DataSheet'
 
 export default class MathSheet extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
-    this.onCellsChanged = this.onCellsChanged.bind(this);
+    this.onCellsChanged = this.onCellsChanged.bind(this)
     this.state = {
       'A1': {key: 'A1', value: '200', expr: '200'},
-      'A2': {key: 'A2', value: '200', expr: '=A1', className:'equation'},
+      'A2': {key: 'A2', value: '200', expr: '=A1', className: 'equation'},
       'A3': {key: 'A3', value: '', expr: ''},
       'A4': {key: 'A4', value: '', expr: ''},
       'B1': {key: 'B1', value: '', expr: ''},
@@ -27,17 +27,16 @@ export default class MathSheet extends React.Component {
     }
   }
 
-
-  generateGrid() {
-    return [0, 1,2,3,4].map((row, i) => 
+  generateGrid () {
+    return [0, 1, 2, 3, 4].map((row, i) =>
       ['', 'A', 'B', 'C', 'D'].map((col, j) => {
-        if(i == 0 && j == 0) {
+        if (i == 0 && j == 0) {
           return {readOnly: true, value: ''}
         }
-        if(row === 0) {
+        if (row === 0) {
           return {readOnly: true, value: col}
-        } 
-        if(j === 0) {
+        }
+        if (j === 0) {
           return {readOnly: true, value: row}
         }
         return this.state[col + row]
@@ -45,11 +44,11 @@ export default class MathSheet extends React.Component {
     )
   }
 
-  validateExp(trailKeys, expr) {
-    let valid = true;
-    const matches = expr.match(/[A-Z][1-9]+/g) || [];
+  validateExp (trailKeys, expr) {
+    let valid = true
+    const matches = expr.match(/[A-Z][1-9]+/g) || []
     matches.map(match => {
-      if(trailKeys.indexOf(match) > -1) {
+      if (trailKeys.indexOf(match) > -1) {
         valid = false
       } else {
         valid = this.validateExp([...trailKeys, match], this.state[match].expr)
@@ -58,18 +57,18 @@ export default class MathSheet extends React.Component {
     return valid
   }
 
-  computeExpr(key, expr, scope) {
-    let value = null;
-    if(expr.charAt(0) !== '=') {
-      return {className: '', value: expr, expr: expr};
+  computeExpr (key, expr, scope) {
+    let value = null
+    if (expr.charAt(0) !== '=') {
+      return {className: '', value: expr, expr: expr}
     } else {
       try {
         value = mathjs.eval(expr.substring(1), scope)
-      } catch(e) {
+      } catch (e) {
         value = null
       }
 
-      if(value !== null && this.validateExp([key], expr)) {
+      if (value !== null && this.validateExp([key], expr)) {
         return {className: 'equation', value, expr}
       } else {
         return {className: 'error', value: 'error', expr: ''}
@@ -77,20 +76,20 @@ export default class MathSheet extends React.Component {
     }
   }
 
-  cellUpdate(state, changeCell, expr) {
+  cellUpdate (state, changeCell, expr) {
     const scope = _.mapValues(state, (val) => isNaN(val.value) ? 0 : parseFloat(val.value))
     const updatedCell = _.assign({}, changeCell, this.computeExpr(changeCell.key, expr, scope))
     state[changeCell.key] = updatedCell
 
     _.each(state, (cell, key) => {
-      if(cell.expr.charAt(0) === '=' && cell.expr.indexOf(changeCell.key) > -1 && key !== changeCell.key) {
+      if (cell.expr.charAt(0) === '=' && cell.expr.indexOf(changeCell.key) > -1 && key !== changeCell.key) {
         state = this.cellUpdate(state, cell, cell.expr)
       }
     })
     return state
   }
 
-  onCellsChanged(changes) {
+  onCellsChanged (changes) {
     const state = _.assign({}, this.state)
     changes.forEach(({cell, value}) => {
       this.cellUpdate(state, cell, value)
@@ -98,8 +97,7 @@ export default class MathSheet extends React.Component {
     this.setState(state)
   }
 
-  render() {
-
+  render () {
     return (
       <Datasheet
         data={this.generateGrid()}
@@ -109,5 +107,4 @@ export default class MathSheet extends React.Component {
       />
     )
   }
-
 }

@@ -1,154 +1,175 @@
 body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .equation.cell {
-  position: relative;
+    position: relative;
 }
+
 .error.cell {
-  background: rgba(255,0,0,0.14);
-  font-size: 0.8em;
-  color: red;
+    background: rgba(255, 0, 0, 0.14);
+    font-size: 0.8em;
+    color: red;
 }
+
 .error.cell > div.text {
-  text-align: center;
+    text-align: center;
 }
+
 .equation.cell:before {
-  content: '';
-  width: 0;
-  height: 0;
-  position: absolute;
-  left: 0;
-  top: 0;
-  border-style: solid;
-  border-width: 6px 6px 0 0;
-  border-color: #2185d0 transparent transparent transparent;
-  z-index: 2;
+    content: '';
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-style: solid;
+    border-width: 6px 6px 0 0;
+    border-color: #2185d0 transparent transparent transparent;
+    z-index: 2;
 }
 
 .row-handle.cell {
-  width: 1rem;
+    width: 1rem;
 }
 
 tbody .row-handle.cell, thead .cell:not(.row-handle) {
-  cursor: move;
+    cursor: move;
 }
 
 .data-grid-container table.data-grid tr {
- background: white;
-}
-.data-grid-container table.data-grid .drop-target,  .data-grid-container table.data-grid thead .cell.read-only.drop-target {
-  background: #6F86FC;
-  transition: none;
-  color: white;
-}
-.data-grid-container table.data-grid thead .cell.read-only {
-  transition: none;
+    background: white;
 }
 
+.data-grid-container table.data-grid .drop-target, .data-grid-container table.data-grid thead .cell.read-only.drop-target {
+    background: #6F86FC;
+    transition: none;
+    color: white;
+}
+
+.data-grid-container table.data-grid thead .cell.read-only {
+    transition: none;
+}
 
 .App {
-  text-align: center;
+    text-align: center;
 }
 
 .App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+    animation: App-logo-spin infinite 20s linear;
+    height: 80px;
 }
 
 .App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+    background-color: #222;
+    height: 150px;
+    padding: 20px;
+    color: white;
 }
 
 @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .container {
-  max-width: 600px;
-  margin: auto;
+    max-width: 600px;
+    margin: auto;
 }
+
 table.data-grid {
-  margin: auto;
-  width: 100%;
-}
-.Select-control, .Select-input, .Select-placeholder,.Select-clear, .Select-placeholder, .Select--single > .Select-control .Select-value {
-  height: 15px;
-  line-height: 12px;
-  font-size: 12px;
-  text-align: left;
-  border-radius: 0;
-  border: 0;
+    margin: auto;
+    width: 100%;
 }
 
-.Select-control input{
-  height: 16px;
-  font-size: 12px;
-  padding: 0;
+.Select-control, .Select-input, .Select-placeholder, .Select-clear, .Select-placeholder, .Select--single > .Select-control .Select-value {
+    height: 15px;
+    line-height: 12px;
+    font-size: 12px;
+    text-align: left;
+    border-radius: 0;
+    border: 0;
 }
+
+.Select-control input {
+    height: 16px;
+    font-size: 12px;
+    padding: 0;
+}
+
 .sheet-container {
-  display: block;
-  padding: 5px;
+    display: block;
+    padding: 5px;
 
-  box-shadow: 0px 0px 6px #CCC; 
-  margin: auto;
-  width: 500px;
-  margin-top: 20px;
-  transition: box-shadow 0.5s ease-in;
+    box-shadow: 0px 0px 6px #CCC;
+    margin: auto;
+    width: 500px;
+    margin-top: 20px;
+    transition: box-shadow 0.5s ease-in;
 }
+
 .sheet-container:hover {
-  transition: box-shadow 0.5s ease-in;
+    transition: box-shadow 0.5s ease-in;
 
-  box-shadow: 0px 0px 1px #CCC;
+    box-shadow: 0px 0px 1px #CCC;
 }
-.sheet-container table.data-grid tr td.cell:not(.selected){
-  border: 1px solid #ececec;
+
+.sheet-container table.data-grid tr td.cell:not(.selected) {
+    border: 1px solid #ececec;
 }
+
 .sheet-container table.data-grid tr td.cell, .sheet-container table.data-grid tr th.cell {
-  font-size: 12px;
+    font-size: 12px;
 }
+
 div.divider {
-  margin: 40px 0px;
-  height: 1px;
-  width: 100%;
-  background-color: #EEE;
+    margin: 40px 0px;
+    height: 1px;
+    width: 100%;
+    background-color: #EEE;
 }
+
 pre {
-      display: inline-block;
+    display: inline-block;
     background: #333;
     padding: 10px 30px;
     border-left: 2px solid white;
 }
+
 .header {
-  text-align: center;
-  padding: 50px 0px;
-  background: #e63946;
-  color: #EEE;
-  margin-bottom: 50px;
+    text-align: center;
+    padding: 50px 0px;
+    background: #e63946;
+    color: #EEE;
+    margin-bottom: 50px;
 }
+
 .footer-container a {
-  color: white;
+    color: white;
 }
+
 .footer-container {
-  margin-top: 50px;
-  text-align: center;
+    margin-top: 50px;
+    text-align: center;
     padding: 50px 0px;
     background: #e63946;
     color: #EEE;
 }
+
 .add-grocery {
-  text-align: left;
-  padding: 5px 10px;
-  color: #888;
+    text-align: left;
+    padding: 5px 10px;
+    color: #888;
 }
+
 .add-button {
-  float: right;
+    float: right;
     border-radius: 0;
     background: #CCC;
     border-radius: 2px;
@@ -158,17 +179,20 @@ pre {
     cursor: pointer;
     font-size: 9px;
 }
+
 .add-button:hover {
-  background: #f17d86;
+    background: #f17d86;
 }
+
 .github-link {
-  display: block;
-  width: 200px;
-  font-size: 12px;
-  text-decoration: none;
-  margin: auto;
-  color: white;
+    display: block;
+    width: 200px;
+    font-size: 12px;
+    text-decoration: none;
+    margin: auto;
+    color: white;
 }
+
 .github-link:hover {
-  color: #DDD;
+    color: #DDD;
 }

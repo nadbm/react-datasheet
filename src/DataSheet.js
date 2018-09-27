@@ -6,8 +6,10 @@ import Cell from './Cell'
 import DataCell from './DataCell'
 import DataEditor from './DataEditor'
 import ValueViewer from './ValueViewer'
-import { TAB_KEY, ENTER_KEY, DELETE_KEY, ESCAPE_KEY, BACKSPACE_KEY,
-  LEFT_KEY, UP_KEY, DOWN_KEY, RIGHT_KEY } from './keys'
+import {
+  TAB_KEY, ENTER_KEY, DELETE_KEY, ESCAPE_KEY, BACKSPACE_KEY,
+  LEFT_KEY, UP_KEY, DOWN_KEY, RIGHT_KEY
+} from './keys'
 
 const isEmpty = (obj) => Object.keys(obj).length === 0
 
@@ -85,18 +87,18 @@ export default class DataSheet extends PureComponent {
   getState () {
     let state = this.state
     if (this.isSelectionControlled()) {
-      let { start, end } = this.props.selected || {}
+      let {start, end} = this.props.selected || {}
       start = start || this.defaultState.start
       end = end || this.defaultState.end
-      state = { ...state, start, end }
+      state = {...state, start, end}
     }
     return state
   }
 
   _setState (state) {
     if (this.isSelectionControlled() && (('start' in state) || ('end' in state))) {
-      let { start, end, ...rest } = state
-      let { selected, onSelect } = this.props
+      let {start, end, ...rest} = state
+      let {selected, onSelect} = this.props
       selected = selected || {}
       if (!start) {
         start = 'start' in selected ? selected.start : this.defaultState.start
@@ -104,7 +106,7 @@ export default class DataSheet extends PureComponent {
       if (!end) {
         end = 'end' in selected ? selected.end : this.defaultState.end
       }
-      onSelect && onSelect({ start, end })
+      onSelect && onSelect({start, end})
       this.setState(rest)
     } else {
       this.setState(state)
@@ -141,16 +143,16 @@ export default class DataSheet extends PureComponent {
 
   handlePaste (e) {
     if (isEmpty(this.state.editing)) {
-      let { start, end } = this.getState()
+      let {start, end} = this.getState()
 
-      start = { i: Math.min(start.i, end.i), j: Math.min(start.j, end.j) }
-      end = { i: Math.max(start.i, end.i), j: Math.max(start.j, end.j) }
+      start = {i: Math.min(start.i, end.i), j: Math.min(start.j, end.j)}
+      end = {i: Math.max(start.i, end.i), j: Math.max(start.j, end.j)}
 
       const parse = this.props.parsePaste || defaultParsePaste
       const changes = []
       const pasteData = parse(e.clipboardData.getData('text/plain'))
       // in order of preference
-      const { data, onCellsChanged, onPaste, onChange } = this.props
+      const {data, onCellsChanged, onPaste, onChange} = this.props
       if (onCellsChanged) {
         const additions = []
         pasteData.forEach((row, i) => {
@@ -158,9 +160,9 @@ export default class DataSheet extends PureComponent {
             end = {i: start.i + i, j: start.j + j}
             const cell = data[end.i] && data[end.i][end.j]
             if (!cell) {
-              additions.push({ row: end.i, col: end.j, value })
+              additions.push({row: end.i, col: end.j, value})
             } else if (!cell.readOnly) {
-              changes.push({ cell, row: end.i, col: end.j, value })
+              changes.push({cell, row: end.i, col: end.j, value})
             }
           })
         })
@@ -267,10 +269,10 @@ export default class DataSheet extends PureComponent {
           this._setState({editing: start, clear: {}, forceEdit: true})
           e.preventDefault()
         } else if (numbersPressed ||
-            numPadKeysPressed ||
-            lettersPressed ||
-            latin1Supplement ||
-            equationKeysPressed) {
+          numPadKeysPressed ||
+          lettersPressed ||
+          latin1Supplement ||
+          equationKeysPressed) {
           // empty out cell if user starts typing without pressing enter
           this._setState({editing: start, clear: start, forceEdit: false})
         }
@@ -355,7 +357,10 @@ export default class DataSheet extends PureComponent {
           func = () => this.handleNavigate(e, {i: 0, j: offset}, true)
         }
         // setTimeout makes sure that component is done handling the event before we take over
-        setTimeout(() => { func(); this.dgDom && this.dgDom.focus() }, 1)
+        setTimeout(() => {
+          func()
+          this.dgDom && this.dgDom.focus()
+        }, 1)
       }
     }
   }
@@ -401,7 +406,7 @@ export default class DataSheet extends PureComponent {
   }
 
   onChange (row, col, value) {
-    const { onChange, onCellsChanged, data } = this.props
+    const {onChange, onCellsChanged, data} = this.props
     if (onCellsChanged) {
       onCellsChanged([{cell: data[row][col], row, col, value}])
     } else if (onChange) {
@@ -411,15 +416,15 @@ export default class DataSheet extends PureComponent {
   }
 
   onRevert () {
-    this._setState({ editing: {} })
+    this._setState({editing: {}})
     this.dgDom && this.dgDom.focus()
   }
 
   componentDidUpdate (prevProps, prevState) {
-    let { start, end } = this.state
+    let {start, end} = this.state
     let prevEnd = prevState.end
     if (!isEmpty(end) && !(end.i === prevEnd.i && end.j === prevEnd.j) && !this.isSelectionControlled()) {
-      this.props.onSelect && this.props.onSelect({ start, end })
+      this.props.onSelect && this.props.onSelect({start, end})
     }
   }
 
@@ -431,9 +436,9 @@ export default class DataSheet extends PureComponent {
     const negY = (i <= start.i && i >= end.i)
 
     return (posX && posY) ||
-        (negX && posY) ||
-        (negX && negY) ||
-        (posX && negY)
+      (negX && posY) ||
+      (negX && negY) ||
+      (posX && negY)
   }
 
   isEditing (i, j) {
@@ -445,9 +450,11 @@ export default class DataSheet extends PureComponent {
   }
 
   render () {
-    const {sheetRenderer: SheetRenderer, rowRenderer: RowRenderer, cellRenderer,
+    const {
+      sheetRenderer: SheetRenderer, rowRenderer: RowRenderer, cellRenderer,
       dataRenderer, valueRenderer, dataEditor, valueViewer, attributesRenderer,
-      className, overflow, data, keyFn} = this.props
+      className, overflow, data, keyFn
+    } = this.props
     const {forceEdit} = this.state
 
     return (

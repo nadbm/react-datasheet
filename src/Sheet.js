@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 
 class Sheet extends PureComponent {
@@ -6,7 +6,7 @@ class Sheet extends PureComponent {
     return (
       <table className={this.props.className}>
         <tbody>
-          {this.props.children}
+        {this.props.children}
         </tbody>
       </table>
     )

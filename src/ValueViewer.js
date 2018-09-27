@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-
 import CellShape from './CellShape'
 
 export default class ValueViewer extends PureComponent {

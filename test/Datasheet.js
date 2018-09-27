@@ -1,9 +1,7 @@
 import React from 'react'
-
 import {
   shallow,
-  mount,
-  render
+  mount
 } from 'enzyme'
 import sinon from 'sinon'
 import expect from 'expect'
@@ -22,12 +20,12 @@ const DOWN_KEY = 40
 const DELETE_KEY = 46
 
 const triggerKeyDownEvent = (wrapper, keyCode, options = {}) => {
-  wrapper.simulate('keydown', { keyCode, ...options })
+  wrapper.simulate('keydown', {keyCode, ...options})
 }
 
 const triggerEvent = (node, keyCode) => {
   node.dispatchEvent(new Event('focus'))
-  node.dispatchEvent(new KeyboardEvent('keydown', { keyCode }))
+  node.dispatchEvent(new KeyboardEvent('keydown', {keyCode}))
 }
 
 const triggerMouseEvent = (node, eventType) => {
@@ -68,7 +66,7 @@ describe('Component', () => {
         )
 
         expect(wrapper.html()).toEqual(
-          shallow(<td className='test cell' colSpan={5} rowSpan={4} style={{ width: '200px' }}>
+          shallow(<td className='test cell' colSpan={5} rowSpan={4} style={{width: '200px'}}>
             <span className='value-viewer'>5</span>
           </td>).html())
 
@@ -113,11 +111,11 @@ describe('Component', () => {
             <span className='value-viewer'>5</span>
           </td>).html())
 
-        wrapper.setProps({ editing: true, selected: true })
+        wrapper.setProps({editing: true, selected: true})
 
         expect(wrapper.html()).toEqual(
           shallow(<td className='cell selected editing'>
-            <input className='data-editor' value='5' />
+            <input className='data-editor' value='5'/>
           </td>).html())
       })
 
@@ -142,7 +140,7 @@ describe('Component', () => {
             {...props}
           />
         )
-        wrapper.setProps({ cell: { value: 6, data: 6 }})
+        wrapper.setProps({cell: {value: 6, data: 6}})
         expect(wrapper.html()).toEqual(
           shallow(<td className='cell updated'>
             <span className='value-viewer'>6</span>
@@ -275,7 +273,7 @@ describe('Component', () => {
           mount(<td className='test cell' colSpan={5} rowSpan={4} style={{width: '200px'}}>
             <span className='value-viewer'>5</span>
           </td>).html())
-        wrapper.setProps({ cell: {...cell, forceComponent: false, value: 7}})
+        wrapper.setProps({cell: {...cell, forceComponent: false, value: 7}})
         expect(wrapper.html()).toEqual(
           mount(<td className='test cell updated' colSpan={5} rowSpan={4} style={{width: '200px'}}>
             <span className='value-viewer'>7</span>
@@ -321,7 +319,7 @@ describe('Component', () => {
             valueRenderer={cell => cell.value}
           />, {attachTo: document.getElementById('root')}
         )
-        wrapper.setProps({ cell: {...cell, value: 7}})
+        wrapper.setProps({cell: {...cell, value: 7}})
         expect(wrapper.html()).toEqual(
           shallow(<td className='test cell updated'>
             <div>HELLO</div>
@@ -351,7 +349,7 @@ describe('Component', () => {
       it('should remove all event listeners from document', () => {
         const addEvent = sinon.spy()
         const removeEvent = sinon.spy()
-        global.document = { addEventListener: addEvent, removeEventListener: removeEvent}
+        global.document = {addEventListener: addEvent, removeEventListener: removeEvent}
 
         const component = shallow(<DataSheet
           keyFn={(i) => 'custom_key_' + i}
@@ -520,7 +518,7 @@ describe('Component', () => {
 
       it('handles  a custom editable component and exits on ENTER_KEY', (done) => {
         customWrapper = mount(<DataSheet
-          data={[[{value: 1}, {component: <input className={'custom-component'} />}, {value: 2}]]}
+          data={[[{value: 1}, {component: <input className={'custom-component'}/>}, {value: 2}]]}
           valueRenderer={(cell) => 'VALUE RENDERED'}
           onChange={(cell, i, j, value) => data[i][j].data = value}
         />)
@@ -539,7 +537,7 @@ describe('Component', () => {
 
       it('handles  a custom editable component and exits', (done) => {
         customWrapper = mount(<DataSheet
-          data={[[{value: 1}, {component: <input className={'custom-component'} />}, {value: 2}]]}
+          data={[[{value: 1}, {component: <input className={'custom-component'}/>}, {value: 2}]]}
           valueRenderer={(cell) => 'VALUE RENDERED'}
           onChange={(cell, i, j, value) => data[i][j].data = value}
         />)
@@ -649,8 +647,8 @@ describe('Component', () => {
         expect(wrapper.find('td.cell').length).toEqual(4)
         wrapper.find('td').at(0).simulate('mouseDown')
         wrapper.find('td').at(3).simulate('mouseOver')
-        expect(wrapper.state('start')).toEqual({ i: 0, j: 0 })
-        expect(wrapper.state('end')).toEqual({ i: 1, j: 1 })
+        expect(wrapper.state('start')).toEqual({i: 0, j: 0})
+        expect(wrapper.state('end')).toEqual({i: 1, j: 1})
         expect(wrapper.state('selecting')).toEqual(true)
         document.dispatchEvent(mouseUpEvt)
         expect(wrapper.state('selecting')).toEqual(false)
@@ -660,10 +658,10 @@ describe('Component', () => {
         customWrapper = mount(
           <DataSheet
             data={data}
-            onSelect={({ start, end }) => {
+            onSelect={({start, end}) => {
               try {
-                expect(start).toEqual({ i: 0, j: 0 })
-                expect(end).toEqual({ i: 0, j: 0 })
+                expect(start).toEqual({i: 0, j: 0})
+                expect(end).toEqual({i: 0, j: 0})
                 done()
               } catch (err) {
                 done(err)
@@ -671,7 +669,7 @@ describe('Component', () => {
             }}
             valueRenderer={(cell) => cell.data}
             onChange={(cell, i, j, value) => custData[i][j].data = value}
-            />)
+          />)
         customWrapper.find('td').at(0).simulate('mouseDown')
         expect(customWrapper.state('end')).toEqual({i: 0, j: 0})
       })
@@ -681,11 +679,11 @@ describe('Component', () => {
           <DataSheet
             data={data}
             selected={selected}
-            onSelect={({ start, end }) => {
+            onSelect={({start, end}) => {
               try {
-                selected = { start, end }
-                expect(start).toEqual({ i: 0, j: 0 })
-                expect(end).toEqual({ i: 0, j: 0 })
+                selected = {start, end}
+                expect(start).toEqual({i: 0, j: 0})
+                expect(end).toEqual({i: 0, j: 0})
                 done()
               } catch (err) {
                 done(err)
@@ -693,7 +691,7 @@ describe('Component', () => {
             }}
             valueRenderer={(cell) => cell.data}
             onChange={(cell, i, j, value) => custData[i][j].data = value}
-            />)
+          />)
         customWrapper.find('td').at(0).simulate('mouseDown')
         expect(selected.end).toEqual({i: 0, j: 0})
       })
@@ -702,9 +700,9 @@ describe('Component', () => {
         customWrapper = mount(
           <DataSheet
             data={data}
-            selected={{ start: { i: 0, j: 0 }, end: { i: 0, j: 0 } }}
+            selected={{start: {i: 0, j: 0}, end: {i: 0, j: 0}}}
             valueRenderer={cell => cell.data}
-            />)
+          />)
         expect(customWrapper.find('td.cell.selected').length).toEqual(1)
       })
 
@@ -712,9 +710,9 @@ describe('Component', () => {
         customWrapper = mount(
           <DataSheet
             data={data}
-            selected={{ start: { i: 0, j: 0 }, end: { i: 1, j: 1 } }}
+            selected={{start: {i: 0, j: 0}, end: {i: 1, j: 1}}}
             valueRenderer={cell => cell.data}
-            />)
+          />)
         expect(customWrapper.find('td.cell.selected').length).toEqual(4)
       })
 
@@ -724,7 +722,7 @@ describe('Component', () => {
             data={data}
             selected={null}
             valueRenderer={cell => cell.data}
-            />)
+          />)
         expect(customWrapper.find('td.cell.selected').length).toEqual(0)
       })
 
@@ -732,9 +730,9 @@ describe('Component', () => {
         customWrapper = mount(
           <DataSheet
             data={data}
-            selected={{ end: { i: 1, j: 1 } }}
+            selected={{end: {i: 1, j: 1}}}
             valueRenderer={cell => cell.data}
-            />)
+          />)
         expect(customWrapper.find('td.cell.selected').length).toEqual(0)
       })
 
@@ -742,9 +740,9 @@ describe('Component', () => {
         customWrapper = mount(
           <DataSheet
             data={data}
-            selected={{ start: { i: 0, j: 0 } }}
+            selected={{start: {i: 0, j: 0}}}
             valueRenderer={cell => cell.data}
-            />)
+          />)
         expect(customWrapper.find('td.cell.selected').length).toEqual(0)
       })
 
@@ -753,9 +751,9 @@ describe('Component', () => {
           <DataSheet
             data={data}
             selected={null}
-            onSelect={selected => customWrapper.setProps({ selected })}
+            onSelect={selected => customWrapper.setProps({selected})}
             valueRenderer={cell => cell.data}
-            />)
+          />)
         // validate inital state
         expect(customWrapper.find('td.cell.selected').length).toEqual(0)
         // perform mouse events
@@ -765,8 +763,8 @@ describe('Component', () => {
         customWrapper.find('td').at(3).simulate('mouseOver')
         document.dispatchEvent(mouseUpEvt)
         // validate
-        expect(customWrapper.props().selected.start).toEqual({ i: 0, j: 0 })
-        expect(customWrapper.props().selected.end).toEqual({ i: 1, j: 1 })
+        expect(customWrapper.props().selected.start).toEqual({i: 0, j: 0})
+        expect(customWrapper.props().selected.end).toEqual({i: 1, j: 1})
         expect(customWrapper.find('td.cell.selected').length).toEqual(4)
       })
     })
@@ -855,7 +853,7 @@ describe('Component', () => {
       })
 
       it('starts editing certain keys are pressed', () => {
-      // [0  , 9 ,a , z , 0 , 9  , +  , = , decim]
+        // [0  , 9 ,a , z , 0 , 9  , +  , = , decim]
         [48, 57, 65, 90, 96, 105, 107, 187, 189].map(charCode => {
           cells.at(0).simulate('mousedown')
           triggerKeyDownEvent(cells.at(0), charCode)
@@ -867,7 +865,7 @@ describe('Component', () => {
 
       it('does not start editing if cell is readOnly', () => {
         wrapper.setProps({data: [[{data: 1, readOnly: true}, {data: 2, readOnly: true}]]});
-      // [0  , 9 ,a , z , 0 , 9  , +  , = , decim]
+        // [0  , 9 ,a , z , 0 , 9  , +  , = , decim]
         [48, 57, 65, 90, 96, 105, 107, 187, 189].map(charCode => {
           cells.at(0).simulate('mousedown')
           triggerKeyDownEvent(cells.at(0), charCode)
@@ -945,10 +943,10 @@ describe('Component', () => {
         cells.at(0).simulate('doubleClick')
 
         expect(wrapper.state()).toEqual({
-          start: { i: 0, j: 0 },
-          end: { i: 0, j: 0 },
+          start: {i: 0, j: 0},
+          end: {i: 0, j: 0},
           selecting: true,
-          editing: { i: 0, j: 0 },
+          editing: {i: 0, j: 0},
           forceEdit: true,
           clear: {}
         })
@@ -966,12 +964,12 @@ describe('Component', () => {
         cells.at(0).simulate('mouseUp')
         triggerKeyDownEvent(wrapper, '1'.charCodeAt(0))
         expect(wrapper.state()).toEqual({
-          start: { i: 0, j: 0 },
-          end: { i: 0, j: 0 },
+          start: {i: 0, j: 0},
+          end: {i: 0, j: 0},
           selecting: true,
-          editing: { i: 0, j: 0 },
+          editing: {i: 0, j: 0},
           forceEdit: false,
-          clear: { i: 0, j: 0 }
+          clear: {i: 0, j: 0}
         })
         wrapper.find('td.cell.selected input').node.value = 213
         wrapper.find('td.cell.selected input').simulate('change')
@@ -980,12 +978,12 @@ describe('Component', () => {
         triggerKeyDownEvent(wrapper.find('td.cell.selected input'), RIGHT_KEY)
         expect(data[0][0].data).toEqual(213)
         expect(wrapper.state()).toEqual({
-          start: { i: 0, j: 1 }, // RIGHT_KEY movement
-          end: { i: 0, j: 1 }, // RIGHT_KEY movement
+          start: {i: 0, j: 1}, // RIGHT_KEY movement
+          end: {i: 0, j: 1}, // RIGHT_KEY movement
           selecting: true,
           editing: {},
           forceEdit: false,
-          clear: { i: 0, j: 0 }
+          clear: {i: 0, j: 0}
         })
       })
 
@@ -997,21 +995,21 @@ describe('Component', () => {
         cells.at(0).simulate('mouseUp')
         triggerKeyDownEvent(wrapper, '1'.charCodeAt(0))
         expect(wrapper.state()).toEqual({
-          start: { i: 0, j: 0 },
-          end: { i: 0, j: 0 },
+          start: {i: 0, j: 0},
+          end: {i: 0, j: 0},
           selecting: true,
-          editing: { i: 0, j: 0 },
+          editing: {i: 0, j: 0},
           forceEdit: false,
-          clear: { i: 0, j: 0 }
+          clear: {i: 0, j: 0}
         })
         cells.at(0).simulate('keyDown', {keyCode: RIGHT_KEY})
         expect(wrapper.state()).toEqual({
-          start: { i: 0, j: 0 }, // RIGHT_KEY movement
-          end: { i: 0, j: 0 }, // RIGHT_KEY movement
+          start: {i: 0, j: 0}, // RIGHT_KEY movement
+          end: {i: 0, j: 0}, // RIGHT_KEY movement
           selecting: true,
-          editing: { i: 0, j: 0 },
+          editing: {i: 0, j: 0},
           forceEdit: false,
-          clear: { i: 0, j: 0 }
+          clear: {i: 0, j: 0}
         })
       })
 
@@ -1019,7 +1017,7 @@ describe('Component', () => {
         let copied = ''
         const evt = document.createEvent('HTMLEvents')
         evt.initEvent('copy', false, true)
-        evt.clipboardData = { setData: (type, text) => copied = text}
+        evt.clipboardData = {setData: (type, text) => copied = text}
 
         cells.at(0).simulate('mouseDown')
         cells.at(3).simulate('mouseOver')
@@ -1031,7 +1029,7 @@ describe('Component', () => {
         let copied = ''
         const evt = document.createEvent('HTMLEvents')
         evt.initEvent('copy', false, true)
-        evt.clipboardData = { setData: (type, text) => copied = text}
+        evt.clipboardData = {setData: (type, text) => copied = text}
         customWrapper = mount(
           <DataSheet
             data={data}
@@ -1051,7 +1049,7 @@ describe('Component', () => {
         let pasted = ''
         const evt = document.createEvent('HTMLEvents')
         evt.initEvent('copy', false, true)
-        evt.clipboardData = { setData: (type, text) => pasted = text}
+        evt.clipboardData = {setData: (type, text) => pasted = text}
 
         expect(wrapper.state('start')).toEqual({})
         document.dispatchEvent(evt)
@@ -1061,7 +1059,7 @@ describe('Component', () => {
       it('does not paste data if no cell is selected', () => {
         const evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        evt.clipboardData = {getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
         expect(data[0].map(d => d.data)).toEqual([4, 2])
         expect(data[1].map(d => d.data)).toEqual([0, 5])
@@ -1072,7 +1070,7 @@ describe('Component', () => {
 
         const evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        evt.clipboardData = {getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
 
         expect(data[0].map(d => d.data)).toEqual(['99', '100'])
@@ -1093,14 +1091,17 @@ describe('Component', () => {
 
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        evt.clipboardData = {getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
 
         expect(datacust[0].map(d => d.data)).toEqual([12, '99'])
       })
 
       it('pastes multiple rows correclty on windows', () => {
-        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}], [{data: 1012, readOnly: true}, {data: 1024, readOnly: false}]]
+        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}], [{
+          data: 1012,
+          readOnly: true
+        }, {data: 1024, readOnly: false}]]
         customWrapper = mount(
           <DataSheet
             data={datacust}
@@ -1112,14 +1113,17 @@ describe('Component', () => {
 
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\r\n1001\t1002'}
+        evt.clipboardData = {getData: (type) => '99\t100\r\n1001\t1002'}
         document.dispatchEvent(evt)
 
         expect(datacust[1].map(d => d.data)).toEqual([1012, '1001'])
       })
 
       it('pastes multiple rows correclty when multiple cells are selected', () => {
-        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}, {data: 25, readOnly: false}], [{data: 1012, readOnly: true}, {data: 1024, readOnly: false}, {data: 1036, readOnly: false}]]
+        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}, {
+          data: 25,
+          readOnly: false
+        }], [{data: 1012, readOnly: true}, {data: 1024, readOnly: false}, {data: 1036, readOnly: false}]]
         customWrapper = mount(
           <DataSheet
             data={datacust}
@@ -1130,20 +1134,23 @@ describe('Component', () => {
         customWrapper.find('td').at(1).simulate('mouseDown')
 
         wrapper.setState({
-          start: { i: 1, j: 0 },
-          end: { i: 2, j: 0 }
+          start: {i: 1, j: 0},
+          end: {i: 2, j: 0}
         })
 
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\t101\r\n1001\t1002\t1003'}
+        evt.clipboardData = {getData: (type) => '99\t100\t101\r\n1001\t1002\t1003'}
         document.dispatchEvent(evt)
 
         expect(datacust[1].map(d => d.data)).toEqual([1012, '1001', '1002'])
       })
 
       it('pastes multiple rows correclty when multiple cells are selected from bottom up', () => {
-        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}, {data: 25, readOnly: false}], [{data: 1012, readOnly: true}, {data: 1024, readOnly: false}, {data: 1036, readOnly: false}]]
+        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}, {
+          data: 25,
+          readOnly: false
+        }], [{data: 1012, readOnly: true}, {data: 1024, readOnly: false}, {data: 1036, readOnly: false}]]
         customWrapper = mount(
           <DataSheet
             data={datacust}
@@ -1154,13 +1161,13 @@ describe('Component', () => {
         customWrapper.find('td').at(1).simulate('mouseDown')
 
         wrapper.setState({
-          start: { i: 2, j: 0 },
-          end: { i: 1, j: 0 }
+          start: {i: 2, j: 0},
+          end: {i: 1, j: 0}
         })
 
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\t101\r\n1001\t1002\t1003'}
+        evt.clipboardData = {getData: (type) => '99\t100\t101\r\n1001\t1002\t1003'}
         document.dispatchEvent(evt)
 
         expect(datacust[1].map(d => d.data)).toEqual([1012, '1001', '1002'])
@@ -1179,7 +1186,7 @@ describe('Component', () => {
 
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '100'}
+        evt.clipboardData = {getData: (type) => '100'}
 
         expect(datacust[0].map(d => d.data)).toEqual([12, 24])
       })
@@ -1213,12 +1220,15 @@ describe('Component', () => {
         customWrapper.find('td').at(0).simulate('mouseDown')
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        evt.clipboardData = {getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
       })
 
       it('pastes data properly, using parsePaste if defined', () => {
-        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}], [{data: 1012, readOnly: true}, {data: 1024, readOnly: false}]]
+        const datacust = [[{data: 12, readOnly: true}, {data: 24, readOnly: false}], [{
+          data: 1012,
+          readOnly: true
+        }, {data: 1024, readOnly: false}]]
         customWrapper = mount(
           <DataSheet
             data={datacust}
@@ -1234,7 +1244,7 @@ describe('Component', () => {
 
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99,100--1001,1002'}
+        evt.clipboardData = {getData: (type) => '99,100--1001,1002'}
         document.dispatchEvent(evt)
 
         expect(datacust[1].map(d => d.data)).toEqual([1012, '1001'])
@@ -1367,7 +1377,7 @@ describe('Component', () => {
             return (
               <table className={className}>
                 <tbody>
-                  {props.children}
+                {props.children}
                 </tbody>
               </table>
             )
@@ -1391,19 +1401,19 @@ describe('Component', () => {
             return (
               <table className={props.className}>
                 <thead>
-                  <tr>
-                    {columns.map(col => <th key={col}>{col}</th>)}
-                  </tr>
+                <tr>
+                  {columns.map(col => <th key={col}>{col}</th>)}
+                </tr>
                 </thead>
                 <tbody>
-                  {props.children}
+                {props.children}
                 </tbody>
               </table>
             )
           }}
-          />
+        />
         wrapper = mount(component)
-          // extra row for header
+        // extra row for header
         expect(wrapper.find('tr').length).toEqual(3)
         expect(wrapper.find('th').nodes.map(n => n.innerHTML)).toEqual(columns)
         expect(wrapper.find('td span').nodes.map(n => n.innerHTML)).toEqual(['4', '2', '3', '5'])
@@ -1503,7 +1513,7 @@ describe('Component', () => {
                 />
               )
             }
-          }
+            }
           />
         )
         wrapper = mount(component)
@@ -1515,7 +1525,7 @@ describe('Component', () => {
         cells.at(0).simulate('doubleClick')
         expect(wrapper.find('td.cell.selected select').node.value).toEqual('4')
 
-        wrapper.find('td.cell.selected select').simulate('change', {target: { value: '5'}})
+        wrapper.find('td.cell.selected select').simulate('change', {target: {value: '5'}})
         wrapper.find('td.cell.selected select').simulate('keydown', {keyCode: ENTER_KEY})
         expect(data[0][0].data).toEqual(5)
 
@@ -1523,7 +1533,7 @@ describe('Component', () => {
         triggerKeyDownEvent(wrapper, ENTER_KEY)
         const input = cells.at(2).find('input')
         expect(input.node.value).toEqual('3')
-        input.simulate('change', {target: { value: '1'}})
+        input.simulate('change', {target: {value: '1'}})
         triggerKeyDownEvent(input, ENTER_KEY)
         expect(data[1][0].data).toEqual('1')
       })
@@ -1542,7 +1552,7 @@ describe('Component', () => {
     const changeData = (changes) => {
       const newData = data.map(row => [...row])
       changes.forEach(({cell, row, col, value}) => {
-        newData[row][col] = { data: value }
+        newData[row][col] = {data: value}
       })
 
       return newData
@@ -1567,8 +1577,8 @@ describe('Component', () => {
 
     beforeEach(() => {
       data = [
-        [{ data: 4 }, { data: 2 }],
-        [{ data: 3 }, { data: 5 }]
+        [{data: 4}, {data: 2}],
+        [{data: 3}, {data: 5}]
       ]
 
       component = <DataSheet
@@ -1606,7 +1616,7 @@ describe('Component', () => {
         wrapper.find('td').at(0).simulate('mouseDown')
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        evt.clipboardData = {getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
         setTimeout(() => {
           expect(handleChange.callCount).toEqual(4)
@@ -1675,7 +1685,7 @@ describe('Component', () => {
         wrapper.find('td').at(0).simulate('mouseDown')
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        evt.clipboardData = {getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
         expect(handlePaste.calledOnce).toBe(true)
         expect(handlePaste.firstCall.calledWith([
@@ -1739,7 +1749,7 @@ describe('Component', () => {
         wrapper.find('td').at(3).simulate('mouseDown')
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        evt.clipboardData = {getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
         expect(handlePaste.called).toBe(false)
         setTimeout(() => {
@@ -1760,7 +1770,7 @@ describe('Component', () => {
         wrapper.find('td').at(0).simulate('mouseDown')
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('paste', false, true)
-        evt.clipboardData = { getData: (type) => '99\t100\n1001\t1002'}
+        evt.clipboardData = {getData: (type) => '99\t100\n1001\t1002'}
         document.dispatchEvent(evt)
         expect(handlePaste.called).toBe(false)
         setTimeout(() => {

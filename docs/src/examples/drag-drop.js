@@ -43,8 +43,8 @@ const rowTargetSpec = {
       return
     }
     // Obtain the dragged item
-    const { rowIndex: fromIndex } = monitor.getItem()
-    const { rowIndex: toIndex, onRowDrop } = props
+    const {rowIndex: fromIndex} = monitor.getItem()
+    const {rowIndex: toIndex, onRowDrop} = props
     onRowDrop(fromIndex, toIndex)
   }
 }
@@ -85,8 +85,8 @@ const colTargetSpec = {
     }
 
     // Obtain the dragged item
-    const { columnIndex: fromIndex } = monitor.getItem()
-    const { columnIndex: toIndex, onColumnDrop } = props
+    const {columnIndex: fromIndex} = monitor.getItem()
+    const {columnIndex: toIndex, onColumnDrop} = props
     onColumnDrop(fromIndex, toIndex)
   }
 }

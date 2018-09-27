@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-
-import {ENTER_KEY, ESCAPE_KEY, TAB_KEY, RIGHT_KEY, LEFT_KEY, UP_KEY, DOWN_KEY} from './keys'
+import { ENTER_KEY, ESCAPE_KEY, TAB_KEY, RIGHT_KEY, LEFT_KEY, UP_KEY, DOWN_KEY } from './keys'
 
 import Cell from './Cell'
 import CellShape from './CellShape'
@@ -19,7 +18,7 @@ function initialValue ({cell, row, col, valueRenderer}) {
 
 function widthStyle (cell) {
   const width = typeof cell.width === 'number' ? cell.width + 'px' : cell.width
-  return width ? { width } : null
+  return width ? {width} : null
 }
 
 export default class DataCell extends PureComponent {
@@ -45,16 +44,16 @@ export default class DataCell extends PureComponent {
     }
     if (nextProps.editing === true && this.props.editing === false) {
       const value = nextProps.clearing ? '' : initialData(nextProps)
-      this.setState({ value, reverting: false })
+      this.setState({value, reverting: false})
     }
   }
 
   componentDidUpdate (prevProps) {
     if (prevProps.editing === true &&
-        this.props.editing === false &&
-        !this.state.reverting &&
-        !this.state.committing &&
-        this.state.value !== initialData(this.props)) {
+      this.props.editing === false &&
+      !this.state.reverting &&
+      !this.state.committing &&
+      this.state.value !== initialData(this.props)) {
       this.props.onChange(this.props.row, this.props.col, this.state.value)
     }
   }
@@ -64,13 +63,13 @@ export default class DataCell extends PureComponent {
   }
 
   handleChange (value) {
-    this.setState({ value, committing: false })
+    this.setState({value, committing: false})
   }
 
   handleCommit (value, e) {
     const {onChange, onNavigate} = this.props
     if (value !== initialData(this.props)) {
-      this.setState({ value, committing: true })
+      this.setState({value, committing: true})
       onChange(this.props.row, this.props.col, value)
     } else {
       this.handleRevert()
@@ -157,18 +156,20 @@ export default class DataCell extends PureComponent {
   renderViewer (cell, row, col, valueRenderer, valueViewer) {
     const Viewer = cell.valueViewer || valueViewer || ValueViewer
     const value = renderValue(cell, row, col, valueRenderer)
-    return <Viewer cell={cell} row={row} col={col} value={value} />
+    return <Viewer cell={cell} row={row} col={col} value={value}/>
   }
 
   render () {
-    const {row, col, cell, cellRenderer: CellRenderer,
+    const {
+      row, col, cell, cellRenderer: CellRenderer,
       valueRenderer, dataEditor, valueViewer, attributesRenderer,
-      selected, editing, onKeyUp} = this.props
+      selected, editing, onKeyUp
+    } = this.props
     const {updated} = this.state
 
     const content = this.renderComponent(editing, cell) ||
-        this.renderEditor(editing, cell, row, col, dataEditor) ||
-        this.renderViewer(cell, row, col, valueRenderer, valueViewer)
+      this.renderEditor(editing, cell, row, col, dataEditor) ||
+      this.renderViewer(cell, row, col, valueRenderer, valueViewer)
 
     const className = [
       cell.className,
@@ -195,7 +196,7 @@ export default class DataCell extends PureComponent {
         onDoubleClick={this.handleDoubleClick}
         onContextMenu={this.handleContextMenu}
         onKeyUp={onKeyUp}
-        >
+      >
         {content}
       </CellRenderer>
     )
