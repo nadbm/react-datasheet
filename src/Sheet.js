@@ -6,7 +6,7 @@ class Sheet extends PureComponent {
     return (
       <table className={this.props.className}>
         <tbody>
-        {this.props.children}
+          {this.props.children}
         </tbody>
       </table>
     )

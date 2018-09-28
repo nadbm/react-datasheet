@@ -156,7 +156,7 @@ export default class DataCell extends PureComponent {
   renderViewer (cell, row, col, valueRenderer, valueViewer) {
     const Viewer = cell.valueViewer || valueViewer || ValueViewer
     const value = renderValue(cell, row, col, valueRenderer)
-    return <Viewer cell={cell} row={row} col={col} value={value}/>
+    return <Viewer cell={cell} row={row} col={col} value={value} />
   }
 
   render () {
