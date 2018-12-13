@@ -11,7 +11,7 @@ Demo here: https://nadbm.github.io/react-datasheet/
 Examples are located in https://github.com/nadbm/react-datasheet/tree/master/docs/src/examples
 
 Current features:
-* Select cells, copy-paste cells
+* Select cells, cut, copy and paste cells
 * Navigation using keyboard keys
 * Deletion using keyboard keys
 * Callbacks for onCellsChanged, valueRenderer(visible data)
