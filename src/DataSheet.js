@@ -35,6 +35,7 @@ export default class DataSheet extends PureComponent {
     this.onContextMenu = this.onContextMenu.bind(this)
     this.handleNavigate = this.handleNavigate.bind(this)
     this.handleKey = this.handleKey.bind(this).bind(this)
+    this.handleCut = this.handleCut.bind(this)
     this.handleCopy = this.handleCopy.bind(this)
     this.handlePaste = this.handlePaste.bind(this)
     this.pageClick = this.pageClick.bind(this)
@@ -63,6 +64,7 @@ export default class DataSheet extends PureComponent {
   removeAllListeners () {
     document.removeEventListener('mousedown', this.pageClick)
     document.removeEventListener('mouseup', this.onMouseUp)
+    document.removeEventListener('cut', this.handleCut)
     document.removeEventListener('copy', this.handleCopy)
     document.removeEventListener('paste', this.handlePaste)
   }
@@ -116,6 +118,15 @@ export default class DataSheet extends PureComponent {
     if (!element.contains(e.target)) {
       this.setState(this.defaultState)
       this.removeAllListeners()
+    }
+  }
+
+  handleCut (e) {
+    if (isEmpty(this.state.editing)) {
+      e.preventDefault()
+      this.handleCopy(e)
+      const {start, end} = this.getState()
+      this.clearSelectedCells(start, end)
     }
   }
 
@@ -384,7 +395,8 @@ export default class DataSheet extends PureComponent {
     // Listen for any outside mouse clicks
     document.addEventListener('mousedown', this.pageClick)
 
-    // Copy paste event handler
+    // Cut, copy and paste event handlers
+    document.addEventListener('cut', this.handleCut)
     document.addEventListener('copy', this.handleCopy)
     document.addEventListener('paste', this.handlePaste)
   }
