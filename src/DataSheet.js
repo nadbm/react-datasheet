@@ -159,7 +159,7 @@ export default class DataSheet extends PureComponent {
 
       const parse = this.props.parsePaste || defaultParsePaste
       const changes = []
-      const pasteData = parse(e.clipboardData.getData('text/plain'))
+      const pasteData = parse(e.clipboardData.getData('text/plain'), {start, end})
       // in order of preference
       const { data, onCellsChanged, onPaste, onChange } = this.props
       if (onCellsChanged) {
