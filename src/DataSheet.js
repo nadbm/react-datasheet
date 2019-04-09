@@ -366,7 +366,7 @@ export default class DataSheet extends PureComponent {
           func = () => this.handleNavigate(e, {i: 0, j: offset}, true)
         }
         // setTimeout makes sure that component is done handling the event before we take over
-        setTimeout(() => { func(); this.dgDom && this.dgDom.focus() }, 1)
+        setTimeout(() => { func(); }, 1)
       }
     }
   }
@@ -424,7 +424,6 @@ export default class DataSheet extends PureComponent {
 
   onRevert () {
     this._setState({ editing: {} })
-    this.dgDom && this.dgDom.focus()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -463,7 +462,7 @@ export default class DataSheet extends PureComponent {
     const {forceEdit} = this.state
 
     return (
-      <span ref={r => { this.dgDom = r }} tabIndex='0' className='data-grid-container' onKeyDown={this.handleKey}>
+      <span ref={r => { this.dgDom = r }} className='data-grid-container' onKeyDown={this.handleKey}>
         <SheetRenderer data={data} className={['data-grid', className, overflow].filter(a => a).join(' ')}>
           {data.map((row, i) =>
             <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
