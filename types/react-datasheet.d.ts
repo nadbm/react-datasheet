@@ -207,7 +207,7 @@ declare namespace ReactDataSheet {
         /** An event handler that you can call to use default React-DataSheet keyboard handling to signal reverting an ongoing edit (Escape key) or completing an edit (Enter or Tab). For most editors based on an input element this will probably work. However, if this keyboard handling is unsuitable for your editor you can trigger these changes explicitly using the onCommit and onRevert callbacks. */
         onKeyDown: React.KeyboardEventHandler<HTMLElement>;
         /** function (newValue, [event]) {} A callback to indicate that editing is over, here is the final value. If you pass a KeyboardEvent as the second argument, React-DataSheet will perform default navigation for you (for example, going down to the next row if you hit the enter key). You actually don't need to use onCommit if the default keyboard handling is good enough for you. */
-        onCommit: (newValue: V, event: React.KeyboardEvent<HTMLElement>) => void;
+        onCommit: (newValue: V, event?: React.KeyboardEvent<HTMLElement>) => void;
         /** function () {} A no-args callback that you can use to indicate that you want to cancel ongoing edits. As with onCommit, you don't need to worry about this if the default keyboard handling works for your editor. */
         onRevert: () => void;
     }
@@ -231,7 +231,7 @@ declare namespace ReactDataSheet {
 }
 
 declare class ReactDataSheet<T extends ReactDataSheet.Cell<T, V>, V = string> extends Component<ReactDataSheet.DataSheetProps<T, V>, ReactDataSheet.DataSheetState> {
-        getSelectedCells: (data: T[][], start: ReactDataSheet.CellReference, end: ReactDataSheet.CellReference) => {cell: T, row: number, col: number};
+        getSelectedCells: (data: T[][], start: ReactDataSheet.CellReference, end: ReactDataSheet.CellReference) => {cell: T, row: number, col: number}[];
 }
 
 export default ReactDataSheet;
