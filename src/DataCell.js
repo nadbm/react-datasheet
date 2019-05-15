@@ -89,7 +89,7 @@ export default class DataCell extends PureComponent {
   handleMouseDown (e) {
     const {row, col, onMouseDown, cell} = this.props
     if (!cell.disableEvents) {
-      onMouseDown(row, col)
+      onMouseDown(row, col, e)
     }
   }
 

@@ -323,12 +323,20 @@ export default class DataSheet extends PureComponent {
 
   handleNavigate (e, offsets, jumpRow) {
     if (offsets && (offsets.i || offsets.j)) {
-      const {start} = this.getState()
+      const {start, end} = this.getState()
       const {data} = this.props
+      const oldStartLocation = {i: start.i, j: start.j}
+      const newEndLocation = {i: end.i + offsets.i, j: end.j + offsets.j}
+
       let newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
+
       const updateLocation = () => {
         if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
-          this._setState({start: newLocation, end: newLocation, editing: {}})
+          this._setState({
+            start: e.shiftKey && !jumpRow ? oldStartLocation : newLocation,
+            end: e.shiftKey && !jumpRow ? newEndLocation : newLocation,
+            editing: {}
+          })
           e.preventDefault()
           return true
         }
@@ -385,10 +393,17 @@ export default class DataSheet extends PureComponent {
     }
   }
 
-  onMouseDown (i, j) {
+  onMouseDown (i, j, e) {
     let editing = (isEmpty(this.state.editing) || this.state.editing.i !== i || this.state.editing.j !== j)
       ? {} : this.state.editing
-    this._setState({selecting: true, start: {i, j}, end: {i, j}, editing: editing, forceEdit: false})
+
+    this._setState({
+      selecting: true,
+      start: e.shiftKey ? this.state.start : {i, j},
+      end: {i, j},
+      editing: editing,
+      forceEdit: false
+    })
 
     // Keep listening to mouse if user releases the mouse (dragging outside)
     document.addEventListener('mouseup', this.onMouseUp)
