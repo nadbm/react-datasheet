@@ -1,11 +1,10 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { isMobile } from "./helpers";
+import { isMobile } from './helpers'
 
 import CellShape from './CellShape'
 
 export default class Cell extends PureComponent {
-
   render () {
     const {
           cell, row, col, attributesRenderer,
