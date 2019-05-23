@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { isMobile } from './helpers'
-
 import CellShape from './CellShape'
 
 export default class Cell extends PureComponent {
@@ -19,7 +17,8 @@ export default class Cell extends PureComponent {
         className={className}
         onMouseDown={onMouseDown}
         onMouseOver={onMouseOver}
-        {...(isMobile() ? { onClick: onDoubleClick } : { onDoubleClick })}
+        onDoubleClick={onDoubleClick}
+        onTouchEnd={onDoubleClick}
         onContextMenu={onContextMenu}
         colSpan={colSpan}
         rowSpan={rowSpan}
