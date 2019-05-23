@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-
 import CellShape from './CellShape'
 
 export default class Cell extends PureComponent {
@@ -19,6 +18,7 @@ export default class Cell extends PureComponent {
         onMouseDown={onMouseDown}
         onMouseOver={onMouseOver}
         onDoubleClick={onDoubleClick}
+        onTouchEnd={onDoubleClick}
         onContextMenu={onContextMenu}
         colSpan={colSpan}
         rowSpan={rowSpan}
