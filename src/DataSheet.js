@@ -159,7 +159,6 @@ export default class DataSheet extends PureComponent {
 
       const parse = this.props.parsePaste || defaultParsePaste
       const changes = []
-      const pasteData = parse(e.clipboardData.getData('text/plain'))
       let pasteData = [];
       if (window.clipboardData && window.clipboardData.getData) { // IE
         pasteData = parse(window.clipboardData.getData('Text'));
