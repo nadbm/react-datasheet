@@ -159,11 +159,11 @@ export default class DataSheet extends PureComponent {
 
       const parse = this.props.parsePaste || defaultParsePaste
       const changes = []
-      let pasteData = [];
+      let pasteData = []
       if (window.clipboardData && window.clipboardData.getData) { // IE
-        pasteData = parse(window.clipboardData.getData('Text'));
+        pasteData = parse(window.clipboardData.getData('Text'))
       } else if (e.clipboardData && e.clipboardData.getData) {
-        pasteData = parse(e.clipboardData.getData('text/plain'));
+        pasteData = parse(e.clipboardData.getData('text/plain'))
       }
 
       // in order of preference
@@ -411,15 +411,14 @@ export default class DataSheet extends PureComponent {
       forceEdit: false
     })
 
-    var ua = window.navigator.userAgent;
-    var isIE = /MSIE|Trident/.test(ua);
-    
+    var ua = window.navigator.userAgent
+    var isIE = /MSIE|Trident/.test(ua)
     // Listen for Ctrl + V in case of IE
-    if ( isIE ) {
-      var thisContext = this;
+    if (isIE) {
+      var thisContext = this
         document.addEventListener('keydown', function (e){
-          if((e.keyCode ==86 || e.which ==86)&& e.ctrlKey){
-            thisContext.handlePaste(e);
+          if ( (e.keyCode === 86 || e.which === 86) && e.ctrlKey){
+            thisContext.handlePaste(e)
           }
         });
     }
