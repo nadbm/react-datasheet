@@ -227,7 +227,7 @@ If the change is the result of a user edit, the array will contain a single chan
 - There is no `cell` property
 - either `row` or `col`, or both, will be outside the bounds of your original grid. They will correspond to the indices the new data would occupy if you expanded your grid to hold them.
 
-You can choose to ignore the additions, or you can expand your model to accomodate the new data.
+You can choose to ignore the additions, or you can expand your model to accommodate the new data.
 
 ### Deprecated handlers
 
