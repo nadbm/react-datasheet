@@ -67,6 +67,7 @@ export default class DataSheet extends PureComponent {
     document.removeEventListener('cut', this.handleCut)
     document.removeEventListener('copy', this.handleCopy)
     document.removeEventListener('paste', this.handlePaste)
+    document.removeEventListener('keydown', this.handlePaste)
   }
 
   componentDidMount () {
@@ -415,10 +416,9 @@ export default class DataSheet extends PureComponent {
     var isIE = /MSIE|Trident/.test(ua)
     // Listen for Ctrl + V in case of IE
     if (isIE) {
-      var thisContext = this
-        document.addEventListener('keydown', function (e){
+        document.addEventListener('keydown', (e) => {
           if ( (e.keyCode === 86 || e.which === 86) && e.ctrlKey){
-            thisContext.handlePaste(e)
+            this.handlePaste(e)
           }
         });
     }
