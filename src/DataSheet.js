@@ -67,6 +67,7 @@ export default class DataSheet extends PureComponent {
     document.removeEventListener('cut', this.handleCut)
     document.removeEventListener('copy', this.handleCopy)
     document.removeEventListener('paste', this.handlePaste)
+    document.removeEventListener('keydown', this.handlePaste)
   }
 
   componentDidMount () {
@@ -159,7 +160,13 @@ export default class DataSheet extends PureComponent {
 
       const parse = this.props.parsePaste || defaultParsePaste
       const changes = []
-      const pasteData = parse(e.clipboardData.getData('text/plain'))
+      let pasteData = []
+      if (window.clipboardData && window.clipboardData.getData) { // IE
+        pasteData = parse(window.clipboardData.getData('Text'))
+      } else if (e.clipboardData && e.clipboardData.getData) {
+        pasteData = parse(e.clipboardData.getData('text/plain'))
+      }
+
       // in order of preference
       const { data, onCellsChanged, onPaste, onChange } = this.props
       if (onCellsChanged) {
@@ -404,6 +411,17 @@ export default class DataSheet extends PureComponent {
       editing: editing,
       forceEdit: false
     })
+
+    var ua = window.navigator.userAgent
+    var isIE = /MSIE|Trident/.test(ua)
+    // Listen for Ctrl + V in case of IE
+    if (isIE) {
+        document.addEventListener('keydown', (e) => {
+          if ( (e.keyCode === 86 || e.which === 86) && e.ctrlKey){
+            this.handlePaste(e)
+          }
+        });
+    }
 
     // Keep listening to mouse if user releases the mouse (dragging outside)
     document.addEventListener('mouseup', this.onMouseUp)
