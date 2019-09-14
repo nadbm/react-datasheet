@@ -360,7 +360,7 @@ describe('Component', () => {
           valueRenderer={(cell) => cell.data}
         />)
         component.unmount()
-        expect(removeEvent.callCount).toEqual(5)
+        expect(removeEvent.callCount).toEqual(6)
       })
     })
   })

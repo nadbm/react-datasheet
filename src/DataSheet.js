@@ -416,11 +416,11 @@ export default class DataSheet extends PureComponent {
     var isIE = /MSIE|Trident/.test(ua)
     // Listen for Ctrl + V in case of IE
     if (isIE) {
-        document.addEventListener('keydown', (e) => {
-          if ( (e.keyCode === 86 || e.which === 86) && e.ctrlKey){
-            this.handlePaste(e)
-          }
-        });
+      document.addEventListener('keydown', (e) => {
+        if ((e.keyCode === 86 || e.which === 86) && e.ctrlKey) {
+          this.handlePaste(e)
+        }
+      })
     }
 
     // Keep listening to mouse if user releases the mouse (dragging outside)

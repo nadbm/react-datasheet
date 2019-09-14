@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import mathjs from 'mathjs';
+import * as mathjs from 'mathjs';
 import Datasheet from '../lib/DataSheet'
 
 export default class MathSheet extends React.Component {
@@ -64,7 +64,7 @@ export default class MathSheet extends React.Component {
       return {className: '', value: expr, expr: expr};
     } else {
       try {
-        value = mathjs.eval(expr.substring(1), scope)
+        value = mathjs.evaluate(expr.substring(1), scope)
       } catch(e) {
         value = null
       }

@@ -4,11 +4,11 @@
   "private": true,
   "homepage": "http://nadbm.github.io/react-datasheet",
   "devDependencies": {
-    "react-scripts": "^1.0.6"
+    "react-scripts": "^3.1.1"
   },
   "dependencies": {
-    "gh-pages": "^1.1.0",
-    "mathjs": "^3.10.0",
+    "gh-pages": "^2.1.1",
+    "mathjs": "^6.2.1",
     "react": "^15.4.2",
     "react-dnd": "^2.5.4",
     "react-dnd-html5-backend": "^2.5.4",
@@ -22,5 +22,17 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
