@@ -38,7 +38,8 @@ export default class DataCell extends PureComponent {
     this.state = {updated: false, reverting: false, value: '', committing: false}
   }
 
-  componentWillReceiveProps (nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (initialValue(nextProps) !== initialValue(this.props)) {
       this.setState({updated: true})
       this.timeout = setTimeout(() => this.setState({updated: false}), 700)
