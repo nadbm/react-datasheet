@@ -113,12 +113,12 @@ describe('Component', () => {
             <span className='value-viewer'>5</span>
           </td>).html())
 
-        wrapper.setProps({ editing: true, selected: true })
-
-        expect(wrapper.html()).toEqual(
-          shallow(<td className='cell selected editing'>
-            <input className='data-editor' value='5' />
-          </td>).html())
+        wrapper.setProps({ editing: true, selected: true }, () => {
+          expect(wrapper.html()).toEqual(
+            shallow(<td className='cell selected editing'>
+              <input className='data-editor' value='5' />
+            </td>).html())
+        })
       })
 
       it('should properly render a flash when value changes', () => {
@@ -142,11 +142,13 @@ describe('Component', () => {
             {...props}
           />
         )
-        wrapper.setProps({ cell: { value: 6, data: 6 }})
-        expect(wrapper.html()).toEqual(
-          shallow(<td className='cell updated'>
-            <span className='value-viewer'>6</span>
-          </td>).html())
+        wrapper.setProps({ cell: { value: 6, data: 6 }}, () => {
+          expect(wrapper.html()).toEqual(
+            shallow(<td className='cell updated'>
+              <span className='value-viewer'>6</span>
+            </td>).html())
+        })
+
       })
     })
 
