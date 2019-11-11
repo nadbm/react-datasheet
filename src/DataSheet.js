@@ -401,15 +401,16 @@ export default class DataSheet extends PureComponent {
   }
 
   onMouseDown (i, j, e) {
+    const isNowEditingSameCell = !isEmpty(this.state.editing) && this.state.editing.i === i && this.state.editing.j === j
     let editing = (isEmpty(this.state.editing) || this.state.editing.i !== i || this.state.editing.j !== j)
       ? {} : this.state.editing
 
     this._setState({
-      selecting: true,
+      selecting: !isNowEditingSameCell,
       start: e.shiftKey ? this.state.start : {i, j},
       end: {i, j},
       editing: editing,
-      forceEdit: false
+      forceEdit: !!isNowEditingSameCell
     })
 
     var ua = window.navigator.userAgent
