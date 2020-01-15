@@ -25,7 +25,7 @@
     "build:watch": "watch 'npm run build' ./src",
     "prepublish": "npm run build",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "test": "standard src/*.js && NODE_ENV=test nyc --  mocha ./test/**/*.js --compilers js:babel-register",
+    "test": "standard src/*.js && NODE_ENV=test nyc --  mocha ./test/**/*.js --require babel-core/register",
     "test:watch": "watch 'npm run test' ./test ./src"
   },
   "devDependencies": {

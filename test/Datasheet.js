@@ -1337,6 +1337,181 @@ describe('Component', () => {
     })
   })
 
+  describe('DataSheet component with restricted cell movement (column)', () => {
+    let data = []
+    let component = null
+    let wrapper = null
+    let customWrapper = null
+    const selected = null
+    jsdom()
+
+    beforeEach(() => {
+      data = [
+        [{
+          className: 'test1',
+          data: 4,
+          overflow: 'clip'
+        }, {
+          className: 'test2',
+          data: 2,
+          key: 'custom_key'
+        }, {
+          className: 'test3',
+          data: 3
+        }, {
+          className: 'test4',
+          data: 4
+        }],
+        [{
+          className: 'test5',
+          data: 0,
+          width: '25%'
+        }, {
+          className: 'test6',
+          data: 5,
+          width: 100
+        }, {
+          className: 'test7',
+          data: 5,
+          width: 100
+        }, {
+          className: 'test8',
+          data: 3
+        }]
+      ]
+      component = <DataSheet
+        keyFn={(i) => 'custom_key_' + i}
+        className='test'
+        overflow='nowrap'
+        data={data}
+        valueRenderer={(cell) => cell.data}
+        // only allow navigation to the middle 2 columns
+        isCellNavigable={(cell, row, col, jumpNext) => col === 1 || col === 2}
+        onChange={(cell, i, j, value) => data[i][j].data = value}
+      />
+      wrapper = mount(component)
+    })
+    afterEach(() => {
+      wrapper.instance().removeAllListeners()
+      if (customWrapper) {
+        if ('removeAllListeners' in customWrapper.instance()) {
+          customWrapper.instance().removeAllListeners()
+        }
+        customWrapper = null
+      }
+    })
+
+    it('navigate with tab over restricted cells', () => {
+      // click into row0, col1
+      wrapper.find('td').at(1).simulate('mouseDown')
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 1 })
+      // first tab gets us to row0, col2
+      triggerKeyDownEvent(wrapper.find('td').at(2), TAB_KEY)
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 2 })
+      // next tab gets us to row1, col1
+      triggerKeyDownEvent(wrapper.find('td').at(5), TAB_KEY)
+      expect(wrapper.state('start')).toEqual({ i: 1, j: 1 })
+      // next tab gets us to row1, col2
+      triggerKeyDownEvent(wrapper.find('td').at(6), TAB_KEY)
+      expect(wrapper.state('start')).toEqual({ i: 1, j: 2 })
+      // next tab stays at row1, col2
+      triggerKeyDownEvent(wrapper.find('td').at(7), TAB_KEY)
+      expect(wrapper.state('start')).toEqual({ i: 1, j: 2 })
+    })
+
+    it('navigate with shift tab over restricted cells', () => {
+      // click into row1, col2
+      wrapper.find('td').at(6).simulate('mouseDown')
+      expect(wrapper.state('start')).toEqual({ i: 1, j: 2 })
+      // first shift tab gets us to row1, col1
+      triggerKeyDownEvent(wrapper.find('td').at(6), TAB_KEY, { shiftKey: true })
+      expect(wrapper.state('start')).toEqual({ i: 1, j: 1 })
+      // next shift tab gets us to row0, col2
+      triggerKeyDownEvent(wrapper.find('td').at(5), TAB_KEY, { shiftKey: true })
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 2 })
+      // next shift tab gets us to row0, col1
+      triggerKeyDownEvent(wrapper.find('td').at(3), TAB_KEY, { shiftKey: true })
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 1 })
+      // next shift tab stays at row0, col1
+      triggerKeyDownEvent(wrapper.find('td').at(2), TAB_KEY, { shiftKey: true })
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 1 })
+    })
+  })
+
+  describe('DataSheet component with restricted cell movement (row)', () => {
+    let data = []
+    let component = null
+    let wrapper = null
+    let customWrapper = null
+    const selected = null
+    jsdom()
+
+    beforeEach(() => {
+      data = [
+        [{
+          className: 'test1',
+          data: 4,
+          overflow: 'clip'
+        }, {
+          className: 'test2',
+          data: 2,
+          key: 'custom_key'
+        }, {
+          className: 'test3',
+          data: 3
+        }, {
+          className: 'test4',
+          data: 4
+        }],
+        [{
+          className: 'test5',
+          data: 0,
+          width: '25%'
+        }, {
+          className: 'test6',
+          data: 5,
+          width: 100
+        }, {
+          className: 'test7',
+          data: 5,
+          width: 100
+        }, {
+          className: 'test8',
+          data: 3
+        }]
+      ]
+      component = <DataSheet
+        keyFn={(i) => 'custom_key_' + i}
+        className='test'
+        overflow='nowrap'
+        data={data}
+        valueRenderer={(cell) => cell.data}
+        // only allow navigation in the 2nd row
+        isCellNavigable={(cell, row, col, jumpNext) => row === 1}
+        onChange={(cell, i, j, value) => data[i][j].data = value}
+      />
+      wrapper = mount(component)
+    })
+    afterEach(() => {
+      wrapper.instance().removeAllListeners()
+      if (customWrapper) {
+        if ('removeAllListeners' in customWrapper.instance()) {
+          customWrapper.instance().removeAllListeners()
+        }
+        customWrapper = null
+      }
+    })
+
+    it('navigate with down key over restricted cells', () => {
+      // click into row0, col1
+      wrapper.find('td').at(1).simulate('mouseDown')
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 1 })
+      // first tab gets us to row0, col2
+      triggerKeyDownEvent(wrapper, DOWN_KEY)
+      expect(wrapper.state('start')).toEqual({ i: 1, j: 1 })
+    })
+  })
+
   describe('DataSheet with custom renderers', () => {
     let data = []
     let columns = []

@@ -290,10 +290,10 @@ export default class DataSheet extends PureComponent {
           this._setState({editing: start, clear: {}, forceEdit: true})
           e.preventDefault()
         } else if (numbersPressed ||
-            numPadKeysPressed ||
-            lettersPressed ||
-            latin1Supplement ||
-            equationKeysPressed) {
+          numPadKeysPressed ||
+          lettersPressed ||
+          latin1Supplement ||
+          equationKeysPressed) {
           // empty out cell if user starts typing without pressing enter
           this._setState({editing: start, clear: start, forceEdit: false})
         }
@@ -358,13 +358,48 @@ export default class DataSheet extends PureComponent {
     return data[i] && typeof (data[i][j]) !== 'undefined'
   }
 
+  searchForNextSelectablePos (data, newLocation, jumpRow, offsets) {
+    while (
+      newLocation.i >= 0 && newLocation.i < data.length &&
+      newLocation.j < (data[newLocation.i].length) &&
+      newLocation.j >= 0 &&
+      !this.props.isCellNavigable(data[newLocation.i][newLocation.j], newLocation.i, newLocation.j, jumpRow)
+      ) {
+      newLocation = { i: newLocation.i + offsets.i, j: newLocation.j + offsets.j }
+    }
+    return newLocation
+  }
+
   handleNavigate (e, offsets, jumpRow) {
     if (offsets && (offsets.i || offsets.j)) {
       const {start} = this.getState()
       const { data } = this.props
       let newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
+
       const multiSelect = e.shiftKey && !jumpRow
 
+      if (this.props.isCellNavigable && !multiSelect) {
+        newLocation = this.searchForNextSelectablePos(data, newLocation, jumpRow, offsets)
+        // did we jump over the border?
+        if (newLocation.i >= data.length || newLocation.j < 0 || newLocation.j >= data[newLocation.i].length) {
+          if (!jumpRow) {
+            return
+          }
+          // we are allowed to go to the next row
+          if (offsets.j < 0) {
+            newLocation = { i: start.i - 1, j: data[0].length - 1 }
+          } else {
+            newLocation = { i: start.i + 1, j: 0 }
+          }
+
+          // search for a new valid location in the next row
+          newLocation = this.searchForNextSelectablePos(data, newLocation, false, offsets)
+          if (!this.isCellDefined(newLocation.i, newLocation.j)) {
+            // we haven't found any row that is navigable
+            return
+          }
+        }
+      }
       if (multiSelect) {
         this.updateLocationMultipleCells(offsets)
       } else if (this.isCellDefined(newLocation.i, newLocation.j)) {
@@ -497,9 +532,9 @@ export default class DataSheet extends PureComponent {
     const negY = (i <= start.i && i >= end.i)
 
     return (posX && posY) ||
-        (negX && posY) ||
-        (negX && negY) ||
-        (posX && negY)
+      (negX && posY) ||
+      (negX && negY) ||
+      (posX && negY)
   }
 
   isEditing (i, j) {
@@ -552,7 +587,7 @@ export default class DataSheet extends PureComponent {
                       {... isEditing ? {
                         onEdit: this.handleEdit
                       }
-                      : {}
+                        : {}
                       }
                     />
                   )
@@ -574,6 +609,7 @@ DataSheet.propTypes = {
   onCellsChanged: PropTypes.func,
   onContextMenu: PropTypes.func,
   onSelect: PropTypes.func,
+  isCellNavigable: PropTypes.func,
   selected: PropTypes.shape({
     start: PropTypes.shape({
       i: PropTypes.number,
