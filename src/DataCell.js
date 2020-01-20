@@ -248,7 +248,7 @@ DataCell.propTypes = {
   forceEdit: PropTypes.bool,
   selected: PropTypes.bool,
   editing: PropTypes.bool,
-  editValue: PropTypes.any.isRequired,
+  editValue: PropTypes.any,
   clearing: PropTypes.bool,
   cellRenderer: PropTypes.func,
   valueRenderer: PropTypes.func.isRequired,
@@ -263,7 +263,7 @@ DataCell.propTypes = {
   onContextMenu: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
   onRevert: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired
+  onEdit: PropTypes.func
 }
 
 DataCell.defaultProps = {
