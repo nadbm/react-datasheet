@@ -34,6 +34,7 @@ export default class DataSheet extends PureComponent {
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
     this.handleNavigate = this.handleNavigate.bind(this)
+    this.handleEdit = this.handleEdit.bind(this)
     this.handleKey = this.handleKey.bind(this).bind(this)
     this.handleCut = this.handleCut.bind(this)
     this.handleCopy = this.handleCopy.bind(this)
@@ -244,6 +245,10 @@ export default class DataSheet extends PureComponent {
     } else if (commit && keyCode === ENTER_KEY) {
       this.handleNavigate(e, {i: e.shiftKey ? -1 : 1, j: 0})
     }
+  }
+
+  handleEdit (value) {
+    this.setState({ editValue: value })
   }
 
   handleKey (e) {
@@ -503,6 +508,7 @@ export default class DataSheet extends PureComponent {
             <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
               {
                 row.map((cell, j) => {
+                  const isEditing = this.isEditing(i, j)
                   return (
                     <DataCell
                       key={cell.key ? cell.key : `${i}-${j}`}
@@ -519,7 +525,7 @@ export default class DataSheet extends PureComponent {
                       onNavigate={this.handleKeyboardCellMovement}
                       onKey={this.handleKey}
                       selected={this.isSelected(i, j)}
-                      editing={this.isEditing(i, j)}
+                      editing={isEditing}
                       clearing={this.isClearing(i, j)}
                       attributesRenderer={attributesRenderer}
                       cellRenderer={cellRenderer}
@@ -527,6 +533,12 @@ export default class DataSheet extends PureComponent {
                       dataRenderer={dataRenderer}
                       valueViewer={valueViewer}
                       dataEditor={dataEditor}
+                      editValue={this.state.editValue}
+                      {... isEditing ? {
+                        onEdit: this.handleEdit
+                      }
+                      : {}
+                      }
                     />
                   )
                 })

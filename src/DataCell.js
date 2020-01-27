@@ -43,10 +43,11 @@ export default class DataCell extends PureComponent {
     this.handleContextMenu = this.handleContextMenu.bind(this)
     this.handleDoubleClick = this.handleDoubleClick.bind(this)
 
+    this.getEditValue = this.getEditValue.bind(this)
+
     this.state = {
       updated: false,
       reverting: false,
-      value: '',
       committing: false
     }
   }
@@ -58,7 +59,8 @@ export default class DataCell extends PureComponent {
     }
     if (this.props.editing === true && prevProps.editing === false) {
       const value = this.props.clearing ? '' : initialData(this.props)
-      this.setState({ value, reverting: false })
+      this.setState({ reverting: false })
+      this.props.onEdit(value)
     }
 
     if (
@@ -66,9 +68,9 @@ export default class DataCell extends PureComponent {
       this.props.editing === false &&
       !this.state.reverting &&
       !this.state.committing &&
-      this.state.value !== initialData(this.props)
+      this.props.editValue !== initialData(this.props)
     ) {
-      this.props.onChange(this.props.row, this.props.col, this.state.value)
+      this.props.onChange(this.props.row, this.props.col, this.props.editValue)
     }
   }
 
@@ -77,14 +79,15 @@ export default class DataCell extends PureComponent {
   }
 
   handleChange (value) {
-    this.setState({ value, committing: false })
+    this.setState({ committing: false })
+    this.props.onEdit(value)
   }
 
   handleCommit (value, e) {
     const { onChange, onNavigate } = this.props
     if (value !== initialData(this.props)) {
-      this.setState({ value, committing: true })
-      onChange(this.props.row, this.props.col, value)
+      this.setState({ committing: true })
+      onChange(this.props.row, this.props.col, this.props.editValue)
     } else {
       this.handleRevert()
     }
@@ -143,8 +146,12 @@ export default class DataCell extends PureComponent {
       (!eatKeys && [LEFT_KEY, RIGHT_KEY, UP_KEY, DOWN_KEY].includes(keyCode))
 
     if (commit) {
-      this.handleCommit(this.state.value, e)
+      this.handleCommit(this.getEditValue(), e)
     }
+  }
+
+  getEditValue () {
+    return this.props.editValue === undefined ? '' : this.props.editValue
   }
 
   renderComponent (editing, cell) {
@@ -162,7 +169,7 @@ export default class DataCell extends PureComponent {
           cell={cell}
           row={row}
           col={col}
-          value={this.state.value}
+          value={this.getEditValue()}
           onChange={this.handleChange}
           onCommit={this.handleCommit}
           onRevert={this.handleRevert}
@@ -241,6 +248,7 @@ DataCell.propTypes = {
   forceEdit: PropTypes.bool,
   selected: PropTypes.bool,
   editing: PropTypes.bool,
+  editValue: PropTypes.any,
   clearing: PropTypes.bool,
   cellRenderer: PropTypes.func,
   valueRenderer: PropTypes.func.isRequired,
@@ -254,7 +262,8 @@ DataCell.propTypes = {
   onDoubleClick: PropTypes.func.isRequired,
   onContextMenu: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
-  onRevert: PropTypes.func.isRequired
+  onRevert: PropTypes.func.isRequired,
+  onEdit: PropTypes.func
 }
 
 DataCell.defaultProps = {
