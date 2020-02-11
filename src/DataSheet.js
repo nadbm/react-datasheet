@@ -340,7 +340,8 @@ export default class DataSheet extends PureComponent {
       const oldStartLocation = {i: start.i, j: start.j}
       const newEndLocation = {i: end.i + offsets.i, j: end.j + offsets.j}
 
-      let newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
+      const startJ = start.j + offsets.j
+      let newLocation = {i: start.i + offsets.i, j: (startJ > 0 ? startJ : 0)}
 
       const updateLocation = () => {
         if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
