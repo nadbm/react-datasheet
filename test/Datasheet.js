@@ -1456,7 +1456,8 @@ describe('Component', () => {
           className: 'test2',
           data: 2,
           key: 'custom_key'
-        }, {
+        }],
+        [{
           className: 'test3',
           data: 3
         }, {
@@ -1471,7 +1472,8 @@ describe('Component', () => {
           className: 'test6',
           data: 5,
           width: 100
-        }, {
+        }],
+        [{
           className: 'test7',
           data: 5,
           width: 100
@@ -1486,8 +1488,8 @@ describe('Component', () => {
         overflow='nowrap'
         data={data}
         valueRenderer={(cell) => cell.data}
-        // only allow navigation in the 2nd row
-        isCellNavigable={(cell, row, col, jumpNext) => row === 1}
+        // dont allow navigating into row 2 (index 1)
+        isCellNavigable={(cell, row, col, jumpNext) => row !== 1}
         onChange={(cell, i, j, value) => data[i][j].data = value}
       />
       wrapper = mount(component)
@@ -1502,12 +1504,120 @@ describe('Component', () => {
       }
     })
 
-    it('navigate with down key over restricted cells', () => {
+    it('navigate with down key when inside restricted row should jump to next navigable', () => {
+      // click into row1, col1
+      wrapper.find('td').at(3).simulate('mouseDown')
+      expect(wrapper.state('start')).toEqual({ i: 1, j: 1 })
+      // nav down should get us to next free row
+      triggerKeyDownEvent(wrapper, DOWN_KEY)
+      expect(wrapper.state('start')).toEqual({ i: 2, j: 1 })
+    })
+    it('navigate with up key at the top should stay', () => {
       // click into row0, col1
       wrapper.find('td').at(1).simulate('mouseDown')
       expect(wrapper.state('start')).toEqual({ i: 0, j: 1 })
-      // first tab gets us to row0, col2
+      // navigating up should stay in the top row
+      triggerKeyDownEvent(wrapper, UP_KEY)
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 1 })
+    })
+    it('navigate with up key below restricted row should jump over', () => {
+      // click into row0, col1
+      wrapper.find('td').at(5).simulate('mouseDown')
+      expect(wrapper.state('start')).toEqual({ i: 2, j: 1 })
+      // nav up should jump over row1
+      triggerKeyDownEvent(wrapper, UP_KEY)
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 1 })
+    })
+  })
+
+  describe('DataSheet component with restricted cell movement (top row)', () => {
+    let data = []
+    let component = null
+    let wrapper = null
+    let customWrapper = null
+    const selected = null
+    jsdom()
+
+    beforeEach(() => {
+      data = [
+        [{
+          className: 'test1',
+          data: 4,
+          overflow: 'clip'
+        }, {
+          className: 'test2',
+          data: 2,
+          key: 'custom_key'
+        }],
+        [{
+          className: 'test3',
+          data: 3
+        }, {
+          className: 'test4',
+          data: 4
+        }],
+        [{
+          className: 'test5',
+          data: 0,
+          width: '25%'
+        }, {
+          className: 'test6',
+          data: 5,
+          width: 100
+        }],
+        [{
+          className: 'test7',
+          data: 5,
+          width: 100
+        }, {
+          className: 'test8',
+          data: 3
+        }]
+      ]
+      component = <DataSheet
+        keyFn={(i) => 'custom_key_' + i}
+        className='test'
+        overflow='nowrap'
+        data={data}
+        valueRenderer={(cell) => cell.data}
+        // dont allow navigating into row 1 (index 0)
+        isCellNavigable={(cell, row, col, jumpNext) => row > 0}
+        onChange={(cell, i, j, value) => data[i][j].data = value}
+      />
+      wrapper = mount(component)
+    })
+    afterEach(() => {
+      wrapper.instance().removeAllListeners()
+      if (customWrapper) {
+        if ('removeAllListeners' in customWrapper.instance()) {
+          customWrapper.instance().removeAllListeners()
+        }
+        customWrapper = null
+      }
+    })
+
+    it('navigate with down key when inside restricted row should jump to next navigable', () => {
+      // click into row0, col1
+      wrapper.find('td').at(1).simulate('mouseDown')
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 1 })
+      // nav down should get us to next free row
       triggerKeyDownEvent(wrapper, DOWN_KEY)
+      expect(wrapper.state('start')).toEqual({ i: 1, j: 1 })
+    })
+    it('navigate with up key at the top should stay', () => {
+      // click into row0, col1
+      wrapper.find('td').at(1).simulate('mouseDown')
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 1 })
+      // navigating up should stay in the top row
+      triggerKeyDownEvent(wrapper, UP_KEY)
+      expect(wrapper.state('start')).toEqual({ i: 0, j: 1 })
+    })
+    it('navigate with up key below top row should stay', () => {
+      // click into row1, col1
+      wrapper.find('td').at(3).simulate('mouseDown')
+      expect(wrapper.state('start')).toEqual({ i: 1, j: 1 })
+      // nav up should stay in last navigable row
+      triggerKeyDownEvent(wrapper, UP_KEY)
       expect(wrapper.state('start')).toEqual({ i: 1, j: 1 })
     })
   })

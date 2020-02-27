@@ -381,7 +381,7 @@ export default class DataSheet extends PureComponent {
       if (this.props.isCellNavigable && !multiSelect) {
         newLocation = this.searchForNextSelectablePos(data, newLocation, jumpRow, offsets)
         // did we jump over the border?
-        if (newLocation.i >= data.length || newLocation.j < 0 || newLocation.j >= data[newLocation.i].length) {
+        if (newLocation.i < 0 || newLocation.i >= data.length || newLocation.j < 0 || newLocation.j >= data[newLocation.i].length) {
           if (!jumpRow) {
             return
           }
