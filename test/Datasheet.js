@@ -1386,7 +1386,7 @@ describe('Component', () => {
         data={data}
         valueRenderer={(cell) => cell.data}
         // only allow navigation to the middle 2 columns
-        isCellNavigable={(cell, row, col, jumpNext) => col === 1 || col === 2}
+        isCellNavigable={(cell, row, col) => col === 1 || col === 2}
         onChange={(cell, i, j, value) => data[i][j].data = value}
       />
       wrapper = mount(component)
@@ -1489,7 +1489,7 @@ describe('Component', () => {
         data={data}
         valueRenderer={(cell) => cell.data}
         // dont allow navigating into row 2 (index 1)
-        isCellNavigable={(cell, row, col, jumpNext) => row !== 1}
+        isCellNavigable={(cell, row, col) => row !== 1}
         onChange={(cell, i, j, value) => data[i][j].data = value}
       />
       wrapper = mount(component)
@@ -1581,7 +1581,7 @@ describe('Component', () => {
         data={data}
         valueRenderer={(cell) => cell.data}
         // dont allow navigating into row 1 (index 0)
-        isCellNavigable={(cell, row, col, jumpNext) => row > 0}
+        isCellNavigable={(cell, row, col) => row > 0}
         onChange={(cell, i, j, value) => data[i][j].data = value}
       />
       wrapper = mount(component)

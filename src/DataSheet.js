@@ -353,64 +353,58 @@ export default class DataSheet extends PureComponent {
     })
   }
 
-  isCellDefined (i, j) {
-    const { data } = this.props
-    return data[i] && typeof (data[i][j]) !== 'undefined'
-  }
+  searchForNextSelectablePos (isCellNavigable, data, start, offsets, jumpRow) {
+    const previousRow = (location) => ({ i: location.i - 1, j: data[0].length - 1 })
+    const nextRow = (location) => ({ i: location.i + 1, j: 0 })
+    const advanceOffset = (location) => ({i: location.i + offsets.i, j: location.j + offsets.j})
+    const isCellDefined = ({i, j}) => data[i] && typeof (data[i][j]) !== 'undefined'
 
-  searchForNextSelectablePos (data, newLocation, jumpRow, offsets) {
+    let newLocation = advanceOffset(start)
+
     while (
-      newLocation.i >= 0 && newLocation.i < data.length &&
-      newLocation.j < (data[newLocation.i].length) &&
-      newLocation.j >= 0 &&
-      !this.props.isCellNavigable(data[newLocation.i][newLocation.j], newLocation.i, newLocation.j, jumpRow)
-      ) {
-      newLocation = { i: newLocation.i + offsets.i, j: newLocation.j + offsets.j }
+      isCellDefined(newLocation) &&
+      !isCellNavigable(data[newLocation.i][newLocation.j], newLocation.i, newLocation.j)
+    ) {
+      newLocation = advanceOffset(newLocation)
     }
-    return newLocation
+
+    if (!isCellDefined(newLocation)) {
+      if (!jumpRow) {
+        return null
+      }
+      if (offsets.j < 0) {
+        newLocation = previousRow(newLocation)
+      } else {
+        newLocation = nextRow(newLocation)
+      }
+    }
+
+    if (
+      isCellDefined(newLocation) &&
+      !isCellNavigable(data[newLocation.i][newLocation.j], newLocation.i, newLocation.j)) {
+      return this.searchForNextSelectablePos(isCellNavigable, data, newLocation, offsets, jumpRow)
+    } else if (isCellDefined(newLocation)) {
+      return newLocation
+    } else {
+      return null
+    }
   }
 
   handleNavigate (e, offsets, jumpRow) {
     if (offsets && (offsets.i || offsets.j)) {
-      const {start} = this.getState()
       const { data } = this.props
-      let newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
+      const { start } = this.getState()
 
       const multiSelect = e.shiftKey && !jumpRow
+      const isCellNavigable = this.props.isCellNavigable ? this.props.isCellNavigable : () => true
 
-      if (this.props.isCellNavigable && !multiSelect) {
-        newLocation = this.searchForNextSelectablePos(data, newLocation, jumpRow, offsets)
-        // did we jump over the border?
-        if (newLocation.i < 0 || newLocation.i >= data.length || newLocation.j < 0 || newLocation.j >= data[newLocation.i].length) {
-          if (!jumpRow) {
-            return
-          }
-          // we are allowed to go to the next row
-          if (offsets.j < 0) {
-            newLocation = { i: start.i - 1, j: data[0].length - 1 }
-          } else {
-            newLocation = { i: start.i + 1, j: 0 }
-          }
-
-          // search for a new valid location in the next row
-          newLocation = this.searchForNextSelectablePos(data, newLocation, false, offsets)
-          if (!this.isCellDefined(newLocation.i, newLocation.j)) {
-            // we haven't found any row that is navigable
-            return
-          }
-        }
-      }
       if (multiSelect) {
         this.updateLocationMultipleCells(offsets)
-      } else if (this.isCellDefined(newLocation.i, newLocation.j)) {
-        this.updateLocationSingleCell(newLocation)
-      } else if (jumpRow) {
-        if (offsets.j < 0) {
-          newLocation = {i: start.i - 1, j: data[0].length - 1}
-        } else {
-          newLocation = {i: start.i + 1, j: 0}
+      } else {
+        const newLocation = this.searchForNextSelectablePos(isCellNavigable, data, start, offsets, jumpRow)
+        if (newLocation) {
+          this.updateLocationSingleCell(newLocation)
         }
-        this.updateLocationSingleCell(newLocation)
       }
     }
   }
