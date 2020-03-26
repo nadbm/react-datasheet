@@ -39,6 +39,7 @@ export default class DataSheet extends PureComponent {
     this.handleCut = this.handleCut.bind(this)
     this.handleCopy = this.handleCopy.bind(this)
     this.handlePaste = this.handlePaste.bind(this)
+    this.handleIECopyPaste = this.handleIECopyPaste.bind(this)
     this.pageClick = this.pageClick.bind(this)
     this.onChange = this.onChange.bind(this)
     this.onRevert = this.onRevert.bind(this)
@@ -67,8 +68,10 @@ export default class DataSheet extends PureComponent {
     document.removeEventListener('mouseup', this.onMouseUp)
     document.removeEventListener('cut', this.handleCut)
     document.removeEventListener('copy', this.handleCopy)
+    document.removeEventListener('keydown', this.handleCopy)
     document.removeEventListener('paste', this.handlePaste)
     document.removeEventListener('keydown', this.handlePaste)
+    document.removeEventListener('keydown', this.handleIECopyPaste)
   }
 
   componentDidMount () {
@@ -148,7 +151,12 @@ export default class DataSheet extends PureComponent {
           return value
         }).join('\t')
       ).join('\n')
-      e.clipboardData.setData('text/plain', text)
+
+      if (e.clipboardData) {
+        e.clipboardData.setData('text/plain', text)
+      } else {
+        window.clipboardData.setData('Text', text)
+      }
     }
   }
 
@@ -449,6 +457,16 @@ export default class DataSheet extends PureComponent {
     }
   }
 
+  handleIECopyPaste (e) {
+    if ((e.keyCode === 86 || e.which === 86) && e.ctrlKey) {
+      this.handlePaste(e)
+    }
+
+    if ((e.keyCode === 67 || e.which === 67) && e.ctrlKey) {
+      this.handleCopy(e)
+    }
+  }
+
   onMouseDown (i, j, e) {
     const isNowEditingSameCell = !isEmpty(this.state.editing) && this.state.editing.i === i && this.state.editing.j === j
     let editing = (isEmpty(this.state.editing) || this.state.editing.i !== i || this.state.editing.j !== j)
@@ -464,24 +482,20 @@ export default class DataSheet extends PureComponent {
 
     var ua = window.navigator.userAgent
     var isIE = /MSIE|Trident/.test(ua)
-    // Listen for Ctrl + V in case of IE
+    // Listen for Ctrl + V and Ctrl + V in case of IE
     if (isIE) {
-      document.addEventListener('keydown', (e) => {
-        if ((e.keyCode === 86 || e.which === 86) && e.ctrlKey) {
-          this.handlePaste(e)
-        }
-      })
+      document.addEventListener('keydown', this.handleIECopyPaste)
+    } else {
+      // Cut, copy and paste event handlers for other browsers
+      document.addEventListener('cut', this.handleCut)
+      document.addEventListener('copy', this.handleCopy)
+      document.addEventListener('paste', this.handlePaste)
     }
 
     // Keep listening to mouse if user releases the mouse (dragging outside)
     document.addEventListener('mouseup', this.onMouseUp)
     // Listen for any outside mouse clicks
     document.addEventListener('mousedown', this.pageClick)
-
-    // Cut, copy and paste event handlers
-    document.addEventListener('cut', this.handleCut)
-    document.addEventListener('copy', this.handleCopy)
-    document.addEventListener('paste', this.handlePaste)
   }
 
   onMouseOver (i, j) {
