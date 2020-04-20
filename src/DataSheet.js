@@ -133,7 +133,7 @@ export default class DataSheet extends PureComponent {
     }
   }
 
-  handleIEClipboardEvents(e) {
+  handleIEClipboardEvents (e) {
     if (e.ctrlKey) {
       if (e.keyCode === 67) {
         // C - copy
