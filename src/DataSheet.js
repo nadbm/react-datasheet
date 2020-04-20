@@ -426,6 +426,7 @@ export default class DataSheet extends PureComponent {
           this.updateLocationSingleCell(newLocation)
         }
       }
+      e.preventDefault()
     }
   }
 
