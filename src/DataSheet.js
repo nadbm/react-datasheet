@@ -60,6 +60,7 @@ export default class DataSheet extends PureComponent {
     this.state = this.defaultState
 
     this.removeAllListeners = this.removeAllListeners.bind(this)
+    this.handleIEClipboardEvents = this.handleIEClipboardEvents.bind(this)
   }
 
   removeAllListeners () {
@@ -68,7 +69,7 @@ export default class DataSheet extends PureComponent {
     document.removeEventListener('cut', this.handleCut)
     document.removeEventListener('copy', this.handleCopy)
     document.removeEventListener('paste', this.handlePaste)
-    document.removeEventListener('keydown', this.handlePaste)
+    document.removeEventListener('keydown', this.handleIEClipboardEvents)
   }
 
   componentDidMount () {
@@ -132,6 +133,21 @@ export default class DataSheet extends PureComponent {
     }
   }
 
+  handleIEClipboardEvents(e) {
+    if (e.ctrlKey) {
+      if (e.keyCode === 67) {
+        // C - copy
+        this.handleCopy(e)
+      } else if (e.keyCode === 88) {
+        // X - cut
+        this.handleCut(e)
+      } else if (e.keyCode === 86 || e.which === 86) {
+        // P - patse
+        this.handlePaste(e)
+      }
+    }
+  }
+
   handleCopy (e) {
     if (isEmpty(this.state.editing)) {
       e.preventDefault()
@@ -148,7 +164,11 @@ export default class DataSheet extends PureComponent {
           return value
         }).join('\t')
       ).join('\n')
-      e.clipboardData.setData('text/plain', text)
+      if (window.clipboardData && window.clipboardData.setData) {
+        window.clipboardData.setData('Text', text)
+      } else {
+        e.clipboardData.setData('text/plain', text)
+      }
     }
   }
 
@@ -466,11 +486,7 @@ export default class DataSheet extends PureComponent {
     var isIE = /MSIE|Trident/.test(ua)
     // Listen for Ctrl + V in case of IE
     if (isIE) {
-      document.addEventListener('keydown', (e) => {
-        if ((e.keyCode === 86 || e.which === 86) && e.ctrlKey) {
-          this.handlePaste(e)
-        }
-      })
+      document.addEventListener('keydown', this.handleIEClipboardEvents)
     }
 
     // Keep listening to mouse if user releases the mouse (dragging outside)
