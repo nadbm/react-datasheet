@@ -16,6 +16,7 @@ import CellShape from './CellShape';
 import DataEditor from './DataEditor';
 import ValueViewer from './ValueViewer';
 import { renderValue, renderData } from './renderHelpers';
+import memoize from 'memoizee';
 
 function initialData({ cell, row, col, valueRenderer, dataRenderer }) {
   return renderData(cell, row, col, valueRenderer, dataRenderer);
@@ -29,7 +30,6 @@ function widthStyle(cell) {
   const width = typeof cell.width === 'number' ? cell.width + 'px' : cell.width;
   return width ? { width } : null;
 }
-
 export default class DataCell extends PureComponent {
   constructor(props) {
     super(props);
@@ -154,14 +154,14 @@ export default class DataCell extends PureComponent {
     return this.props.editValue === undefined ? '' : this.props.editValue;
   }
 
-  renderComponent(editing, cell) {
+  renderComponent = (editing, cell) => {
     const { component, readOnly, forceComponent } = cell;
     if ((editing && !readOnly) || forceComponent) {
       return component;
     }
-  }
+  };
 
-  renderEditor(editing, cell, row, col, dataEditor) {
+  renderEditor = (editing, cell, row, col, dataEditor) => {
     if (editing) {
       const Editor = cell.dataEditor || dataEditor || DataEditor;
       return (
@@ -177,13 +177,31 @@ export default class DataCell extends PureComponent {
         />
       );
     }
-  }
+  };
 
-  renderViewer(cell, row, col, valueRenderer, valueViewer) {
+  renderViewer = (cell, row, col, valueRenderer, valueViewer) => {
     const Viewer = cell.valueViewer || valueViewer || ValueViewer;
     const value = renderValue(cell, row, col, valueRenderer);
     return <Viewer cell={cell} row={row} col={col} value={value} />;
-  }
+  };
+
+  renderContent = (
+    editing,
+    cell,
+    row,
+    col,
+    dataEditor,
+    valueRenderer,
+    valueViewer,
+  ) => {
+    return (
+      this.renderComponent(editing, cell) ||
+      this.renderEditor(editing, cell, row, col, dataEditor) ||
+      this.renderViewer(cell, row, col, valueRenderer, valueViewer)
+    );
+  };
+
+  memoizedRenderContent = memoize(this.renderContent);
 
   render() {
     const {
@@ -200,11 +218,18 @@ export default class DataCell extends PureComponent {
       onKeyUp,
     } = this.props;
     const { updated } = this.state;
-
-    const content =
-      this.renderComponent(editing, cell) ||
-      this.renderEditor(editing, cell, row, col, dataEditor) ||
-      this.renderViewer(cell, row, col, valueRenderer, valueViewer);
+    const contentRenderer = editing
+      ? this.renderContent
+      : this.memoizedRenderContent;
+    const content = contentRenderer(
+      editing,
+      cell,
+      row,
+      col,
+      dataEditor,
+      valueRenderer,
+      valueViewer,
+    );
 
     const className = [
       cell.className,
@@ -234,6 +259,7 @@ export default class DataCell extends PureComponent {
         onDoubleClick={this.handleDoubleClick}
         onContextMenu={this.handleContextMenu}
         onKeyUp={onKeyUp}
+        content={content}
       >
         {content}
       </CellRenderer>
