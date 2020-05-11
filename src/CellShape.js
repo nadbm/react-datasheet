@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 /*
 readOnly    Bool    false   Cell will never go in edit mode
 key String  undefined   By default, each cell is given the key of col number and row number. This would override that key
@@ -25,7 +25,7 @@ const CellShape = {
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   overflow: PropTypes.oneOf(['wrap', 'nowrap', 'clip']),
   dataEditor: PropTypes.func,
-  valueViewer: PropTypes.func
-}
+  valueViewer: PropTypes.func,
+};
 
-export default CellShape
+export default CellShape;

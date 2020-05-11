@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 
 import {
   ENTER_KEY,
@@ -8,59 +8,59 @@ import {
   RIGHT_KEY,
   LEFT_KEY,
   UP_KEY,
-  DOWN_KEY
-} from './keys'
+  DOWN_KEY,
+} from './keys';
 
-import Cell from './Cell'
-import CellShape from './CellShape'
-import DataEditor from './DataEditor'
-import ValueViewer from './ValueViewer'
-import { renderValue, renderData } from './renderHelpers'
+import Cell from './Cell';
+import CellShape from './CellShape';
+import DataEditor from './DataEditor';
+import ValueViewer from './ValueViewer';
+import { renderValue, renderData } from './renderHelpers';
 
-function initialData ({ cell, row, col, valueRenderer, dataRenderer }) {
-  return renderData(cell, row, col, valueRenderer, dataRenderer)
+function initialData({ cell, row, col, valueRenderer, dataRenderer }) {
+  return renderData(cell, row, col, valueRenderer, dataRenderer);
 }
 
-function initialValue ({ cell, row, col, valueRenderer }) {
-  return renderValue(cell, row, col, valueRenderer)
+function initialValue({ cell, row, col, valueRenderer }) {
+  return renderValue(cell, row, col, valueRenderer);
 }
 
-function widthStyle (cell) {
-  const width = typeof cell.width === 'number' ? cell.width + 'px' : cell.width
-  return width ? { width } : null
+function widthStyle(cell) {
+  const width = typeof cell.width === 'number' ? cell.width + 'px' : cell.width;
+  return width ? { width } : null;
 }
 
 export default class DataCell extends PureComponent {
-  constructor (props) {
-    super(props)
-    this.handleChange = this.handleChange.bind(this)
-    this.handleCommit = this.handleCommit.bind(this)
-    this.handleRevert = this.handleRevert.bind(this)
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleCommit = this.handleCommit.bind(this);
+    this.handleRevert = this.handleRevert.bind(this);
 
-    this.handleKey = this.handleKey.bind(this)
-    this.handleMouseDown = this.handleMouseDown.bind(this)
-    this.handleMouseOver = this.handleMouseOver.bind(this)
-    this.handleContextMenu = this.handleContextMenu.bind(this)
-    this.handleDoubleClick = this.handleDoubleClick.bind(this)
+    this.handleKey = this.handleKey.bind(this);
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseOver = this.handleMouseOver.bind(this);
+    this.handleContextMenu = this.handleContextMenu.bind(this);
+    this.handleDoubleClick = this.handleDoubleClick.bind(this);
 
-    this.getEditValue = this.getEditValue.bind(this)
+    this.getEditValue = this.getEditValue.bind(this);
 
     this.state = {
       updated: false,
       reverting: false,
-      committing: false
-    }
+      committing: false,
+    };
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     if (initialValue(prevProps) !== initialValue(this.props)) {
-      this.setState({ updated: true })
-      this.timeout = setTimeout(() => this.setState({ updated: false }), 700)
+      this.setState({ updated: true });
+      this.timeout = setTimeout(() => this.setState({ updated: false }), 700);
     }
     if (this.props.editing === true && prevProps.editing === false) {
-      const value = this.props.clearing ? '' : initialData(this.props)
-      this.setState({ reverting: false })
-      this.props.onEdit(value)
+      const value = this.props.clearing ? '' : initialData(this.props);
+      this.setState({ reverting: false });
+      this.props.onEdit(value);
     }
 
     if (
@@ -70,100 +70,100 @@ export default class DataCell extends PureComponent {
       !this.state.committing &&
       this.props.editValue !== initialData(this.props)
     ) {
-      this.props.onChange(this.props.row, this.props.col, this.props.editValue)
+      this.props.onChange(this.props.row, this.props.col, this.props.editValue);
     }
   }
 
-  componentWillUnmount () {
-    clearTimeout(this.timeout)
+  componentWillUnmount() {
+    clearTimeout(this.timeout);
   }
 
-  handleChange (value) {
-    this.setState({ committing: false })
-    this.props.onEdit(value)
+  handleChange(value) {
+    this.setState({ committing: false });
+    this.props.onEdit(value);
   }
 
-  handleCommit (value, e) {
-    const { onChange, onNavigate } = this.props
+  handleCommit(value, e) {
+    const { onChange, onNavigate } = this.props;
     if (value !== initialData(this.props)) {
-      this.setState({ committing: true })
-      onChange(this.props.row, this.props.col, this.props.editValue)
+      this.setState({ committing: true });
+      onChange(this.props.row, this.props.col, this.props.editValue);
     } else {
-      this.handleRevert()
+      this.handleRevert();
     }
     if (e) {
-      e.preventDefault()
-      onNavigate(e, true)
+      e.preventDefault();
+      onNavigate(e, true);
     }
   }
 
-  handleRevert () {
-    this.setState({ reverting: true })
-    this.props.onRevert()
+  handleRevert() {
+    this.setState({ reverting: true });
+    this.props.onRevert();
   }
 
-  handleMouseDown (e) {
-    const { row, col, onMouseDown, cell } = this.props
+  handleMouseDown(e) {
+    const { row, col, onMouseDown, cell } = this.props;
     if (!cell.disableEvents) {
-      onMouseDown(row, col, e)
+      onMouseDown(row, col, e);
     }
   }
 
-  handleMouseOver (e) {
-    const { row, col, onMouseOver, cell } = this.props
+  handleMouseOver(e) {
+    const { row, col, onMouseOver, cell } = this.props;
     if (!cell.disableEvents) {
-      onMouseOver(row, col)
+      onMouseOver(row, col);
     }
   }
 
-  handleDoubleClick (e) {
-    const { row, col, onDoubleClick, cell } = this.props
+  handleDoubleClick(e) {
+    const { row, col, onDoubleClick, cell } = this.props;
     if (!cell.disableEvents) {
-      onDoubleClick(row, col)
+      onDoubleClick(row, col);
     }
   }
 
-  handleContextMenu (e) {
-    const { row, col, onContextMenu, cell } = this.props
+  handleContextMenu(e) {
+    const { row, col, onContextMenu, cell } = this.props;
     if (!cell.disableEvents) {
-      onContextMenu(e, row, col)
+      onContextMenu(e, row, col);
     }
   }
 
-  handleKey (e) {
-    const keyCode = e.which || e.keyCode
+  handleKey(e) {
+    const keyCode = e.which || e.keyCode;
     if (keyCode === ESCAPE_KEY) {
-      return this.handleRevert()
+      return this.handleRevert();
     }
     const {
       cell: { component },
-      forceEdit
-    } = this.props
-    const eatKeys = forceEdit || !!component
+      forceEdit,
+    } = this.props;
+    const eatKeys = forceEdit || !!component;
     const commit =
       keyCode === ENTER_KEY ||
       keyCode === TAB_KEY ||
-      (!eatKeys && [LEFT_KEY, RIGHT_KEY, UP_KEY, DOWN_KEY].includes(keyCode))
+      (!eatKeys && [LEFT_KEY, RIGHT_KEY, UP_KEY, DOWN_KEY].includes(keyCode));
 
     if (commit) {
-      this.handleCommit(this.getEditValue(), e)
+      this.handleCommit(this.getEditValue(), e);
     }
   }
 
-  getEditValue () {
-    return this.props.editValue === undefined ? '' : this.props.editValue
+  getEditValue() {
+    return this.props.editValue === undefined ? '' : this.props.editValue;
   }
 
-  renderComponent (editing, cell) {
-    const { component, readOnly, forceComponent } = cell
+  renderComponent(editing, cell) {
+    const { component, readOnly, forceComponent } = cell;
     if ((editing && !readOnly) || forceComponent) {
-      return component
+      return component;
     }
   }
 
-  renderEditor (editing, cell, row, col, dataEditor) {
+  renderEditor(editing, cell, row, col, dataEditor) {
     if (editing) {
-      const Editor = cell.dataEditor || dataEditor || DataEditor
+      const Editor = cell.dataEditor || dataEditor || DataEditor;
       return (
         <Editor
           cell={cell}
@@ -175,17 +175,17 @@ export default class DataCell extends PureComponent {
           onRevert={this.handleRevert}
           onKeyDown={this.handleKey}
         />
-      )
+      );
     }
   }
 
-  renderViewer (cell, row, col, valueRenderer, valueViewer) {
-    const Viewer = cell.valueViewer || valueViewer || ValueViewer
-    const value = renderValue(cell, row, col, valueRenderer)
-    return <Viewer cell={cell} row={row} col={col} value={value} />
+  renderViewer(cell, row, col, valueRenderer, valueViewer) {
+    const Viewer = cell.valueViewer || valueViewer || ValueViewer;
+    const value = renderValue(cell, row, col, valueRenderer);
+    return <Viewer cell={cell} row={row} col={col} value={value} />;
   }
 
-  render () {
+  render() {
     const {
       row,
       col,
@@ -197,14 +197,14 @@ export default class DataCell extends PureComponent {
       attributesRenderer,
       selected,
       editing,
-      onKeyUp
-    } = this.props
-    const { updated } = this.state
+      onKeyUp,
+    } = this.props;
+    const { updated } = this.state;
 
     const content =
       this.renderComponent(editing, cell) ||
       this.renderEditor(editing, cell, row, col, dataEditor) ||
-      this.renderViewer(cell, row, col, valueRenderer, valueViewer)
+      this.renderViewer(cell, row, col, valueRenderer, valueViewer);
 
     const className = [
       cell.className,
@@ -213,10 +213,10 @@ export default class DataCell extends PureComponent {
       selected && 'selected',
       editing && 'editing',
       cell.readOnly && 'read-only',
-      updated && 'updated'
+      updated && 'updated',
     ]
       .filter(a => a)
-      .join(' ')
+      .join(' ');
 
     return (
       <CellRenderer
@@ -237,7 +237,7 @@ export default class DataCell extends PureComponent {
       >
         {content}
       </CellRenderer>
-    )
+    );
   }
 }
 
@@ -263,13 +263,13 @@ DataCell.propTypes = {
   onContextMenu: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
   onRevert: PropTypes.func.isRequired,
-  onEdit: PropTypes.func
-}
+  onEdit: PropTypes.func,
+};
 
 DataCell.defaultProps = {
   forceEdit: false,
   selected: false,
   editing: false,
   clearing: false,
-  cellRenderer: Cell
-}
+  cellRenderer: Cell,
+};

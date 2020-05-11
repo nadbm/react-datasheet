@@ -18,15 +18,15 @@
   "scripts": {
     "lint": "eslint ./src",
     "lintfix": "eslint ./src --fix",
-    "std": "standard src/*.js",
-    "stdfix": "standard src/*.js --fix",
     "clean": "rimraf dist",
     "build": "babel ./src  --out-dir ./lib && cp src/react-datasheet.css lib",
     "build:watch": "watch 'npm run build' ./src",
     "prepublish": "npm run build",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "test": "standard src/*.js && NODE_ENV=test nyc --  mocha ./test/**/*.js --require babel-core/register",
-    "test:watch": "watch 'npm run test' ./test ./src"
+    "test": "NODE_ENV=test nyc --  mocha ./test/**/*.js --require babel-core/register",
+    "test:watch": "watch 'npm run test' ./test ./src",
+    "format": "prettier --write '{src,test}/**/*.js' --ignore-path docs,.gitignore",
+    "format-test": "prettier-check '**/*.js'"
   },
   "devDependencies": {
     "@types/react": "^16.0.38",
@@ -57,7 +57,6 @@
     "react-dom": "^15.0.0",
     "rimraf": "^2.6.1",
     "sinon": "^1.17.3",
-    "standard": "*",
     "watch": "^1.0.2"
   },
   "peerDependencies": {
@@ -65,11 +64,21 @@
     "react": ">=16",
     "react-dom": ">=16"
   },
-  "dependencies": {},
+  "dependencies": {
+    "husky": "^4.2.5",
+    "prettier": "^2.0.5",
+    "prettier-check": "^2.0.0",
+    "prettier-quick": "0.0.5"
+  },
   "files": [
     "lib",
     "types"
   ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged --pattern '**/*.*(js|jsx)'"
+    }
+  },
   "main": "lib/index.js",
   "types": "types/react-datasheet.d.ts"
 }
