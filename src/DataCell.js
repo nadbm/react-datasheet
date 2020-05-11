@@ -87,7 +87,7 @@ export default class DataCell extends PureComponent {
     const { onChange, onNavigate } = this.props;
     if (value !== initialData(this.props)) {
       this.setState({ committing: true });
-      onChange(this.props.row, this.props.col, this.props.editValue);
+      onChange(this.props.row, this.props.col, value);
     } else {
       this.handleRevert();
     }
