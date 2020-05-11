@@ -65,7 +65,8 @@ const RowRenderer = props => {
   );
 };
 
-const CellRenderer = props => {
+const CellRenderer = React.memo(props => {
+  console.log('RENDER cell');
   const {
     as: Tag,
     cell,
@@ -93,7 +94,7 @@ const CellRenderer = props => {
       {props.children}
     </Tag>
   );
-};
+});
 
 export default class OverrideEverythingSheet extends PureComponent {
   constructor(props) {
@@ -236,7 +237,7 @@ export default class OverrideEverythingSheet extends PureComponent {
   }
 
   handleCellsChanged(changes, additions) {
-    const grid = this.state.grid.map(row => [...row]);
+    const grid = this.state.grid;
     changes.forEach(({ cell, row, col, value }) => {
       grid[row][col] = { ...grid[row][col], value };
     });
