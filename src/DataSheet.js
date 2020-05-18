@@ -631,6 +631,11 @@ export default class DataSheet extends PureComponent {
     return (i >= start.i && i <= end.i) || (i <= start.i && i >= end.i);
   }
 
+  isRowEditing(i) {
+    const { i: editingRow } = this.state.editing;
+    return i == editingRow;
+  }
+
   renderRow = (row, i) => {
     const {
       sheetRenderer: SheetRenderer,
@@ -647,6 +652,9 @@ export default class DataSheet extends PureComponent {
       keyFn,
     } = this.props;
     const { forceEdit } = this.state;
+    if (this.isRowEditing(i)) {
+      this.memoizedRenderRow.delete(row, i);
+    }
 
     return (
       <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
@@ -725,9 +733,9 @@ export default class DataSheet extends PureComponent {
         >
           {data.map((row, i) => {
             if (this.isRowActive(i)) {
-              return this.renderRow(row, i, true);
+              return this.renderRow(row, i);
             } else {
-              return this.memoizedRenderRow(row, i, false);
+              return this.memoizedRenderRow(row, i);
             }
           })}
         </SheetRenderer>
