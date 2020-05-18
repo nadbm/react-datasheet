@@ -628,7 +628,7 @@ export default class DataSheet extends PureComponent {
 
   isRowActive(i) {
     const { start, end } = this.getState();
-    return i >= start.i && i <= end.i;
+    return (i >= start.i && i <= end.i) || (i <= start.i && i >= end.i);
   }
 
   renderRow = (row, i) => {
