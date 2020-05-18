@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import memoize from 'memoizee';
 import Sheet from './Sheet';
 import Row from './Row';
 import Cell from './Cell';
@@ -625,6 +626,71 @@ export default class DataSheet extends PureComponent {
     return this.state.clear.i === i && this.state.clear.j === j;
   }
 
+  isRowActive(i) {
+    const { start, end } = this.getState();
+    return i >= start.i && i <= end.i;
+  }
+
+  renderRow = (row, i) => {
+    const {
+      sheetRenderer: SheetRenderer,
+      rowRenderer: RowRenderer,
+      cellRenderer,
+      dataRenderer,
+      valueRenderer,
+      dataEditor,
+      valueViewer,
+      attributesRenderer,
+      className,
+      overflow,
+      data,
+      keyFn,
+    } = this.props;
+    const { forceEdit } = this.state;
+
+    return (
+      <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
+        {row.map((cell, j) => {
+          const isEditing = this.isEditing(i, j);
+          return (
+            <DataCell
+              key={cell.key ? cell.key : `${i}-${j}`}
+              row={i}
+              col={j}
+              cell={cell}
+              forceEdit={forceEdit}
+              onMouseDown={this.onMouseDown}
+              onMouseOver={this.onMouseOver}
+              onDoubleClick={this.onDoubleClick}
+              onContextMenu={this.onContextMenu}
+              onChange={this.onChange}
+              onRevert={this.onRevert}
+              onNavigate={this.handleKeyboardCellMovement}
+              onKey={this.handleKey}
+              selected={this.isSelected(i, j)}
+              editing={isEditing}
+              clearing={this.isClearing(i, j)}
+              attributesRenderer={attributesRenderer}
+              cellRenderer={cellRenderer}
+              valueRenderer={valueRenderer}
+              dataRenderer={dataRenderer}
+              valueViewer={valueViewer}
+              dataEditor={dataEditor}
+              editValue={this.state.editValue}
+              {...(isEditing
+                ? {
+                    onEdit: this.handleEdit,
+                  }
+                : {})}
+            />
+          );
+        })}
+      </RowRenderer>
+    );
+  };
+
+  memoizedRenderRow = memoize(this.renderRow);
+
   render() {
     const {
       sheetRenderer: SheetRenderer,
@@ -657,45 +723,13 @@ export default class DataSheet extends PureComponent {
             .filter(a => a)
             .join(' ')}
         >
-          {data.map((row, i) => (
-            <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
-              {row.map((cell, j) => {
-                const isEditing = this.isEditing(i, j);
-                return (
-                  <DataCell
-                    key={cell.key ? cell.key : `${i}-${j}`}
-                    row={i}
-                    col={j}
-                    cell={cell}
-                    forceEdit={forceEdit}
-                    onMouseDown={this.onMouseDown}
-                    onMouseOver={this.onMouseOver}
-                    onDoubleClick={this.onDoubleClick}
-                    onContextMenu={this.onContextMenu}
-                    onChange={this.onChange}
-                    onRevert={this.onRevert}
-                    onNavigate={this.handleKeyboardCellMovement}
-                    onKey={this.handleKey}
-                    selected={this.isSelected(i, j)}
-                    editing={isEditing}
-                    clearing={this.isClearing(i, j)}
-                    attributesRenderer={attributesRenderer}
-                    cellRenderer={cellRenderer}
-                    valueRenderer={valueRenderer}
-                    dataRenderer={dataRenderer}
-                    valueViewer={valueViewer}
-                    dataEditor={dataEditor}
-                    editValue={this.state.editValue}
-                    {...(isEditing
-                      ? {
-                          onEdit: this.handleEdit,
-                        }
-                      : {})}
-                  />
-                );
-              })}
-            </RowRenderer>
-          ))}
+          {data.map((row, i) => {
+            if (this.isRowActive(i)) {
+              return this.renderRow(row, i, true);
+            } else {
+              return this.memoizedRenderRow(row, i, false);
+            }
+          })}
         </SheetRenderer>
       </span>
     );
