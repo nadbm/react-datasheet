@@ -260,8 +260,8 @@ export default class DataSheet extends PureComponent {
     const { data, customNavigate } = this.props;
     const isEditing = editing && !isEmpty(editing);
     const currentCell = data[start.i] && data[start.i][start.j];
-    let defaultOffset = { i: 1, j: 0 }
-    let jumpRow = false
+    let defaultOffset = { i: 1, j: 0 };
+    let jumpRow = false;
 
     if (isEditing && !commit) {
       return false;
@@ -289,8 +289,22 @@ export default class DataSheet extends PureComponent {
     } else if (commit && keyCode === ENTER_KEY) {
       defaultOffset = { i: e.shiftKey ? -1 : 1, j: 0 };
     }
-    const [newOffset, newJumpRow] = customNavigate ? customNavigate(currentCell, keyCode, e) || [defaultOffset, jumpRow] : [defaultOffset, jumpRow]
-    this.handleNavigate(e, newOffset, newJumpRow);
+    if (
+      [TAB_KEY, RIGHT_KEY, LEFT_KEY, UP_KEY, DOWN_KEY, ENTER_KEY].includes(
+        keyCode,
+      )
+    ) {
+      const [newOffset, newJumpRow] = customNavigate
+        ? customNavigate(currentCell, keyCode, e) || [defaultOffset, jumpRow]
+        : [defaultOffset, jumpRow];
+      if (keyCode === ENTER_KEY) {
+        if (commit) {
+          this.handleNavigate(e, newOffset, newJumpRow);
+        }
+      } else {
+        this.handleNavigate(e, newOffset, newJumpRow);
+      }
+    }
   }
 
   handleEdit(value) {
