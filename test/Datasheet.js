@@ -834,6 +834,73 @@ describe('Component', () => {
         expect(wrapper.state('selecting')).toEqual(false);
       });
 
+      it('selects multiple field properly 2x2 (click and shift click)', () => {
+        expect(wrapper.find('td.cell.selected').length).toEqual(0);
+        wrapper.find('td').at(0).simulate('mouseDown');
+        wrapper.find('td').at(0).simulate('mouseUp');
+        wrapper.find('td').at(3).simulate('mouseDown', {
+          shiftKey: true,
+        });
+        wrapper.find('td').at(3).simulate('mouseUp', {
+          shiftKey: true,
+        });
+        expect(wrapper.find('td.cell.selected').length).toEqual(4);
+        expect(
+          wrapper.find('td.cell.selected span').nodes.map(n => n.innerHTML),
+        ).toEqual(['4', '2', '0', '5']);
+
+        expect(wrapper.state('selecting')).toEqual(true);
+        expect(wrapper.state('editing')).toEqual({});
+        expect(wrapper.state('start')).toEqual({
+          i: 0,
+          j: 0,
+        });
+        expect(wrapper.state('end')).toEqual({
+          i: 1,
+          j: 1,
+        });
+      });
+
+      it('selects multiple field properly 2x2 (click and shift click) and the selection is controlled', () => {
+        customWrapper = mount(
+          <DataSheet
+            data={data}
+            selected={null}
+            onSelect={selected => customWrapper.setProps({ selected })}
+            valueRenderer={cell => cell.data}
+          />,
+        );
+        expect(customWrapper.find('td.cell.selected').length).toEqual(0);
+        customWrapper.find('td').at(0).simulate('mouseDown');
+        customWrapper.find('td').at(0).simulate('mouseUp');
+        customWrapper.find('td').at(3).simulate('mouseDown', {
+          shiftKey: true,
+        });
+        customWrapper.find('td').at(3).simulate('mouseUp', {
+          shiftKey: true,
+        });
+        expect(customWrapper.find('td.cell.selected').length).toEqual(4);
+        expect(
+          customWrapper
+            .find('td.cell.selected span')
+            .nodes.map(n => n.innerHTML),
+        ).toEqual(['4', '2', '0', '5']);
+
+        expect(customWrapper.state('selecting')).toEqual(true);
+        expect(customWrapper.state('editing')).toEqual({});
+        // Start and end are stored in props for a controlled component
+        expect(customWrapper.state('start')).toEqual({});
+        expect(customWrapper.state('end')).toEqual({});
+        expect(customWrapper.props().selected.start).toEqual({
+          i: 0,
+          j: 0,
+        });
+        expect(customWrapper.props().selected.end).toEqual({
+          i: 1,
+          j: 1,
+        });
+      });
+
       it('calls onSelect prop when a new element is selected', done => {
         customWrapper = mount(
           <DataSheet
