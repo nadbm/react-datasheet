@@ -231,7 +231,6 @@ export default class DataCell extends PureComponent {
         style={widthStyle(cell)}
         onMouseDown={this.handleMouseDown}
         onMouseOver={this.handleMouseOver}
-        onMouseUp={this.props.onMouseUp}
         onDoubleClick={this.handleDoubleClick}
         onContextMenu={this.handleContextMenu}
         onKeyUp={onKeyUp}
