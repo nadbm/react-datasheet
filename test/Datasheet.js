@@ -1262,6 +1262,62 @@ describe('Component', () => {
         expect(pasted).toEqual('');
       });
 
+      it('copies data properly, using handleCopy if defined', () => {
+        let copied = '';
+        const evt = document.createEvent('HTMLEvents');
+        evt.initEvent('copy', false, true);
+        evt.clipboardData = { setData: (type, text) => (copied = text) };
+        customWrapper = mount(
+          <DataSheet
+            data={data}
+            valueRenderer={(cell, i, j) => cell.data}
+            dataRenderer={(cell, i, j) => `{${i},${j}}${cell.data}`}
+            onChange={(cell, i, j, value) => (data[i][j].data = value)}
+            handleCopy={({
+              event,
+              dataRenderer,
+              valueRenderer,
+              data,
+              start,
+              end,
+              range,
+            }) => {
+              const text = range(start.i, end.i)
+                .map(i =>
+                  range(start.j, end.j)
+                    .map(j => {
+                      const cell = data[i][j];
+                      const value = dataRenderer
+                        ? dataRenderer(cell, i, j)
+                        : null;
+                      if (
+                        value === '' ||
+                        value === null ||
+                        typeof value === 'undefined'
+                      ) {
+                        const val = valueRenderer(cell, i, j);
+                        return JSON.stringify(val);
+                      }
+                      return JSON.stringify(value);
+                    })
+                    .join('\t'),
+                )
+                .join('\n');
+              if (window.clipboardData && window.clipboardData.setData) {
+                window.clipboardData.setData('Text', text);
+              } else {
+                event.clipboardData.setData('text/plain', text);
+              }
+            }}
+          />,
+        );
+        customWrapper.find('td').at(0).simulate('mouseDown');
+        customWrapper.find('td').at(3).simulate('mouseOver');
+
+        document.dispatchEvent(evt);
+        expect(copied).toEqual('"{0,0}4"\t"{0,1}2"\n"{1,0}0"\t"{1,1}5"');
+      });
+
       it('does not paste data if no cell is selected', () => {
         const evt = document.createEvent('HTMLEvents');
         evt.initEvent('paste', false, true);

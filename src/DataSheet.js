@@ -166,28 +166,40 @@ export default class DataSheet extends PureComponent {
       const { dataRenderer, valueRenderer, data } = this.props;
       const { start, end } = this.getState();
 
-      const text = range(start.i, end.i)
-        .map(i =>
-          range(start.j, end.j)
-            .map(j => {
-              const cell = data[i][j];
-              const value = dataRenderer ? dataRenderer(cell, i, j) : null;
-              if (
-                value === '' ||
-                value === null ||
-                typeof value === 'undefined'
-              ) {
-                return valueRenderer(cell, i, j);
-              }
-              return value;
-            })
-            .join('\t'),
-        )
-        .join('\n');
-      if (window.clipboardData && window.clipboardData.setData) {
-        window.clipboardData.setData('Text', text);
+      if (this.props.handleCopy) {
+        this.props.handleCopy({
+          event: e,
+          dataRenderer,
+          valueRenderer,
+          data,
+          start,
+          end,
+          range,
+        });
       } else {
-        e.clipboardData.setData('text/plain', text);
+        const text = range(start.i, end.i)
+          .map(i =>
+            range(start.j, end.j)
+              .map(j => {
+                const cell = data[i][j];
+                const value = dataRenderer ? dataRenderer(cell, i, j) : null;
+                if (
+                  value === '' ||
+                  value === null ||
+                  typeof value === 'undefined'
+                ) {
+                  return valueRenderer(cell, i, j);
+                }
+                return value;
+              })
+              .join('\t'),
+          )
+          .join('\n');
+        if (window.clipboardData && window.clipboardData.setData) {
+          window.clipboardData.setData('Text', text);
+        } else {
+          e.clipboardData.setData('text/plain', text);
+        }
       }
     }
   }
@@ -670,6 +682,7 @@ export default class DataSheet extends PureComponent {
                     forceEdit={forceEdit}
                     onMouseDown={this.onMouseDown}
                     onMouseOver={this.onMouseOver}
+                    onMouseUp={this.onMouseUp}
                     onDoubleClick={this.onDoubleClick}
                     onContextMenu={this.onContextMenu}
                     onChange={this.onChange}
@@ -731,6 +744,7 @@ DataSheet.propTypes = {
   parsePaste: PropTypes.func,
   attributesRenderer: PropTypes.func,
   keyFn: PropTypes.func,
+  handleCopy: PropTypes.func,
 };
 
 DataSheet.defaultProps = {
