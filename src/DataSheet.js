@@ -682,7 +682,6 @@ export default class DataSheet extends PureComponent {
                     forceEdit={forceEdit}
                     onMouseDown={this.onMouseDown}
                     onMouseOver={this.onMouseOver}
-                    onMouseUp={this.onMouseUp}
                     onDoubleClick={this.onDoubleClick}
                     onContextMenu={this.onContextMenu}
                     onChange={this.onChange}
