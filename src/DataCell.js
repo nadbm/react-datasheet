@@ -53,7 +53,7 @@ export default class DataCell extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    if (initialValue(prevProps) !== initialValue(this.props)) {
+    if (!this.props.cell.disableUpdatedFlag && initialValue(prevProps) !== initialValue(this.props)) {
       this.setState({ updated: true });
       this.timeout = setTimeout(() => this.setState({ updated: false }), 700);
     }

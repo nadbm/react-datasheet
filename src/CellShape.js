@@ -20,6 +20,7 @@ const CellShape = {
   component: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   forceComponent: PropTypes.bool,
   disableEvents: PropTypes.bool,
+  disableUpdatedFlag: PropTypes.bool,
   colSpan: PropTypes.number,
   rowSpan: PropTypes.number,
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

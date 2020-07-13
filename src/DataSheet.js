@@ -129,6 +129,7 @@ export default class DataSheet extends PureComponent {
   }
 
   pageClick(e) {
+    if(this.props.disablePageClick) return;
     const element = this.dgDom;
     if (!element.contains(e.target)) {
       this.setState(this.defaultState);
@@ -166,28 +167,40 @@ export default class DataSheet extends PureComponent {
       const { dataRenderer, valueRenderer, data } = this.props;
       const { start, end } = this.getState();
 
-      const text = range(start.i, end.i)
-        .map(i =>
-          range(start.j, end.j)
-            .map(j => {
-              const cell = data[i][j];
-              const value = dataRenderer ? dataRenderer(cell, i, j) : null;
-              if (
-                value === '' ||
-                value === null ||
-                typeof value === 'undefined'
-              ) {
-                return valueRenderer(cell, i, j);
-              }
-              return value;
-            })
-            .join('\t'),
-        )
-        .join('\n');
-      if (window.clipboardData && window.clipboardData.setData) {
-        window.clipboardData.setData('Text', text);
+      if (this.props.handleCopy) {
+        this.props.handleCopy({
+          event: e,
+          dataRenderer,
+          valueRenderer,
+          data,
+          start,
+          end,
+          range,
+        });
       } else {
-        e.clipboardData.setData('text/plain', text);
+        const text = range(start.i, end.i)
+          .map(i =>
+            range(start.j, end.j)
+              .map(j => {
+                const cell = data[i][j];
+                const value = dataRenderer ? dataRenderer(cell, i, j) : null;
+                if (
+                  value === '' ||
+                  value === null ||
+                  typeof value === 'undefined'
+                ) {
+                  return valueRenderer(cell, i, j);
+                }
+                return value;
+              })
+              .join('\t'),
+          )
+          .join('\n');
+        if (window.clipboardData && window.clipboardData.setData) {
+          window.clipboardData.setData('Text', text);
+        } else {
+          e.clipboardData.setData('text/plain', text);
+        }
       }
     }
   }
@@ -724,6 +737,7 @@ export default class DataSheet extends PureComponent {
 DataSheet.propTypes = {
   data: PropTypes.array.isRequired,
   className: PropTypes.string,
+  disablePageClick: PropTypes.bool,
   overflow: PropTypes.oneOf(['wrap', 'nowrap', 'clip']),
   onChange: PropTypes.func,
   onCellsChanged: PropTypes.func,
@@ -751,6 +765,7 @@ DataSheet.propTypes = {
   attributesRenderer: PropTypes.func,
   keyFn: PropTypes.func,
   customNavigate: PropTypes.func,
+  handleCopy: PropTypes.func,
 };
 
 DataSheet.defaultProps = {
