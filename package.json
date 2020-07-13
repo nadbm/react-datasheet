@@ -1,6 +1,6 @@
 {
   "name": "react-datasheet",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Excel-like data grid for React",
   "repository": {
     "type": "git",
@@ -48,7 +48,7 @@
     "expect": "^1.20.2",
     "jsdom": "^8.1.0",
     "mocha": "^5.2.0",
-    "mocha-jsdom": "^1.1.0",
+    "mocha-jsdom": "~1.1.0",
     "nodemon": "^1.17.5",
     "nyc": "^14.1.1",
     "prop-types": "^15.5.10",
@@ -68,7 +68,8 @@
     "husky": "^4.2.5",
     "prettier": "^2.0.5",
     "prettier-check": "^2.0.0",
-    "prettier-quick": "0.0.5"
+    "prettier-quick": "0.0.5",
+    "pretty-quick": "^2.0.1"
   },
   "files": [
     "lib",
