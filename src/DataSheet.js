@@ -129,6 +129,7 @@ export default class DataSheet extends PureComponent {
   }
 
   pageClick(e) {
+    if(this.props.disablePageClick) return;
     const element = this.dgDom;
     if (!element.contains(e.target)) {
       this.setState(this.defaultState);
@@ -717,6 +718,7 @@ export default class DataSheet extends PureComponent {
 DataSheet.propTypes = {
   data: PropTypes.array.isRequired,
   className: PropTypes.string,
+  disablePageClick: PropTypes.bool,
   overflow: PropTypes.oneOf(['wrap', 'nowrap', 'clip']),
   onChange: PropTypes.func,
   onCellsChanged: PropTypes.func,
