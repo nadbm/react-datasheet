@@ -69,7 +69,7 @@ class App extends React.Component {
         data={this.state.grid}
         valueRenderer={cell => cell.value}
         onCellsChanged={changes => {
-          const grid = this.state.grid.map(row => [...row]);
+          const grid = this.state.grid;
           changes.forEach(({ cell, row, col, value }) => {
             grid[row][col] = { ...grid[row][col], value };
           });
