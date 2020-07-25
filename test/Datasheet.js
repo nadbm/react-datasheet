@@ -105,7 +105,6 @@ describe('Component', () => {
           onDoubleClick: () => {},
           onContextMenu: () => {},
           onChange: () => {},
-          onEdit: sinon.spy(),
           valueRenderer: cell => cell.value,
         };
         const wrapper = shallow(<DataCell {...props} />);
@@ -117,20 +116,15 @@ describe('Component', () => {
           ).html(),
         );
 
-        wrapper.setProps(
-          { editing: true, selected: true, editValue: 10 },
-          () => {
-            expect(props.onEdit.called).toEqual(true);
-            expect(props.onEdit.calledWith(5)).toEqual(true);
-            expect(wrapper.html()).toEqual(
-              shallow(
-                <td className="cell selected editing">
-                  <input className="data-editor" value="10" />
-                </td>,
-              ).html(),
-            );
-          },
-        );
+        wrapper.setProps({ editing: true, selected: true }, () => {
+          expect(wrapper.html()).toEqual(
+            shallow(
+              <td className="cell selected editing">
+                <input className="data-editor" value="5" />
+              </td>,
+            ).html(),
+          );
+        });
       });
 
       it('should properly render a flash when value changes', () => {
@@ -186,7 +180,6 @@ describe('Component', () => {
           onDoubleClick: () => {},
           onMouseOver: () => {},
           onContextMenu: () => {},
-          onEdit: sinon.spy(),
           valueRenderer: cell => cell.value,
           dataRenderer: cell => cell.data,
         };
@@ -198,7 +191,7 @@ describe('Component', () => {
       });
 
       it('should not call onChange if value is the same', () => {
-        wrapper.setProps({ editing: true, selected: true, editValue: '5' });
+        wrapper.setProps({ editing: true, selected: true });
         expect(wrapper.find('input').node.value).toEqual('5');
         wrapper.find('input').node.value = '5';
         wrapper.find('input').simulate('change');
@@ -207,12 +200,10 @@ describe('Component', () => {
       });
 
       it('should properly call onChange', () => {
-        wrapper.setProps({ editing: true, selected: true, editValue: '5' });
+        wrapper.setProps({ editing: true, selected: true });
         wrapper.find('input').node.value = '6';
         wrapper.find('input').simulate('change');
-        expect(props.onEdit.called).toEqual(true);
-        expect(props.onEdit.calledWith('6')).toEqual(true);
-        wrapper.setProps({ editing: false, selected: true, editValue: '6' });
+        wrapper.setProps({ editing: false, selected: true });
         expect(props.onChange.called).toEqual(true);
         expect(props.onChange.calledWith(props.row, props.col, '6')).toEqual(
           true,
@@ -226,8 +217,6 @@ describe('Component', () => {
       it('input value should be set to value if data is null', () => {
         wrapper.setProps({ cell: { data: null, value: '2' } });
         wrapper.setProps({ editing: true, selected: true, editValue: '2' });
-        expect(props.onEdit.called).toEqual(true);
-        expect(props.onEdit.calledWith('2')).toEqual(true);
         expect(wrapper.find('input').node.value).toEqual('2');
 
         wrapper.find('input').node.value = '2';
@@ -1148,7 +1137,6 @@ describe('Component', () => {
           end: { i: 0, j: 0 },
           selecting: true,
           editing: { i: 0, j: 0 },
-          editValue: 4,
           forceEdit: true,
           clear: {},
         });
@@ -1170,7 +1158,6 @@ describe('Component', () => {
           end: { i: 0, j: 0 },
           selecting: true,
           editing: { i: 0, j: 0 },
-          editValue: '',
           forceEdit: false,
           clear: { i: 0, j: 0 },
         });
@@ -1185,7 +1172,6 @@ describe('Component', () => {
           end: { i: 0, j: 1 }, // RIGHT_KEY movement
           selecting: true,
           editing: {},
-          editValue: '213',
           forceEdit: false,
           clear: { i: 0, j: 0 },
         });
@@ -1203,7 +1189,6 @@ describe('Component', () => {
           end: { i: 0, j: 0 },
           selecting: true,
           editing: { i: 0, j: 0 },
-          editValue: '',
           forceEdit: false,
           clear: { i: 0, j: 0 },
         });
@@ -1213,7 +1198,6 @@ describe('Component', () => {
           end: { i: 0, j: 0 }, // RIGHT_KEY movement
           selecting: true,
           editing: { i: 0, j: 0 },
-          editValue: '',
           forceEdit: false,
           clear: { i: 0, j: 0 },
         });
@@ -1570,7 +1554,6 @@ describe('Component', () => {
           end: {},
           selecting: false,
           editing: {},
-          editValue: 4,
           forceEdit: false,
           clear: {},
         });
