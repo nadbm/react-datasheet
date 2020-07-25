@@ -42,7 +42,6 @@ export default class DataSheet extends PureComponent {
     this.onDoubleClick = this.onDoubleClick.bind(this);
     this.onContextMenu = this.onContextMenu.bind(this);
     this.handleNavigate = this.handleNavigate.bind(this);
-    this.handleEdit = this.handleEdit.bind(this);
     this.handleKey = this.handleKey.bind(this).bind(this);
     this.handleCut = this.handleCut.bind(this);
     this.handleCopy = this.handleCopy.bind(this);
@@ -129,7 +128,7 @@ export default class DataSheet extends PureComponent {
   }
 
   pageClick(e) {
-    if(this.props.disablePageClick) return;
+    if (this.props.disablePageClick) return;
     const element = this.dgDom;
     if (!element.contains(e.target)) {
       this.setState(this.defaultState);
@@ -299,10 +298,6 @@ export default class DataSheet extends PureComponent {
     } else if (commit && keyCode === ENTER_KEY) {
       this.handleNavigate(e, { i: e.shiftKey ? -1 : 1, j: 0 });
     }
-  }
-
-  handleEdit(value) {
-    this.setState({ editValue: value });
   }
 
   handleKey(e) {
@@ -654,7 +649,6 @@ export default class DataSheet extends PureComponent {
       keyFn,
     } = this.props;
     const { forceEdit } = this.state;
-
     return (
       <span
         ref={r => {
@@ -680,7 +674,7 @@ export default class DataSheet extends PureComponent {
                     row={i}
                     col={j}
                     cell={cell}
-                    forceEdit={forceEdit}
+                    forceEdit={false}
                     onMouseDown={this.onMouseDown}
                     onMouseOver={this.onMouseOver}
                     onDoubleClick={this.onDoubleClick}
@@ -698,10 +692,9 @@ export default class DataSheet extends PureComponent {
                     dataRenderer={dataRenderer}
                     valueViewer={valueViewer}
                     dataEditor={dataEditor}
-                    editValue={this.state.editValue}
                     {...(isEditing
                       ? {
-                          onEdit: this.handleEdit,
+                          forceEdit,
                         }
                       : {})}
                   />
