@@ -215,6 +215,7 @@ re-renders.
 | onContextMenu   |           func           | Context menu handler : `function(event, cell, i, j)`                                                                                                                                                                                                                                                      |
 | parsePaste      |           func           | `function (string) {}` If set, the function will be called with the raw clipboard data. It should return an array of arrays of strings. This is useful for when the clipboard may have data with irregular field or line delimiters. If not set, rows will be split with line breaks and cells with tabs. |
 | isCellNavigable |           func           | `function (cell, row, col) {return true}` If set, the function is used to determine whether navigation to the indicated cell should be allowed or not. If not then using cursor or tab navigation will skip over not allowed cells until it finds the next allowed cell.                                  |
+| handleCopy      |           func           | `function ({ event, dataRenderer, valueRenderer, data, start, end, range })` If set, this function is called whenever the user copies cells. The return string of this function is stored on the clipboard.                                                                                                   |
 
 ### Advanced options
 
