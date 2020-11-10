@@ -147,17 +147,17 @@ declare namespace ReactDataSheet {
     export type ContextMenuHandler<T extends Cell<T, V>, V = string> = (event: MouseEvent, cell: T, row : number, col: number) => void;
 
     /* Props available for handleCopy */
-    export type HandleCopyProps<T, V> = {
-        event: Event,
-        dataRenderer: DataRenderer<T, V>,
-        valueRenderer: ValueRenderer<T, V>,
-        data: T[][],
-        start: Location,
-        end: Location,
-        range: (start: number, end: number) => []
+    export interface HandleCopyProps<T extends Cell<T, V>, V = string> {
+        event: Event;
+        dataRenderer: DataRenderer<T, V>;
+        valueRenderer: ValueRenderer<T, V>;
+        data: T[][];
+        start: Location;
+        end: Location;
+        range: (start: number, end: number) => [];
     }
 
-    export type HandleCopyFunction<T, V> = (obj: HandleCopyProps<T, V>) => void;
+    export type HandleCopyFunction<T extends Cell<T, V>, V = string> = (props: HandleCopyProps<T, V>) => void;
 
     /** The properties that will be passed to the CellRenderer component or function. */
     export interface CellRendererProps<T extends Cell<T, V>, V = string> {
