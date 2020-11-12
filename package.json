@@ -65,7 +65,7 @@
     "pretty-quick": "^2.0.1"
   },
   "peerDependencies": {
-    "prop-types": ">=16",
+    "prop-types": ">=15",
     "react": ">=16",
     "react-dom": ">=16"
   },
