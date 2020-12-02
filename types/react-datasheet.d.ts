@@ -55,6 +55,8 @@ declare namespace ReactDataSheet {
         dataEditor?: DataEditor<T, V>;
         /** Method to render the underlying value of the cell function(cell, i, j). This data is visible once in edit mode. */
         dataRenderer?: DataRenderer<T, V>;
+        /** If set to 'false', all key bindings are disabled. Defaults to 'true'. */
+        keyboardEnabled?: boolean;
         /** onCellsChanged handler: function(arrayOfChanges[, arrayOfAdditions]) {}, where changes is an array of objects of the shape {cell, row, col, value}. */
         onCellsChanged?: CellsChangedHandler<T, V>;
         /** Context menu handler : function(event, cell, i, j). */
