@@ -304,51 +304,53 @@ export default class DataSheet extends PureComponent {
     if (e.isPropagationStopped && e.isPropagationStopped()) {
       return;
     }
-    const keyCode = e.which || e.keyCode;
-    const { start, end, editing } = this.getState();
-    const isEditing = editing && !isEmpty(editing);
-    const noCellsSelected = !start || isEmpty(start);
-    const ctrlKeyPressed = e.ctrlKey || e.metaKey;
-    const deleteKeysPressed =
-      keyCode === DELETE_KEY || keyCode === BACKSPACE_KEY;
-    const enterKeyPressed = keyCode === ENTER_KEY;
-    const numbersPressed = keyCode >= 48 && keyCode <= 57;
-    const lettersPressed = keyCode >= 65 && keyCode <= 90;
-    const latin1Supplement = keyCode >= 160 && keyCode <= 255;
-    const numPadKeysPressed = keyCode >= 96 && keyCode <= 105;
-    const currentCell = !noCellsSelected && this.props.data[start.i][start.j];
-    const equationKeysPressed =
-      [
-        187 /* equal */,
-        189 /* substract */,
-        190 /* period */,
-        107 /* add */,
-        109 /* decimal point */,
-        110,
-      ].indexOf(keyCode) > -1;
+    if (this.props.keyboardEnabled) {
+      const keyCode = e.which || e.keyCode;
+      const { start, end, editing } = this.getState();
+      const isEditing = editing && !isEmpty(editing);
+      const noCellsSelected = !start || isEmpty(start);
+      const ctrlKeyPressed = e.ctrlKey || e.metaKey;
+      const deleteKeysPressed =
+        keyCode === DELETE_KEY || keyCode === BACKSPACE_KEY;
+      const enterKeyPressed = keyCode === ENTER_KEY;
+      const numbersPressed = keyCode >= 48 && keyCode <= 57;
+      const lettersPressed = keyCode >= 65 && keyCode <= 90;
+      const latin1Supplement = keyCode >= 160 && keyCode <= 255;
+      const numPadKeysPressed = keyCode >= 96 && keyCode <= 105;
+      const currentCell = !noCellsSelected && this.props.data[start.i][start.j];
+      const equationKeysPressed =
+        [
+          187 /* equal */,
+          189 /* substract */,
+          190 /* period */,
+          107 /* add */,
+          109 /* decimal point */,
+          110,
+        ].indexOf(keyCode) > -1;
 
-    if (noCellsSelected || ctrlKeyPressed) {
-      return true;
-    }
+      if (noCellsSelected || ctrlKeyPressed) {
+        return true;
+      }
 
-    if (!isEditing) {
-      this.handleKeyboardCellMovement(e);
-      if (deleteKeysPressed) {
-        e.preventDefault();
-        this.clearSelectedCells(start, end);
-      } else if (currentCell && !currentCell.readOnly) {
-        if (enterKeyPressed) {
-          this._setState({ editing: start, clear: {}, forceEdit: true });
+      if (!isEditing) {
+        this.handleKeyboardCellMovement(e);
+        if (deleteKeysPressed) {
           e.preventDefault();
-        } else if (
-          numbersPressed ||
-          numPadKeysPressed ||
-          lettersPressed ||
-          latin1Supplement ||
-          equationKeysPressed
-        ) {
-          // empty out cell if user starts typing without pressing enter
-          this._setState({ editing: start, clear: start, forceEdit: false });
+          this.clearSelectedCells(start, end);
+        } else if (currentCell && !currentCell.readOnly) {
+          if (enterKeyPressed) {
+            this._setState({ editing: start, clear: {}, forceEdit: true });
+            e.preventDefault();
+          } else if (
+            numbersPressed ||
+            numPadKeysPressed ||
+            lettersPressed ||
+            latin1Supplement ||
+            equationKeysPressed
+          ) {
+            // empty out cell if user starts typing without pressing enter
+            this._setState({ editing: start, clear: start, forceEdit: false });
+          }
         }
       }
     }
@@ -739,6 +741,7 @@ DataSheet.propTypes = {
   attributesRenderer: PropTypes.func,
   keyFn: PropTypes.func,
   handleCopy: PropTypes.func,
+  keyboardEnabled: PropTypes.bool,
 };
 
 DataSheet.defaultProps = {
@@ -747,4 +750,5 @@ DataSheet.defaultProps = {
   cellRenderer: Cell,
   valueViewer: ValueViewer,
   dataEditor: DataEditor,
+  keyboardEnabled: true,
 };
