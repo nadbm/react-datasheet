@@ -519,7 +519,7 @@ export default class DataSheet extends PureComponent {
         // setTimeout makes sure that component is done handling the event before we take over
         setTimeout(() => {
           func();
-          this.dgDom && this.dgDom.focus();
+          this.dgDom && this.dgDom.focus({ preventScroll: true });
         }, 1);
       }
     }
@@ -600,7 +600,7 @@ export default class DataSheet extends PureComponent {
 
   onRevert() {
     this._setState({ editing: {} });
-    this.dgDom && this.dgDom.focus();
+    this.dgDom && this.dgDom.focus({ preventScroll: true });
   }
 
   componentDidUpdate(prevProps, prevState) {
