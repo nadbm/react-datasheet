@@ -6,7 +6,7 @@ declare namespace ReactDataSheet {
      * interface GridElement extends ReactDataSheet.Cell<GridElement> {
      *      value: number | string | null;
      * }
-     */ 
+     */
     export interface Cell<T extends Cell<T, V>, V = string> {
         /** Optional function or React Component to render a custom editor. Overrides grid-level dataEditor option. Default: undefined. */
         dataEditor?: DataEditor<T, V>
@@ -55,6 +55,8 @@ declare namespace ReactDataSheet {
         dataEditor?: DataEditor<T, V>;
         /** Method to render the underlying value of the cell function(cell, i, j). This data is visible once in edit mode. */
         dataRenderer?: DataRenderer<T, V>;
+        /** Method to handle copying from cell */
+        handleCopy?: HandleCopyFunction<T, V>;
         /** onCellsChanged handler: function(arrayOfChanges[, arrayOfAdditions]) {}, where changes is an array of objects of the shape {cell, row, col, value}. */
         onCellsChanged?: CellsChangedHandler<T, V>;
         /** Context menu handler : function(event, cell, i, j). */
@@ -72,10 +74,10 @@ declare namespace ReactDataSheet {
         /** Optional function or React Component to customize the way the value for each cell in the sheet is displayed. Affects every cell in the sheet. See cell options to override individual cells. */
         valueViewer?: ValueViewer<T, V>;
         /** Optional. Passing a selection format will make the selection controlled, pass a null for usual behaviour**/
-        selected?: Selection | null; 
+        selected?: Selection | null;
         /** Optional. Calls the function whenever the user changes selection**/
         onSelect?: (selection: Selection) => void;
-        /** Optional. Function to set row key. **/ 
+        /** Optional. Function to set row key. **/
         keyFn?: (row: number) => string | number;
         /** Optional: Function that can decide whether navigating to the indicated cell is possible. */
         isCellNavigable?: (cell: T, row: number, col: number, jumpNext: boolean) => boolean;
@@ -92,7 +94,7 @@ declare namespace ReactDataSheet {
 
     /** A function to add attributes to the rendered cell element. It should return an object with properties corresponding to the name and vales of the attributes you wish to add. To wire it up, pass your function to the attributesRenderer property of the ReactDataSheet component. */
     export type AttributesRenderer<T extends Cell<T, V>, V = string> = (cell: T, row: number, col: number) => {};
-    
+
     /** The properties that will be passed to the SheetRenderer component or function. */
     export interface SheetRendererProps<T extends Cell<T, V>, V = string> {
         /** The same data array as from main ReactDataSheet component */
@@ -144,6 +146,19 @@ declare namespace ReactDataSheet {
     /** Context menu handler : function(event, cell, i, j). To wire it up, pass your function to the onContextMenu property of the ReactDataSheet component. */
     export type ContextMenuHandler<T extends Cell<T, V>, V = string> = (event: MouseEvent, cell: T, row : number, col: number) => void;
 
+    /* Props available for handleCopy */
+    export interface HandleCopyProps<T extends Cell<T, V>, V = string> {
+        event: Event;
+        dataRenderer: DataRenderer<T, V>;
+        valueRenderer: ValueRenderer<T, V>;
+        data: T[][];
+        start: Location;
+        end: Location;
+        range: (start: number, end: number) => [];
+    }
+
+    export type HandleCopyFunction<T extends Cell<T, V>, V = string> = (props: HandleCopyProps<T, V>) => void;
+
     /** The properties that will be passed to the CellRenderer component or function. */
     export interface CellRendererProps<T extends Cell<T, V>, V = string> {
         /** The current row index */
@@ -175,7 +190,7 @@ declare namespace ReactDataSheet {
         /** The regular react props.children. You must render {props.children} within your custom renderer or you won't your cell's data. */
         children: ReactNode;
     }
-    
+
     /** A function or React Component to render each cell element. The default renders a td element. To wire it up, pass it to the cellRenderer property of the ReactDataSheet component.  */
     export type CellRenderer<T extends Cell<T, V>, V = string> = React.ComponentClass<CellRendererProps<T, V>> | React.SFC<CellRendererProps<T, V>>;
 
