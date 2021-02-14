@@ -137,7 +137,7 @@ const grid = [
 <ReactDataSheet
   data={grid}
   valueRenderer={(cell) => cell.value}
-  attributesRenderer={(cell) => {'data-hint': cell.hint || {}}
+  attributesRenderer={(cell) => (cell.hint ? { 'data-hint': cell.hint } : {})}
   ...
 />
 ```
