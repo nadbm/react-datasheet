@@ -269,9 +269,11 @@ export default class DataSheet extends PureComponent {
 
   handleKeyboardCellMovement(e, commit = false) {
     const { start, editing } = this.getState();
-    const { data } = this.props;
+    const { data, customNavigate } = this.props;
     const isEditing = editing && !isEmpty(editing);
     const currentCell = data[start.i] && data[start.i][start.j];
+    let defaultOffset = { i: 1, j: 0 };
+    let jumpRow = false;
 
     if (isEditing && !commit) {
       return false;
@@ -286,17 +288,34 @@ export default class DataSheet extends PureComponent {
     }
 
     if (keyCode === TAB_KEY) {
-      this.handleNavigate(e, { i: 0, j: e.shiftKey ? -1 : 1 }, true);
+      defaultOffset = { i: 0, j: e.shiftKey ? -1 : 1 };
+      jumpRow = true;
     } else if (keyCode === RIGHT_KEY) {
-      this.handleNavigate(e, { i: 0, j: 1 });
+      defaultOffset = { i: 0, j: 1 };
     } else if (keyCode === LEFT_KEY) {
-      this.handleNavigate(e, { i: 0, j: -1 });
+      defaultOffset = { i: 0, j: -1 };
     } else if (keyCode === UP_KEY) {
-      this.handleNavigate(e, { i: -1, j: 0 });
+      defaultOffset = { i: -1, j: 0 };
     } else if (keyCode === DOWN_KEY) {
-      this.handleNavigate(e, { i: 1, j: 0 });
+      defaultOffset = { i: 1, j: 0 };
     } else if (commit && keyCode === ENTER_KEY) {
-      this.handleNavigate(e, { i: e.shiftKey ? -1 : 1, j: 0 });
+      defaultOffset = { i: e.shiftKey ? -1 : 1, j: 0 };
+    }
+    if (
+      [TAB_KEY, RIGHT_KEY, LEFT_KEY, UP_KEY, DOWN_KEY, ENTER_KEY].includes(
+        keyCode,
+      )
+    ) {
+      const [newOffset, newJumpRow] = customNavigate
+        ? customNavigate(currentCell, keyCode, e) || [defaultOffset, jumpRow]
+        : [defaultOffset, jumpRow];
+      if (keyCode === ENTER_KEY) {
+        if (commit) {
+          this.handleNavigate(e, newOffset, newJumpRow);
+        }
+      } else {
+        this.handleNavigate(e, newOffset, newJumpRow);
+      }
     }
   }
 
@@ -738,6 +757,7 @@ DataSheet.propTypes = {
   parsePaste: PropTypes.func,
   attributesRenderer: PropTypes.func,
   keyFn: PropTypes.func,
+  customNavigate: PropTypes.func,
   handleCopy: PropTypes.func,
 };
 
