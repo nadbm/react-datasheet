@@ -12,7 +12,6 @@ import {
 } from './keys';
 
 import Cell from './Cell';
-import CellShape from './CellShape';
 import DataEditor from './DataEditor';
 import ValueViewer from './ValueViewer';
 import { renderValue, renderData } from './renderHelpers';
@@ -240,7 +239,7 @@ export default class DataCell extends PureComponent {
 DataCell.propTypes = {
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
-  cell: PropTypes.shape(CellShape).isRequired,
+  cell: PropTypes.any,
   forceEdit: PropTypes.bool,
   selected: PropTypes.bool,
   editing: PropTypes.bool,

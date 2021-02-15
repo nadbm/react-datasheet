@@ -1,12 +1,15 @@
 import React from 'react';
 
-import { shallow, mount, render } from 'enzyme';
 import sinon from 'sinon';
 import expect from 'expect';
 import _ from 'lodash';
 import DataSheet from '../src/DataSheet';
 import DataCell from '../src/DataCell';
 import jsdom from 'mocha-jsdom';
+import Enzyme, { shallow, mount, render } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+
+Enzyme.configure({ adapter: new Adapter() });
 
 const TAB_KEY = 9;
 const ENTER_KEY = 13;
@@ -192,8 +195,8 @@ describe('Component', () => {
 
       it('should not call onChange if value is the same', () => {
         wrapper.setProps({ editing: true, selected: true });
-        expect(wrapper.find('input').node.value).toEqual('5');
-        wrapper.find('input').node.value = '5';
+        expect(wrapper.find('input').instance().value).toEqual('5');
+        wrapper.find('input').instance().value = '5';
         wrapper.find('input').simulate('change');
         wrapper.setProps({ editing: false, selected: true });
         expect(props.onChange.called).toEqual(false);
@@ -201,7 +204,7 @@ describe('Component', () => {
 
       it('should properly call onChange', () => {
         wrapper.setProps({ editing: true, selected: true });
-        wrapper.find('input').node.value = '6';
+        wrapper.find('input').instance().value = '6';
         wrapper.find('input').simulate('change');
         wrapper.setProps({ editing: false, selected: true });
         expect(props.onChange.called).toEqual(true);
@@ -212,14 +215,14 @@ describe('Component', () => {
 
       it('input value should be cleared if we go into editing with clear call', () => {
         wrapper.setProps({ editing: true, selected: true, clearing: true });
-        expect(wrapper.find('input').node.value).toEqual('');
+        expect(wrapper.find('input').instance().value).toEqual('');
       });
       it('input value should be set to value if data is null', () => {
         wrapper.setProps({ cell: { data: null, value: '2' } });
         wrapper.setProps({ editing: true, selected: true, editValue: '2' });
-        expect(wrapper.find('input').node.value).toEqual('2');
+        expect(wrapper.find('input').instance().value).toEqual('2');
 
-        wrapper.find('input').node.value = '2';
+        wrapper.find('input').instance().value = '2';
         wrapper.find('input').simulate('change');
         wrapper.setProps({ editing: false, selected: true, editValue: '2' });
         expect(props.onChange.called).toEqual(false);
@@ -470,7 +473,7 @@ describe('Component', () => {
     describe('rendering with varying props', () => {
       it('renders the proper elements', () => {
         expect(wrapper.find('table').length).toEqual(1);
-        expect(_.values(wrapper.find('table').node.classList)).toEqual([
+        expect(_.values(wrapper.find('table').instance().classList)).toEqual([
           'data-grid',
           'test',
           'nowrap',
@@ -478,7 +481,7 @@ describe('Component', () => {
 
         expect(wrapper.find('td.cell span').length).toEqual(4);
         expect(
-          wrapper.find('td.cell span').nodes.map(n => n.innerHTML),
+          wrapper.find('td.cell span').map(n => n.instance().innerHTML),
         ).toEqual(['4', '2', '0', '5']);
       });
 
@@ -490,7 +493,7 @@ describe('Component', () => {
 
       it('sets the proper classes for the cells', () => {
         expect(
-          wrapper.find('td').nodes.map(n => _.values(n.classList).sort()),
+          wrapper.find('td').map(n => _.values(n.instance().classList).sort()),
         ).toEqual([
           ['cell', 'clip', 'test1'],
           ['cell', 'test2'],
@@ -508,9 +511,9 @@ describe('Component', () => {
           />,
         );
         customWrapper.find('td').first().simulate('doubleClick');
-        expect(customWrapper.find('td.cell input').nodes[0].value).toEqual(
-          '=+4',
-        );
+        expect(
+          customWrapper.find('td.cell input').at(0).instance().value,
+        ).toEqual('=+4');
       });
 
       it('renders proper elements by column', () => {
@@ -532,7 +535,7 @@ describe('Component', () => {
         );
         // expect(wrapper.find('td > span').length).toEqual(6);
         expect(
-          customWrapper.find('td.cell span').nodes.map(n => n.innerHTML),
+          customWrapper.find('td.cell span').map(n => n.instance().innerHTML),
         ).toEqual([
           'Sun, 01 Jan 2017 00:00:00 GMT',
           '4',
@@ -561,9 +564,9 @@ describe('Component', () => {
           />,
         );
         customWrapper.find('td').first().simulate('doubleClick');
-        expect(customWrapper.find('td.cell input').nodes[0].value).toEqual(
-          '2017-01-01T00:00:00.000Z',
-        );
+        expect(
+          customWrapper.find('td.cell input').at(0).instance().value,
+        ).toEqual('2017-01-01T00:00:00.000Z');
       });
 
       it('renders the attributes to the cell if the attributesRenderer is set', () => {
@@ -653,13 +656,16 @@ describe('Component', () => {
             onChange={(cell, i, j, value) => (data[i][j].data = value)}
           />,
         );
-        const cell = customWrapper.find('td').at(1);
+        let cell = customWrapper.find('td').at(1);
         cell.simulate('mouseDown');
         cell.simulate('doubleClick');
-
+        cell = customWrapper.find('td').at(1);
         expect(customWrapper.state('start')).toEqual({ i: 0, j: 1 });
-        cell.find('.custom-component').first().simulate('doubleClick');
-        triggerEvent(customWrapper.find('.data-grid-container').node, TAB_KEY);
+        cell.find('.custom-component').simulate('doubleClick');
+        triggerEvent(
+          customWrapper.find('.data-grid-container').instance(),
+          TAB_KEY,
+        );
         setTimeout(() => {
           expect(customWrapper.state('start')).toEqual({ i: 0, j: 2 });
           done();
@@ -680,11 +686,12 @@ describe('Component', () => {
             onChange={(cell, i, j, value) => (data[i][j].data = value)}
           />,
         );
-        const cell = customWrapper.find('td').at(1);
+        let cell = customWrapper.find('td').at(1);
 
         const selectCell = () => {
           cell.simulate('mouseDown');
           cell.simulate('doubleClick');
+          cell = customWrapper.find('td').at(1);
         };
 
         const checkEnterKey = callback => {
@@ -692,7 +699,7 @@ describe('Component', () => {
           expect(customWrapper.state('start')).toEqual({ i: 0, j: 1 });
           cell.find('.custom-component').first().simulate('doubleClick');
           triggerEvent(
-            customWrapper.find('.data-grid-container').node,
+            customWrapper.find('.data-grid-container').instance(),
             ENTER_KEY,
           );
           setTimeout(() => {
@@ -705,7 +712,7 @@ describe('Component', () => {
           expect(customWrapper.state('start')).toEqual({ i: 0, j: 1 });
           cell.find('.custom-component').first().simulate('doubleClick');
           triggerEvent(
-            customWrapper.find('.data-grid-container').node,
+            customWrapper.find('.data-grid-container').instance(),
             TAB_KEY,
           );
           setTimeout(() => {
@@ -783,7 +790,7 @@ describe('Component', () => {
         wrapper.find('td').at(1).simulate('mouseUp');
         expect(wrapper.find('td.cell.selected').length).toEqual(1);
         expect(
-          wrapper.find('td.cell.selected span').nodes[0].innerHTML,
+          wrapper.find('td.cell.selected span').at(0).instance().innerHTML,
         ).toEqual('2');
       });
 
@@ -793,7 +800,9 @@ describe('Component', () => {
         wrapper.find('td').at(3).simulate('mouseOver');
         expect(wrapper.find('td.cell.selected').length).toEqual(4);
         expect(
-          wrapper.find('td.cell.selected span').nodes.map(n => n.innerHTML),
+          wrapper
+            .find('td.cell.selected span')
+            .map(n => n.instance().innerHTML),
         ).toEqual(['4', '2', '0', '5']);
 
         expect(wrapper.state('selecting')).toEqual(true);
@@ -1064,7 +1073,8 @@ describe('Component', () => {
       it('goes out of edit mode when another cell is clicked', () => {
         cells.at(0).simulate('mouseDown');
         triggerKeyDownEvent(cells.at(0), '1'.charCodeAt(0));
-        wrapper.find('td.cell.selected input').node.value = 213;
+
+        wrapper.find('td.cell.selected input').instance().value = 213;
         wrapper.find('td.cell.selected input').simulate('change');
         cells.at(1).simulate('mouseDown');
         expect(data[0][0].data).toEqual(213);
@@ -1074,7 +1084,7 @@ describe('Component', () => {
       it('goes out of edit mode when ENTER is clicked', () => {
         cells.at(0).simulate('mouseDown');
         triggerKeyDownEvent(cells.at(0), '1'.charCodeAt(0));
-        wrapper.find('td.cell.selected input').node.value = 213;
+        wrapper.find('td.cell.selected input').instance().value = 213;
         wrapper.find('td.cell.selected input').simulate('change');
         wrapper
           .find('td.cell.selected input')
@@ -1086,7 +1096,7 @@ describe('Component', () => {
       it('goes out of edit mode and reverts to original value when ESCAPE is pressed', () => {
         cells.at(0).simulate('mouseDown');
         triggerKeyDownEvent(cells.at(0), '1'.charCodeAt(0));
-        wrapper.find('td.cell.selected input').node.value = 213;
+        wrapper.find('td.cell.selected input').instance().value = 213;
         wrapper.find('td.cell.selected input').simulate('change');
         triggerKeyDownEvent(wrapper.find('td.cell.editing input'), ESCAPE_KEY);
         expect(data[0][0].data).toEqual(4);
@@ -1128,7 +1138,7 @@ describe('Component', () => {
       });
 
       it('updates value properly after double clicking', () => {
-        cells.at(0).simulate('mouseDown');
+        let cell0 = cells.at(0).simulate('mouseDown');
         cells.at(0).simulate('mouseUp');
         cells.at(0).simulate('doubleClick');
 
@@ -1140,12 +1150,12 @@ describe('Component', () => {
           forceEdit: true,
           clear: {},
         });
-
-        cells.at(0).find('input').node.value = 213;
-        cells.at(0).find('input').simulate('change');
-        cells.at(0).find('input').simulate('keydown', { keyCode: RIGHT_KEY });
+        const input = wrapper.find('input');
+        input.instance().value = 213;
+        input.simulate('change');
+        input.simulate('keydown', { keyCode: RIGHT_KEY });
         expect(data[0][0].data).toEqual(4);
-        cells.at(0).find('input').simulate('keydown', { keyCode: TAB_KEY });
+        input.simulate('keydown', { keyCode: TAB_KEY });
         expect(data[0][0].data).toEqual(213);
       });
 
@@ -1153,6 +1163,7 @@ describe('Component', () => {
         cells.at(0).simulate('mouseDown');
         cells.at(0).simulate('mouseUp');
         triggerKeyDownEvent(wrapper, '1'.charCodeAt(0));
+
         expect(wrapper.state()).toEqual({
           start: { i: 0, j: 0 },
           end: { i: 0, j: 0 },
@@ -1161,7 +1172,7 @@ describe('Component', () => {
           forceEdit: false,
           clear: { i: 0, j: 0 },
         });
-        wrapper.find('td.cell.selected input').node.value = 213;
+        wrapper.find('td.cell.selected input').instance().value = 213;
         wrapper.find('td.cell.selected input').simulate('change');
 
         expect(data[0][0].data).toEqual(4);
@@ -1178,9 +1189,12 @@ describe('Component', () => {
       });
 
       it("doesn't moves to the next cell on left/right arrow if cell is a component", () => {
-        data[0][0].component = <div>HELLO</div>;
-        wrapper.setProps({ data: data });
-        expect(wrapper.exists(<div>HELLO</div>)).toEqual(true);
+        data[0][0].component = <div className="test-class">HELLO</div>;
+        wrapper.setProps({ data });
+        wrapper.instance().forceUpdate();
+        wrapper.update();
+
+        const dataGrid = wrapper.find('table');
         cells.at(0).simulate('mouseDown');
         cells.at(0).simulate('mouseUp');
         triggerKeyDownEvent(wrapper, '1'.charCodeAt(0));
@@ -2021,7 +2035,7 @@ describe('Component', () => {
           />
         );
         wrapper = mount(component);
-        const dataGrid = wrapper.childAt(0);
+        const dataGrid = wrapper.find('table');
         expect(dataGrid.hasClass('data-grid')).toEqual(true);
         expect(dataGrid.hasClass('test')).toEqual(true);
         expect(dataGrid.hasClass('height-2')).toEqual(true);
@@ -2054,13 +2068,12 @@ describe('Component', () => {
         wrapper = mount(component);
         // extra row for header
         expect(wrapper.find('tr').length).toEqual(3);
-        expect(wrapper.find('th').nodes.map(n => n.innerHTML)).toEqual(columns);
-        expect(wrapper.find('td span').nodes.map(n => n.innerHTML)).toEqual([
-          '4',
-          '2',
-          '3',
-          '5',
-        ]);
+        expect(wrapper.find('th').map(n => n.instance().innerHTML)).toEqual(
+          columns,
+        );
+        expect(
+          wrapper.find('td span').map(n => n.instance().innerHTML),
+        ).toEqual(['4', '2', '3', '5']);
       });
 
       // custom tr
@@ -2093,7 +2106,7 @@ describe('Component', () => {
         expect(
           wrapper
             .find('ul.data-grid li div.cell span')
-            .nodes.map(n => n.innerHTML),
+            .map(n => n.instance().innerHTML),
         ).toEqual(['4', '2', '3', '5']);
         expect(wrapper.find('DataCell').at(1).key()).toEqual('custom_key');
         expect(
@@ -2118,10 +2131,14 @@ describe('Component', () => {
         );
         wrapper = mount(component);
         expect(
-          wrapper.find('td.cell p.value-viewer').nodes.map(n => n.innerHTML),
+          wrapper
+            .find('td.cell p.value-viewer')
+            .map(n => n.instance().innerHTML),
         ).toEqual(['4']);
         expect(
-          wrapper.find('td.cell div.value-viewer').nodes.map(n => n.innerHTML),
+          wrapper
+            .find('td.cell div.value-viewer')
+            .map(n => n.instance().innerHTML),
         ).toEqual(['2', '3', '5']);
       });
 
@@ -2167,14 +2184,16 @@ describe('Component', () => {
         );
         wrapper = mount(component);
         expect(
-          wrapper.find('.value-viewer').nodes.map(n => n.innerHTML),
+          wrapper.find('.value-viewer').map(n => n.instance().innerHTML),
         ).toEqual(['4', '2', '3', '5']);
 
-        const cells = wrapper.find('td');
-        cells.at(0).simulate('mouseDown');
-        cells.at(0).simulate('mouseUp');
-        cells.at(0).simulate('doubleClick');
-        expect(wrapper.find('td.cell.selected select').node.value).toEqual('4');
+        let cell0 = wrapper.find('td').at(0);
+        cell0.simulate('mouseDown');
+        cell0.simulate('mouseUp');
+        cell0.simulate('doubleClick');
+        expect(
+          wrapper.find('td.cell.selected select').instance().value,
+        ).toEqual('4');
 
         wrapper
           .find('td.cell.selected select')
@@ -2186,8 +2205,8 @@ describe('Component', () => {
 
         // should have gone down one cell on ENTER
         triggerKeyDownEvent(wrapper, ENTER_KEY);
-        const input = cells.at(2).find('input');
-        expect(input.node.value).toEqual('3');
+        const input = wrapper.find('td').at(2).find('input');
+        expect(input.instance().value).toEqual('3');
         input.simulate('change', { target: { value: '1' } });
         triggerKeyDownEvent(input, ENTER_KEY);
         expect(data[1][0].data).toEqual('1');
@@ -2261,13 +2280,17 @@ describe('Component', () => {
       });
 
       it('should be called once on single cell edit', () => {
-        const td = wrapper.find('td').first();
+        let td = wrapper.find('td').first();
         const cell = data[0][0];
         td.simulate('mouseDown');
         triggerKeyDownEvent(td, '1'.charCodeAt(0));
-        td.find('input').node.value = '213';
-        td.find('input').simulate('change');
-        td.find('input').simulate('keydown', { keyCode: ENTER_KEY });
+
+        const input = wrapper.find('td.cell.selected input');
+
+        input.instance().value = '213';
+        input.simulate('change');
+        input.simulate('keydown', { keyCode: ENTER_KEY });
+
         expect(handleChange.callCount).toEqual(1);
         expect(handleChange.firstCall.calledWith(cell, 0, 0, '213')).toEqual(
           true,
@@ -2343,11 +2366,12 @@ describe('Component', () => {
       });
 
       it('should not be called on single cell edit', () => {
-        const td = wrapper.find('td').first();
+        let td = wrapper.find('td').at(0);
         const cell = data[0][0];
         td.simulate('mouseDown');
         triggerKeyDownEvent(td, '1'.charCodeAt(0));
-        td.find('input').node.value = '213';
+        td = wrapper.find('td').at(0);
+        td.find('input').instance().value = '213';
         td.find('input').simulate('change');
         td.find('input').simulate('keydown', { keyCode: ENTER_KEY });
         expect(handleChange.callCount).toEqual(1);
@@ -2420,13 +2444,15 @@ describe('Component', () => {
       });
 
       it('should be called on single cell edit', done => {
-        const td = wrapper.find('td').first();
+        wrapper.find('td').at(0).simulate('mouseDown');
+
+        const td = wrapper.find('td').at(0);
         const cell = data[0][0];
-        td.simulate('mouseDown');
         triggerKeyDownEvent(td, '1'.charCodeAt(0));
-        td.find('input').node.value = '213';
-        td.find('input').simulate('change');
-        td.find('input').simulate('keydown', { keyCode: ENTER_KEY });
+        const input = wrapper.find('td.cell.selected input');
+        input.instance().value = '213';
+        input.simulate('change');
+        input.simulate('keydown', { keyCode: ENTER_KEY });
         expect(handlePaste.called).toBe(false);
         expect(handleCellsChanged.calledOnce).toBe(true);
         expect(

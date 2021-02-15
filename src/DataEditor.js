@@ -1,8 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
-import CellShape from './CellShape';
-
 export default class DataEditor extends PureComponent {
   constructor(props) {
     super(props);
@@ -37,7 +35,7 @@ DataEditor.propTypes = {
   value: PropTypes.node.isRequired,
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
-  cell: PropTypes.shape(CellShape),
+  cell: PropTypes.any,
   onChange: PropTypes.func.isRequired,
   onCommit: PropTypes.func.isRequired,
   onRevert: PropTypes.func.isRequired,

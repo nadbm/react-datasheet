@@ -75,7 +75,6 @@ const Cell = function ({
     ? attributesRenderer(cell, row, col)
     : {};
 
-  console.log('test?');
   return (
     <td
       className={className}
