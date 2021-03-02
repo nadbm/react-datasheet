@@ -165,9 +165,9 @@ export default class DataSheet extends PureComponent {
       e.preventDefault();
       const { dataRenderer, valueRenderer, data } = this.props;
       const { start, end } = this.getState();
-
+      let text;
       if (this.props.handleCopy) {
-        this.props.handleCopy({
+        text = this.props.handleCopy({
           event: e,
           dataRenderer,
           valueRenderer,
@@ -177,7 +177,7 @@ export default class DataSheet extends PureComponent {
           range,
         });
       } else {
-        const text = range(start.i, end.i)
+        text = range(start.i, end.i)
           .map(i =>
             range(start.j, end.j)
               .map(j => {
@@ -195,11 +195,11 @@ export default class DataSheet extends PureComponent {
               .join('\t'),
           )
           .join('\n');
-        if (window.clipboardData && window.clipboardData.setData) {
-          window.clipboardData.setData('Text', text);
-        } else {
-          e.clipboardData.setData('text/plain', text);
-        }
+      }
+      if (window.clipboardData && window.clipboardData.setData) {
+        window.clipboardData.setData('Text', text);
+      } else {
+        e.clipboardData.setData('text/plain', text);
       }
     }
   }
