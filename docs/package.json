@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "gh-pages": "^2.1.1",
-    "mathjs": "^6.2.1",
+    "mathjs": "^7.5.1",
     "react": "^15.4.2",
     "react-dnd": "^2.5.4",
     "react-dnd-html5-backend": "^2.5.4",
