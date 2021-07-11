@@ -192,6 +192,7 @@ export default class DataCell extends PureComponent {
       valueViewer,
       attributesRenderer,
       selected,
+      selecting,
       editing,
       onKeyUp,
     } = this.props;
@@ -220,6 +221,7 @@ export default class DataCell extends PureComponent {
         col={col}
         cell={cell}
         selected={selected}
+        selecting={selecting}
         editing={editing}
         updated={updated}
         attributesRenderer={attributesRenderer}
@@ -243,6 +245,7 @@ DataCell.propTypes = {
   cell: PropTypes.shape(CellShape).isRequired,
   forceEdit: PropTypes.bool,
   selected: PropTypes.bool,
+  selecting: PropTypes.bool,
   editing: PropTypes.bool,
   editValue: PropTypes.any,
   clearing: PropTypes.bool,
