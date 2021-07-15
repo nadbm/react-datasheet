@@ -51,6 +51,8 @@ declare namespace ReactDataSheet {
         className?: string;
         /** Array of rows and each row should contain the cell objects to display. */
         data: T[][];
+        /** Optional: Avoid Datasheet to listen for clicks on the page */
+        disablePageClick?: boolean;
         /** Optional function or React Component to render a custom editor. Affects every cell in the sheet. Affects every cell in the sheet. See cell options to override individual cells. */
         dataEditor?: DataEditor<T, V>;
         /** Method to render the underlying value of the cell function(cell, i, j). This data is visible once in edit mode. */
