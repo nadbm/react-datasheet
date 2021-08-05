@@ -36,7 +36,6 @@
     "@babel/preset-react": "^7.12.13",
     "@babel/preset-typescript": "^7.12.16",
     "@babel/register": "^7.12.13",
-    "@types/react": "^16.0.38",
     "chai": "^3.5.0",
     "coveralls": "^3.0.1",
     "cross-env": "^4.0.0",
@@ -54,18 +53,19 @@
     "prettier-quick": "0.0.5",
     "pretty-quick": "^2.0.1",
     "prop-types": "^15.7.2",
-    "react": "^16.13.1",
     "react-addons-test-utils": "^15.6.2",
-    "react-dom": "^16.13.1",
     "rimraf": "^2.6.1",
     "shx": "^0.3.3",
     "sinon": "^1.17.3",
-    "watch": "^1.0.2"
+    "watch": "^1.0.2",
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   },
   "peerDependencies": {
-    "prop-types": ">=15",
-    "react": ">=16",
-    "react-dom": ">=16"
+    "react": ">=16.8",
+    "react-dom": ">=16.8"
   },
   "files": [
     "lib",
@@ -77,5 +77,6 @@
     }
   },
   "main": "lib/index.js",
-  "types": "types/react-datasheet.d.ts"
+  "types": "types/react-datasheet.d.ts",
+  "dependencies": {}
 }
