@@ -1,4 +1,4 @@
-import { Component, ReactNode, MouseEventHandler} from "react";
+import { Component, ReactNode, KeyboardEventHandler, MouseEventHandler } from "react";
 
 declare namespace ReactDataSheet {
     /** The cell object is what gets passed to the callbacks and events, and contains the basic information about what to show in each cell. You should extend this interface to build a place to store your data.
@@ -189,6 +189,8 @@ declare namespace ReactDataSheet {
         onDoubleClick: MouseEventHandler<HTMLElement>;
         /** Event handler: to launch default content-menu handling. You can safely ignore this handler if you want to provide your own content menu handling. */
         onContextMenu: MouseEventHandler<HTMLElement>;
+        /** Event handler: important for cell selection behavior */
+        onKeyUp: KeyboardEventHandler<HTMLElement>;
         /** The regular react props.children. You must render {props.children} within your custom renderer or you won't your cell's data. */
         children: ReactNode;
     }
