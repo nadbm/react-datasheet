@@ -540,20 +540,17 @@ export default class DataSheet extends PureComponent {
   }
 
   onMouseDown(i, j, e) {
+    const state = this.getState();
     const isNowEditingSameCell =
-      !isEmpty(this.state.editing) &&
-      this.state.editing.i === i &&
-      this.state.editing.j === j;
+      !isEmpty(state.editing) && state.editing.i === i && state.editing.j === j;
     let editing =
-      isEmpty(this.state.editing) ||
-      this.state.editing.i !== i ||
-      this.state.editing.j !== j
+      isEmpty(state.editing) || state.editing.i !== i || state.editing.j !== j
         ? {}
-        : this.state.editing;
+        : state.editing;
 
     this._setState({
       selecting: !isNowEditingSameCell,
-      start: e.shiftKey ? this.state.start : { i, j },
+      start: e.shiftKey ? state.start : { i, j },
       end: { i, j },
       editing: editing,
       forceEdit: !!isNowEditingSameCell,
