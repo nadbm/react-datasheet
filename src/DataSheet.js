@@ -553,7 +553,7 @@ export default class DataSheet extends PureComponent {
 
     this._setState({
       selecting: !isNowEditingSameCell,
-      start: e.shiftKey ? this.state.start : { i, j },
+      start: e.shiftKey ? this.getState().start : { i, j },
       end: { i, j },
       editing: editing,
       forceEdit: !!isNowEditingSameCell,
