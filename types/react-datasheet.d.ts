@@ -175,6 +175,8 @@ declare namespace ReactDataSheet {
         style: object | null | undefined;
         /** Is the cell currently selected */
         selected: boolean;
+        /** Is selecting in progress */
+        selecting: boolean;
         /** Is the cell currently being edited */
         editing: boolean;
         /** Was the cell recently updated */
