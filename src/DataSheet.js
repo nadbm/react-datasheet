@@ -110,6 +110,14 @@ export default class DataSheet extends PureComponent {
   }
 
   _setState(state) {
+    const { editModeChanged } = this.props;
+    if (editModeChanged) {
+      const wasEditing = !isEmpty(this.state.editing);
+      const wilBeEditing = !isEmpty(state);
+      if (wasEditing != wilBeEditing) {
+        editModeChanged(wilBeEditing);
+      }
+    }
     if (this.isSelectionControlled() && ('start' in state || 'end' in state)) {
       let { start, end, ...rest } = state;
       let { selected, onSelect } = this.props;
@@ -739,6 +747,7 @@ DataSheet.propTypes = {
   attributesRenderer: PropTypes.func,
   keyFn: PropTypes.func,
   handleCopy: PropTypes.func,
+  editModeChanged: PropTypes.func,
 };
 
 DataSheet.defaultProps = {
