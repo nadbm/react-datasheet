@@ -111,8 +111,6 @@ export default class DataSheet extends PureComponent {
   _setState(state) {
     const { editModeChanged } = this.props;
     if (editModeChanged && state.editing) {
-      console.log('>>was', this.state.editing);
-      console.log('>>will', state.editing);
       const wasEditing = !isEmpty(this.state.editing);
       const wilBeEditing = !isEmpty(state.editing);
       if (wasEditing != wilBeEditing) {
