@@ -335,6 +335,7 @@ uses a `tr` element. React-DataSheet will supply these properties:
 | Option   | Type               | Description                                                                                                                     |
 | :------- | :----------------- | :------------------------------------------------------------------------------------------------------------------------------ |
 | row      | number             | The current row index                                                                                                           |
+| selected | Bool               | `true` in case the current row is selected                                                                                      |
 | cells    | Array              | The cells in the current row                                                                                                    |
 | children | Array or component | The regular react `props.children`. You must render `{props.children}` within your custom renderer or you won't see your cells. |
 

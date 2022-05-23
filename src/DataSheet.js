@@ -621,6 +621,17 @@ export default class DataSheet extends PureComponent {
     }
   }
 
+  isSelectedRow(rowIndex) {
+    const { start, end } = this.getState();
+    const startY = start.i;
+    const endY = end.i;
+    if (startY <= endY) {
+      return rowIndex >= startY && rowIndex <= endY;
+    } else {
+      return rowIndex <= startY && rowIndex >= endY;
+    }
+  }
+
   isSelected(i, j) {
     const { start, end } = this.getState();
     const posX = j >= start.j && j <= end.j;
@@ -671,7 +682,12 @@ export default class DataSheet extends PureComponent {
             .join(' ')}
         >
           {data.map((row, i) => (
-            <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
+            <RowRenderer
+              key={keyFn ? keyFn(i) : i}
+              row={i}
+              cells={row}
+              selected={this.isSelectedRow(i)}
+            >
               {row.map((cell, j) => {
                 const isEditing = this.isEditing(i, j);
                 return (
