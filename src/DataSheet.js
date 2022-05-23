@@ -54,9 +54,8 @@ export default class DataSheet extends PureComponent {
     this.isClearing = this.isClearing.bind(this);
     this.handleComponentKey = this.handleComponentKey.bind(this);
 
-    this.handleKeyboardCellMovement = this.handleKeyboardCellMovement.bind(
-      this,
-    );
+    this.handleKeyboardCellMovement =
+      this.handleKeyboardCellMovement.bind(this);
 
     this.defaultState = {
       start: {},
@@ -110,6 +109,14 @@ export default class DataSheet extends PureComponent {
   }
 
   _setState(state) {
+    const { editModeChanged } = this.props;
+    if (editModeChanged && state.editing) {
+      const wasEditing = !isEmpty(this.state.editing);
+      const wilBeEditing = !isEmpty(state.editing);
+      if (wasEditing != wilBeEditing) {
+        editModeChanged(wilBeEditing);
+      }
+    }
     if (this.isSelectionControlled() && ('start' in state || 'end' in state)) {
       let { start, end, ...rest } = state;
       let { selected, onSelect } = this.props;
@@ -319,12 +326,8 @@ export default class DataSheet extends PureComponent {
     const currentCell = !noCellsSelected && this.props.data[start.i][start.j];
     const equationKeysPressed =
       [
-        187 /* equal */,
-        189 /* substract */,
-        190 /* period */,
-        107 /* add */,
-        109 /* decimal point */,
-        110,
+        187 /* equal */, 189 /* substract */, 190 /* period */, 107 /* add */,
+        109 /* decimal point */, 110,
       ].indexOf(keyCode) > -1;
 
     if (noCellsSelected || ctrlKeyPressed) {
@@ -742,6 +745,7 @@ DataSheet.propTypes = {
   attributesRenderer: PropTypes.func,
   keyFn: PropTypes.func,
   handleCopy: PropTypes.func,
+  editModeChanged: PropTypes.func,
 };
 
 DataSheet.defaultProps = {
