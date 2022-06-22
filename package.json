@@ -47,7 +47,7 @@
     "eslint-plugin-react": "^4.2.3",
     "expect": "^1.20.2",
     "husky": "^4.2.5",
-    "jsdom": "^8.1.0",
+    "jsdom": "^16.5.0",
     "mocha": "^5.2.0",
     "mocha-jsdom": "~1.1.0",
     "nodemon": "^1.17.5",
