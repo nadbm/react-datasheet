@@ -1,4 +1,4 @@
-import { Component, ReactNode, KeyboardEventHandler, MouseEventHandler } from "react";
+import { Component, ReactNode, KeyboardEventHandler, MouseEventHandler, ComponentType } from 'react';
 
 declare namespace ReactDataSheet {
     /** The cell object is what gets passed to the callbacks and events, and contains the basic information about what to show in each cell. You should extend this interface to build a place to store your data.
@@ -110,7 +110,7 @@ declare namespace ReactDataSheet {
     }
 
     /** Optional function or React Component to render the main sheet element. The default renders a table element. To wire it up, pass your function to the sheetRenderer property of the ReactDataSheet component. */
-    export type SheetRenderer<T extends Cell<T, V>, V = string> = React.ComponentClass<SheetRendererProps<T, V>> | React.SFC<SheetRendererProps<T, V>>;
+    export type SheetRenderer<T extends Cell<T, V>, V = string> = React.ComponentType<SheetRendererProps<T, V>>;
 
     /** The properties that will be passed to the RowRenderer component or function. */
     export interface RowRendererProps<T extends Cell<T, V>, V = string> {
@@ -123,7 +123,7 @@ declare namespace ReactDataSheet {
     }
 
     /** Optional function or React Component to render each row element. The default renders a tr element. To wire it up, pass your function to the rowRenderer property of the ReactDataSheet component. */
-    export type RowRenderer<T extends Cell<T, V>, V = string> = React.ComponentClass<RowRendererProps<T, V>> | React.SFC<RowRendererProps<T, V>>;
+    export type RowRenderer<T extends Cell<T, V>, V = string> = React.ComponentType<RowRendererProps<T, V>>;
 
     /** The arguments that will be passed to the first parameter of the onCellsChanged handler function. These represent all the changes _inside_ the bounds of the existing grid. The first generic parameter (required) indicates the type of the cell property, and the second generic parameter (default: string) indicates the type of the value property. */
     export type CellsChangedArgs<T extends Cell<T, V>, V = string> = {
@@ -198,7 +198,7 @@ declare namespace ReactDataSheet {
     }
 
     /** A function or React Component to render each cell element. The default renders a td element. To wire it up, pass it to the cellRenderer property of the ReactDataSheet component.  */
-    export type CellRenderer<T extends Cell<T, V>, V = string> = React.ComponentClass<CellRendererProps<T, V>> | React.SFC<CellRendererProps<T, V>>;
+    export type CellRenderer<T extends Cell<T, V>, V = string> = React.ComponentType<CellRendererProps<T, V>>;
 
     /** The properties that will be passed to the CellRenderer component or function. */
     export interface ValueViewerProps<T extends Cell<T, V>, V = string> {
@@ -213,7 +213,7 @@ declare namespace ReactDataSheet {
     }
 
     /** Optional function or React Component to customize the way the value for each cell in the sheet is displayed. If it is passed to the valueViewer property of the ReactDataSheet component, it affects every cell in the sheet. Different editors can also be passed to the valueViewer property of each Cell to control each cell separately. */
-    export type ValueViewer<T extends Cell<T, V>, V = string> = React.ComponentClass<ValueViewerProps<T, V>> | React.SFC<ValueViewerProps<T, V>>;
+    export type ValueViewer<T extends Cell<T, V>, V = string> = React.ComponentType<ValueViewerProps<T, V>>;
 
     /** The properties that will be passed to the DataEditor component or function. */
     export interface DataEditorProps<T, V = string> {
@@ -236,7 +236,7 @@ declare namespace ReactDataSheet {
     }
 
     /** A function or React Component to render a custom editor. If it is passed to the dataEditor property of the ReactDataSheet component, it affects every cell in the sheet. Different editors can also be passed to the dataEditor property of each Cell to control each cell separately. */
-    export type DataEditor<T extends Cell<T, V>, V = string> = React.ComponentClass<DataEditorProps<T, V>> | React.SFC<DataEditorProps<T, V>>;
+    export type DataEditor<T extends Cell<T, V>, V = string> = React.ComponentType<DataEditorProps<T, V>>;
 
     export interface CellReference {
         row: number;
