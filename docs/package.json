@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "http://nadbm.github.io/react-datasheet",
   "devDependencies": {
-    "react-scripts": "^3.1.1"
+    "react-scripts": "^5.0.1"
   },
   "dependencies": {
     "gh-pages": "^2.1.1",
